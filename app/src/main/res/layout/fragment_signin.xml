@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragment.signin.SignInFragment"
+    android:background="@color/main_gray_color">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:padding="@dimen/ten"
+        android:layout_margin="@dimen/ten"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/tv_signin_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/signin"
+            android:textSize="30sp"
+            android:textColor="@color/main_green_color"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="45sp"
+            android:fontFamily="sans-serif-light"/>
+
+        <EditText
+            android:id="@+id/et_login_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittextstyle"
+            android:hint="@string/username"
+            android:textColorHint="@color/text_color_hint"
+            android:fontFamily="sans-serif-light"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/black"
+            android:inputType="text"
+            android:layout_below="@id/tv_signin_title" />
+
+        <TextView
+            android:id="@+id/tv_username_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_login_username"
+            android:text="@string/missing_value"
+            android:textColor="#FF0000"
+            android:layout_marginBottom="15sp"
+            android:visibility="gone"
+            android:fontFamily="sans-serif-light"/>
+
+        <EditText
+            android:id="@+id/et_login_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_username_error"
+            android:background="@drawable/edittextstyle"
+            android:hint="@string/password"
+            android:textColorHint="@color/text_color_hint"
+            android:fontFamily="sans-serif-light"
+            android:layout_marginBottom="5dp"
+            android:textColor="@color/black"
+            android:inputType="textPassword"
+            android:layout_marginTop="5dp"/>
+
+        <TextView
+            android:id="@+id/tv_password_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_login_password"
+            android:text="@string/missing_value"
+            android:textColor="#FF0000"
+            android:layout_marginBottom="10sp"
+            android:visibility="gone"
+            android:fontFamily="sans-serif-light"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnsignin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/signin"
+            android:textColor="@color/white"
+            android:background="@drawable/search_transaction_button_background"
+            android:fontFamily="sans-serif-light"
+            android:layout_below="@id/tv_password_error"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="15dp"
+            android:minHeight="39sp"/>
+
+        <TextView
+            android:id="@+id/tvprocessing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btnsignin"
+            android:textColor="@color/footercolor"
+            android:textAlignment="center"
+            android:layout_marginTop="@dimen/ten"
+            android:fontFamily="sans-serif-light"
+            android:textSize="@dimen/mainactionfontsize" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:padding="5dp"
+        android:gravity="center">
+        <ImageView
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:src="@drawable/logomarkgreen" />
+    </RelativeLayout>
+
+</FrameLayout>
