@@ -18,6 +18,7 @@ import com.example.inspectorappupdate.repository.academic_term.AcademicTermRepos
 import com.example.inspectorappupdate.repository.offense.OffenseRepository
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
+import com.example.inspectorappupdate.viewmodel.offense.OffenseViewModel
 import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -40,6 +41,12 @@ class SearchStudentFragment : Fragment() {
 
     // Initialize the view model for the student search
     private val studentViewModel: StudentViewModel by activityViewModels()
+
+    // Initialise the view model for the student offense
+    private val offenseViewModel: OffenseViewModel by activityViewModels()
+
+    // Variable holding the student id
+    var studentID = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -83,9 +90,11 @@ class SearchStudentFragment : Fragment() {
             studentName.append(it.data.first_name)
             studentName.append(" ")
             studentName.append(it.data.last_name)
-
             binding.tvStudentName.text = studentName.toString()
             binding.tvStudentRegNumber.text = it.data.reg_number
+
+            // Set the student id value
+            studentID = it.data.id
         })
 
         // Getting the current academic term
@@ -114,9 +123,12 @@ class SearchStudentFragment : Fragment() {
                 appDatabase.academicTermDao().insert(academicEntity)
 
                 // Get the student discipline
-                val offenseModel = OffenseRepository().getStudentOffense(token, academicModel.data.id, academicModel.data.academic_year_id)
-                Log.i("ACADEMIC-TERM", "$academicModel")
-                Log.i("ACADEMIC-TERM", "$offenseModel")
+//                val offenseModel = OffenseRepository().getStudentOffense(token, academicModel.data.id, academicModel.data.academic_year_id)
+//                Log.i("ACADEMIC-TERM", "$academicModel")
+//                Log.i("ACADEMIC-TERM", "$offenseModel")
+                Log.i("ACADEMIC-TERM", "$studentID -- ${academicModel.data.id}")
+                offenseViewModel.getStudentOffense(token, studentID, academicModel.data.id)
+
             }catch (e: Exception){
                 Log.i("ACADEMIC-TERM", "${e.message}")
             }
