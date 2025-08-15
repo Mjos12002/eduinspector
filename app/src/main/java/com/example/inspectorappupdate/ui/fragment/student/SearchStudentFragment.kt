@@ -95,10 +95,17 @@ class SearchStudentFragment : Fragment() {
 
             // Set the student id value
             studentID = it.data.id
+
+            getCurrentAcademicTerm()
+
         })
 
-        // Getting the current academic term
-        getCurrentAcademicTerm()
+        // Observe the changes in the offenses live data
+        offenseViewModel.offenseLiveData.observe(viewLifecycleOwner, Observer{
+            val lastOffense = it.data.last()
+            binding.tvLastOffense.text = "Last offense: " + lastOffense.offense_type.type_name
+            binding.tvOffenseTerm.text = lastOffense.term.term_name
+        })
 
         return binding.root
     }
