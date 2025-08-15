@@ -23,9 +23,9 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/tv_search_student_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Welcome"
                 android:textColor="@color/white"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="@dimen/fifteen"
@@ -49,6 +49,7 @@
             android:padding="1sp">
 
             <ImageView
+                android:id="@+id/imv_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_search_24"
@@ -56,9 +57,10 @@
                 android:layout_weight="1"/>
 
             <EditText
+                android:id="@+id/tv_search_student"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Search..."
+                android:hint="@string/search"
                 android:layout_weight="6"
                 android:background="@drawable/search_edittext_style"/>
 

@@ -6,8 +6,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.databinding.FragmentSearchStudentBinding
+import com.example.inspectorappupdate.utils.AppDatabase
+import com.example.inspectorappupdate.utils.DbUtility
+import kotlinx.coroutines.launch
+import java.lang.StringBuilder
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,6 +37,27 @@ class SearchStudentFragment : Fragment() {
     ): View? {
         // Initialize the fragment
         _binding = FragmentSearchStudentBinding.inflate(inflater, container, false)
+
+        // Initialize the local database utility
+        appDatabase = DbUtility().dbBuilder(requireContext())
+
+        // Get from the local database the first name and last name of the user logged in
+        lifecycleScope.launch {
+            val msgBuilder = StringBuilder()
+            val firstName = appDatabase.loggedInUserDao().getLastLogin().firstName
+            val lastName = appDatabase.loggedInUserDao().getLastLogin().lastName
+            msgBuilder.append("Welcome ")
+            msgBuilder.append(firstName)
+            msgBuilder.append(" ")
+            msgBuilder.append(lastName)
+
+            binding.tvSearchStudentHeader.text = msgBuilder.toString()
+        }
+
+        binding.imvSearch.setOnClickListener {
+
+        }
+
         return binding.root
     }
 
@@ -41,15 +67,7 @@ class SearchStudentFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SearchStudentFragment.
-         */
-        // TODO: Rename and change types and number of parameters
+        lateinit var appDatabase: AppDatabase
 
     }
 }

@@ -8,10 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -19,10 +17,8 @@ import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.SearchStudentActivity
 import com.example.inspectorappupdate.databinding.FragmentSigninBinding
 import com.example.inspectorappupdate.entity.user.LoggedInUserEntity
-import com.example.inspectorappupdate.model.auth.CredentialsTextLengthCheck
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
-import com.example.inspectorappupdate.utils.auth.UserAuthUtil
 import com.example.inspectorappupdate.viewmodel.signin.SignInViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
