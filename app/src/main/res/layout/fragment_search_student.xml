@@ -36,38 +36,146 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_below="@id/rl_header_title"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:layout_marginTop="10dp">
+
+        <RelativeLayout
+            android:id="@+id/rl_search_student"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/search_parent_style"
+                android:weightSum="7"
+                android:padding="1sp">
+
+                <ImageView
+                    android:id="@+id/imv_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/outline_search_24"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"/>
+
+                <EditText
+                    android:id="@+id/et_search_student"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search"
+                    android:layout_weight="6"
+                    android:background="@drawable/search_edittext_style"/>
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_student_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:layout_below="@id/rl_search_student"
+            android:padding="10dp"
+            android:background="@color/main_gray_color">
+
+            <TextView
+                android:id="@+id/tv_student_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:textSize="30sp"
+                android:fontFamily="sans-serif-black"/>
+
+            <TextView
+                android:id="@+id/tv_student_reg_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_student_name"
+                android:layout_marginTop="5sp" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_student_details"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
-            android:background="@drawable/search_parent_style"
-            android:weightSum="7"
-            android:padding="1sp">
+            android:weightSum="5">
 
-            <ImageView
-                android:id="@+id/imv_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/outline_search_24"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"/>
+            <RelativeLayout
+                android:id="@+id/rl_deduction_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/mainGreen"
+                android:layout_weight="4">
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/backward_arrow_icon" />
+            </RelativeLayout>
 
-            <EditText
-                android:id="@+id/tv_search_student"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/search"
-                android:layout_weight="6"
-                android:background="@drawable/search_edittext_style"/>
+                android:layout_weight="1"
+                android:background="@drawable/search_parent_style">
+                <TextView
+                    android:id="@+id/tv_total_deduction_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Total deductions"
+                    android:textAlignment="center"
+                    android:textSize="25sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_alignParentTop="true"/>
+
+                <TextView
+                    android:id="@+id/tv_total_deduction_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="40"
+                    android:layout_below="@id/tv_total_deduction_title"
+                    android:layout_marginTop="20sp"
+                    android:textAlignment="center"
+                    android:textSize="40sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="20sp"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_total_deduction_value">
+
+                    <TextView
+                        android:id="@+id/tv_last_offense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:text="Last offense: Kurwana"/>
+
+                    <TextView
+                        android:id="@+id/tv_offense_term"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="3rd term"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
-
     </RelativeLayout>
+
+
 
 
 </RelativeLayout>

@@ -29,7 +29,6 @@ class StudentRepository() {
             resp = if (res.code() == 200) {
                 res.body()!!
             } else {
-
                 val errorResponse = res.errorBody()?.string()
                 val errorJSONObject = Gson().fromJson(errorResponse, StudentModel::class.java)
                 StudentModel(res.code(), true, errorJSONObject.message, data = StudentData(0, "", "", ""))
