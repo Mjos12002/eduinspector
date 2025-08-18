@@ -38,6 +38,9 @@ import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 import java.lang.Exception
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -66,6 +69,8 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
     var academicYearID = 0
     var academicTermID = 0
 
+    var userToken = ""
+
     // Offense Typese List
     lateinit var offenseTypeList : List<OffenseTypeData>
 
@@ -88,6 +93,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
             val msgBuilder = StringBuilder()
             val firstName = appDatabase.loggedInUserDao().getLastLogin().firstName
             val lastName = appDatabase.loggedInUserDao().getLastLogin().lastName
+            userToken = appDatabase.loggedInUserDao().getLastLogin().token
             msgBuilder.append(getString(R.string.welcome))
             msgBuilder.append(", ")
             msgBuilder.append(firstName)
@@ -197,6 +203,11 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         val x = view.findViewById<AppCompatButton>(R.id.btn_add_offense)
         x.setOnClickListener {
+            lifecycleScope.launch {
+                val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+                val resp = OffenseRepository().createStudentOffense(userToken, studentID, offenseTypeID, academicYearID, academicTermID, date, 1)
+                Log.i("ITEM-SELECTED", "$resp")
+            }
 
             Log.i("ITEM-SELECTED", "$offenseTypeID $studentID $academicYearID $academicTermID")
         }
