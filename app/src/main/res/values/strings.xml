@@ -130,6 +130,7 @@
     <string name="attendance_message">Enter ID and TAP the card</string>
     <string name="card_details">Card Details</string>
     <string name="startdate">Start date</string>
+    <string name="add">Add</string>
     <string name="endddate">End date</string>
     <string name="card_id">Card ID</string>
     <string name="start_date">Start Date</string>

@@ -1,25 +1,41 @@
 package com.example.inspectorappupdate.ui.fragment.student
 
+import android.app.Dialog
+import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.AppCompatButton
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.databinding.FragmentSearchStudentBinding
 import com.example.inspectorappupdate.entity.academic_term.AcademicTermEntity
+import com.example.inspectorappupdate.model.offense_type.OffenseTypeData
 import com.example.inspectorappupdate.repository.academic_term.AcademicTermRepository
 import com.example.inspectorappupdate.repository.offense.OffenseRepository
+import com.example.inspectorappupdate.repository.offense_type.OffenseTypeRepository
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.viewmodel.offense.OffenseViewModel
 import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
@@ -33,7 +49,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [SearchStudentFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class SearchStudentFragment : Fragment() {
+class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     // Binding to the fragment UI
     private var _binding : FragmentSearchStudentBinding? = null
@@ -47,6 +63,13 @@ class SearchStudentFragment : Fragment() {
 
     // Variable holding the student id
     var studentID = 0
+    var academicYearID = 0
+    var academicTermID = 0
+
+    // Offense Typese List
+    lateinit var offenseTypeList : List<OffenseTypeData>
+
+    var offenseTypeID = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -103,16 +126,86 @@ class SearchStudentFragment : Fragment() {
         // Observe the changes in the offenses live data
         offenseViewModel.offenseLiveData.observe(viewLifecycleOwner, Observer{
             val lastOffense = it.data.last()
-            binding.tvLastOffense.text = "Last offense: " + lastOffense.offense_type.type_name
+            binding.tvLastOffense.text = "Last offense: "  + lastOffense.offense_type.type_name
             binding.tvOffenseTerm.text = lastOffense.term.term_name
+            val counter = it.data.sumOf { it.marks_deducted }
+            binding.tvTotalDeductionValue.text = "$counter"
         })
 
+        // Add event to add deduction
+        binding.imgAddDeduction.setOnClickListener {
+            showViewToDeductMarks(requireContext())
+        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.i("Welcome", "Hello World")
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun loadOffense(): Array<String>{
+
+        lifecycleScope.launch {
+            val token = appDatabase.loggedInUserDao().getLastLogin().token
+            val offenseType = OffenseTypeRepository().getOffenseType(token)
+
+        }
+        return arrayOf("")
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun showViewToDeductMarks(context: Context) {
+
+
+
+        val dialog = BottomSheetDialog(context)
+
+        val view = layoutInflater.inflate(R.layout.discipline_deduction, null)
+        val spin = view.findViewById<Spinner>(R.id.spn_offense)
+        loadOffense()
+
+        lifecycleScope.launch {
+            val token = appDatabase.loggedInUserDao().getLastLogin().token
+            val offenseType = OffenseTypeRepository().getOffenseType(token)
+            val arr = offenseType.data.map { it.type_name }
+            // Set the offense type
+            offenseTypeList = offenseType.data
+
+            val ad = ArrayAdapter(context,
+                android.R.layout.simple_spinner_item, arr
+            )
+
+            ad.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+            )
+
+            spin.adapter = ad
+
+            // set simple layout resource file
+            // for each item of spinner
+            ad.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+            )
+            ad.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item
+            )
+        }
+
+        spin.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
+
+        val x = view.findViewById<AppCompatButton>(R.id.btn_add_offense)
+        x.setOnClickListener {
+
+            Log.i("ITEM-SELECTED", "$offenseTypeID $studentID $academicYearID $academicTermID")
+        }
+        dialog.setCancelable(false)
+        // set content view to our view.
+        dialog.setContentView(view)
+        // call a show method to display a dialog
+        dialog.show()
+
     }
 
     companion object {
@@ -128,11 +221,8 @@ class SearchStudentFragment : Fragment() {
                 val academicModel = AcademicTermRepository().getAcademicTerm(token)
                 val academicEntity = AcademicTermEntity(0, academicModel.data.id, academicModel.data.academic_year_id, academicModel.data.term_name, academicModel.data.start_date, academicModel.data.end_date)
                 appDatabase.academicTermDao().insert(academicEntity)
-
-                // Get the student discipline
-//                val offenseModel = OffenseRepository().getStudentOffense(token, academicModel.data.id, academicModel.data.academic_year_id)
-//                Log.i("ACADEMIC-TERM", "$academicModel")
-//                Log.i("ACADEMIC-TERM", "$offenseModel")
+                academicTermID = academicEntity.termID
+                academicYearID = academicEntity.yearID
                 Log.i("ACADEMIC-TERM", "$studentID -- ${academicModel.data.id}")
                 offenseViewModel.getStudentOffense(token, studentID, academicModel.data.id)
 
@@ -142,5 +232,18 @@ class SearchStudentFragment : Fragment() {
 
         }
 
+    }
+
+    override fun onItemSelected(
+        p0: AdapterView<*>?,
+        p1: View?,
+        p2: Int,
+        p3: Long
+    ) {
+        offenseTypeID = offenseTypeList[p2].id
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+        TODO("Not yet implemented")
     }
 }
