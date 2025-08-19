@@ -161,12 +161,14 @@
     <string name="successfulpayment">Successfully paid, balance is</string>
     <string name="username_password_invalid_string">Ensure 3 characters for both username and password</string>
     <string name="xxx">xxx</string>
+    <string name="topup">Top Up</string>
     <string name="dots">...</string>
     <string name="available_on_card">Available on your card</string>
     <string name="report">Report</string>
     <string name="last_transaction">Last Transaction</string>
     <string name="quickaction">Quick Actions</string>
-    <string name="invalid_pin">Invalid PIN</string>
+    <string name="new_pin">New PIN</string>
+    <string name="old_pin">Old PIN</string>
     <string name="pin_dontmatch">PIN do not match</string>
     <string name="transaction_details">Transaction Details</string>
     <string name="assigning_card_wait">Registering, wait </string>
@@ -181,5 +183,8 @@
     <string name="student_registration_number">Student registration number</string>
     <string name="first_fragment_label">First Fragment</string>
     <string name="empty_fields">Empty fields</string>
+    <string name="transaction_type">Transaction type</string>
+    <string name="payment_type">Payment type</string>
+    <string name="phone_number">Phone number</string>
 
 </resources>

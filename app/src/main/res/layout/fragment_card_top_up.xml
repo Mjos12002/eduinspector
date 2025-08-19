@@ -1,14 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.student.CardTopUpFragment">
+    tools:context=".ui.fragment.student.CardTopUpFragment"
+    android:background="@color/main_background_color">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
+        android:id="@+id/rl_header_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Top up msaza" />
+        android:layout_height="60dp"
+        android:background="@color/main_green_color"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/ten">
 
-</FrameLayout>
+        <LinearLayout
+            android:id="@+id/ll_from_transaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_card_topup_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="@dimen/fifteen"
+                android:gravity="center_vertical"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_header_title"
+        android:padding="10dp"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/tv_main_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Card Top Up"
+            android:fontFamily="sans-serif-black"
+            android:textSize="20sp"
+            android:textColor="#014C92"
+            android:layout_marginBottom="20sp"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_search_student"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_main_title">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/search_parent_style"
+                android:weightSum="7"
+                android:padding="1sp">
+
+                <ImageView
+                    android:id="@+id/imv_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/outline_search_24"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"/>
+
+                <EditText
+                    android:id="@+id/et_search_student"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/search"
+                    android:layout_weight="6"
+                    android:background="@drawable/search_edittext_style"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_student_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4sp"
+            android:layout_below="@id/rl_search_student"
+            android:padding="10dp"
+            android:background="@color/main_background_color"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_student_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:textSize="30sp"
+                android:fontFamily="sans-serif-black"/>
+
+            <TextView
+                android:id="@+id/tv_student_reg_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_student_name"
+                android:layout_marginTop="5sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10sp"
+            android:layout_below="@+id/rl_student_details"
+            android:background="@drawable/search_parent_style"
+            android:layout_marginTop="20sp">
+
+            <TextView
+                android:id="@+id/tv_transaction_type_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/transaction_type"
+                android:layout_alignParentTop="true"
+                android:textColor="#717171"
+                android:textSize="16sp"/>
+            <Spinner
+                android:id="@+id/spn_transaction_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_transaction_type_title"
+                android:layout_marginTop="10sp"/>
+
+            <TextView
+                android:id="@+id/tv_payment_type_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/payment_type"
+                android:layout_below="@id/spn_transaction_type"
+                android:textColor="#717171"
+                android:textSize="16sp"
+                android:layout_marginTop="15sp"/>
+            <Spinner
+                android:id="@+id/spn_payment_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_payment_type_title"
+                android:layout_marginTop="10sp"/>
+
+            <TextView
+                android:id="@+id/tv_phone_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/phone_number"
+                android:layout_below="@id/spn_payment_type"
+                android:textColor="#717171"
+                android:textSize="16sp"
+                android:layout_marginTop="15sp"/>
+
+            <EditText
+                android:id="@+id/tv_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/amount"
+                android:layout_below="@id/tv_phone_number"
+                android:textColor="#717171"
+                android:textSize="16sp"
+                android:layout_marginTop="15sp"
+                android:background="@drawable/search_edittext_style"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/topup"
+                android:layout_below="@id/tv_amount"
+                android:textColor="@color/white"
+                android:layout_marginTop="20sp"
+                android:background="@drawable/search_transaction_button_background"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
