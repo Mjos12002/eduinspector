@@ -1,6 +1,7 @@
 package com.example.inspectorappupdate
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,6 +21,22 @@ class SearchStudentActivity : AppCompatActivity() {
 
         val navController = findNavController(R.id.nav_host_fragment_content_search_student)
         appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        binding.rlEditPin.setOnClickListener {
+            navController.navigate(R.id.ChangePinFragment)
+        }
+
+        binding.rlCardTopup.setOnClickListener {
+            navController.navigate(R.id.CardTopUpFragment)
+        }
+
+        binding.rlReportLost.setOnClickListener {
+            navController.navigate(R.id.ReportCardFragment)
+        }
+
+        binding.rlDisplineDeduction.setOnClickListener {
+            navController.navigate(R.id.SearchStudentFragment)
+        }
 
     }
 

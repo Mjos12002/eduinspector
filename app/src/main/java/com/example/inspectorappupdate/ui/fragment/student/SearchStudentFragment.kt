@@ -124,7 +124,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
             // Set the student id value
             studentID = it.data.id
-
+            binding.rlDeductionsParent.visibility = View.VISIBLE
             getCurrentAcademicTerm()
 
         })
@@ -133,7 +133,6 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
         offenseViewModel.offenseLiveData.observe(viewLifecycleOwner, Observer{
             val lastOffense = it.data.last()
             binding.tvLastOffense.text = "Last offense: "  + lastOffense.offense_type.type_name
-            binding.tvOffenseTerm.text = lastOffense.term.term_name
             val counter = it.data.sumOf { it.marks_deducted }
             binding.tvTotalDeductionValue.text = "$counter"
         })
@@ -163,8 +162,6 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun showViewToDeductMarks(context: Context) {
-
-
 
         val dialog = BottomSheetDialog(context)
 
@@ -206,10 +203,9 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
             lifecycleScope.launch {
                 val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
                 val resp = OffenseRepository().createStudentOffense(userToken, studentID, offenseTypeID, academicYearID, academicTermID, date, 1)
-                Log.i("ITEM-SELECTED", "$resp")
+                dialog.dismiss()
             }
 
-            Log.i("ITEM-SELECTED", "$offenseTypeID $studentID $academicYearID $academicTermID")
         }
         dialog.setCancelable(false)
         // set content view to our view.

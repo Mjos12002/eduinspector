@@ -45,17 +45,19 @@ class OffenseRepository() {
         return resp
     }
 
+    // Create the student offense
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun createStudentOffense(bearer: String, studentID: Int, offenseTypeID: Int, academicYearID: Int, termID: Int, offenseDate: String, instituteID: Int): StudentOffenseCreationModel{
         var resp: StudentOffenseCreationModel
         try {
             val res = offenseAPIInterface.createStudentOffense("Bearer $bearer", studentID, offenseTypeID, academicYearID, termID, offenseDate, instituteID)
-            resp = if (res.code() == 200) {
+            Log.i("ITEM-SELECTED", "$res")
+            resp = if (res.code() == 200 || res.code() == 201) {
                 res.body()!!
             }else {
                 val errorResponse = res.errorBody()?.string()
                 val errorJSONObject = Gson().fromJson(errorResponse, StudentOffenseCreationModel::class.java)
-                StudentOffenseCreationModel(errorJSONObject.status, true, errorJSONObject.message)
+                StudentOffenseCreationModel(errorJSONObject.status, errorJSONObject.error, errorJSONObject.message)
             }
         }catch (e: Exception) {
             resp = StudentOffenseCreationModel(500, true, e.message.toString())

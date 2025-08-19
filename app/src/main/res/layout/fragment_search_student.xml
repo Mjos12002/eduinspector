@@ -81,7 +81,7 @@
             android:layout_marginTop="4sp"
             android:layout_below="@id/rl_search_student"
             android:padding="10dp"
-            android:background="@color/main_gray_color">
+            android:background="@color/main_background_color">
 
             <TextView
                 android:id="@+id/tv_student_name"
@@ -101,12 +101,14 @@
         </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/rl_deductions_parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/rl_student_details"
             android:layout_marginTop="10dp"
             android:orientation="horizontal"
-            android:weightSum="5">
+            android:weightSum="5"
+            android:visibility="gone">
 
             <RelativeLayout
                 android:id="@+id/rl_deduction_title"
@@ -126,8 +128,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/search_parent_style"
-                android:padding="10sp">
+                android:background="@drawable/deductions_background"
+                android:padding="10sp"
+                >
                 <TextView
                     android:id="@+id/tv_total_deduction_title"
                     android:layout_width="match_parent"
@@ -135,6 +138,7 @@
                     android:text="Total deductions"
                     android:textAlignment="center"
                     android:textSize="25sp"
+                    android:textColor="#013B56"
                     android:fontFamily="sans-serif-medium"
                     android:layout_alignParentTop="true"/>
 
@@ -142,7 +146,6 @@
                     android:id="@+id/tv_total_deduction_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="40"
                     android:layout_below="@id/tv_total_deduction_title"
                     android:layout_marginTop="20sp"
                     android:textAlignment="center"
@@ -159,15 +162,15 @@
                         android:id="@+id/tv_last_offense"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:text="Last offense: Kurwana"/>
+                        android:layout_alignParentStart="true"
+                        android:textColor="#026673"/>
 
                     <TextView
                         android:id="@+id/tv_offense_term"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:text="3rd term"/>
+                        android:textColor="#026673"
+                        android:layout_alignParentEnd="true" />
 
                 </RelativeLayout>
 
