@@ -49,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/search_parent_style"
+                android:background="@drawable/custom_card"
                 android:weightSum="7"
                 android:padding="1sp">
 
@@ -81,7 +81,8 @@
             android:layout_marginTop="4sp"
             android:layout_below="@id/rl_search_student"
             android:padding="10dp"
-            android:background="@color/main_background_color">
+            android:background="@drawable/custom_card"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_student_name"
@@ -135,7 +136,7 @@
                     android:id="@+id/tv_total_deduction_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Total deductions"
+                    android:text="@string/marks_deduction"
                     android:textAlignment="center"
                     android:textSize="25sp"
                     android:textColor="#013B56"

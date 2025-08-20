@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@drawable/search_parent_style"
+                android:background="@drawable/custom_card"
                 android:weightSum="7"
                 android:padding="1sp">
 
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:padding="10sp"
             android:layout_below="@+id/rl_student_details"
-            android:background="@drawable/search_parent_style"
+            android:background="@drawable/custom_card"
             android:layout_marginTop="20sp">
 
             <TextView

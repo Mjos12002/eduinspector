@@ -99,7 +99,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
             msgBuilder.append(firstName)
             msgBuilder.append(" ")
             msgBuilder.append(lastName)
-
+            binding.rlStudentDetails.visibility = View.VISIBLE
             binding.tvSearchStudentHeader.text = msgBuilder.toString()
         }
 

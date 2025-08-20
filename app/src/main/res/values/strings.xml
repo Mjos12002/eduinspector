@@ -186,5 +186,6 @@
     <string name="transaction_type">Transaction type</string>
     <string name="payment_type">Payment type</string>
     <string name="phone_number">Phone number</string>
+    <string name="marks_deduction">Marks deductions</string>
 
 </resources>

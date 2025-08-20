@@ -13,7 +13,7 @@
         android:layout_gravity="center_vertical"
         android:padding="@dimen/ten"
         android:layout_margin="@dimen/ten"
-        android:background="@color/white">
+        android:background="@drawable/custom_card">
 
         <TextView
             android:id="@+id/tv_signin_title"
