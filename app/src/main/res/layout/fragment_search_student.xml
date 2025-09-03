@@ -65,7 +65,7 @@
                     android:id="@+id/et_search_student"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="@string/search"
+                    android:hint="@string/search_student"
                     android:layout_weight="6"
                     android:background="@drawable/search_edittext_style"/>
 
@@ -89,15 +89,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:textSize="30sp"
-                android:fontFamily="sans-serif-black"/>
+                android:textSize="22sp"
+                android:fontFamily="sans-serif-black"
+                android:textColor="#094281"/>
 
             <TextView
                 android:id="@+id/tv_student_reg_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_student_name"
-                android:layout_marginTop="5sp" />
+                android:layout_marginTop="5sp"
+                android:fontFamily="sans-serif-smallcaps"/>
 
         </RelativeLayout>
 

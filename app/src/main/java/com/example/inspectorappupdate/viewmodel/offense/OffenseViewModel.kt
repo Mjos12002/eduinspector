@@ -20,7 +20,6 @@ class OffenseViewModel: ViewModel() {
     suspend fun getStudentOffense(token: String, studentID: Int, termID: Int) {
 
         val offenseModel = OffenseRepository().getStudentOffense(token, studentID, termID)
-        Log.i("ACADEMIC-TERM", "$offenseModel")
         _offenseMutableLiveData.postValue(offenseModel)
 
     }

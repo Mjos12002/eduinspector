@@ -33,6 +33,7 @@ import com.example.inspectorappupdate.repository.offense.OffenseRepository
 import com.example.inspectorappupdate.repository.offense_type.OffenseTypeRepository
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
+import com.example.inspectorappupdate.viewmodel.card.CardViewModel
 import com.example.inspectorappupdate.viewmodel.offense.OffenseViewModel
 import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -60,6 +61,9 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     // Initialize the view model for the student search
     private val studentViewModel: StudentViewModel by activityViewModels()
+
+    // Initialize the view model for the card details
+    private val cardViewModel: CardViewModel by activityViewModels()
 
     // Initialise the view model for the student offense
     private val offenseViewModel: OffenseViewModel by activityViewModels()
@@ -131,10 +135,25 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Observe the changes in the offenses live data
         offenseViewModel.offenseLiveData.observe(viewLifecycleOwner, Observer{
-            val lastOffense = it.data.last()
-            binding.tvLastOffense.text = "Last offense: "  + lastOffense.offense_type.type_name
-            val counter = it.data.sumOf { it.marks_deducted }
-            binding.tvTotalDeductionValue.text = "$counter"
+            try{
+                if(it.data.isNotEmpty()) {
+                    val lastOffense = it.data.last()
+                    binding.tvLastOffense.text = "Last offense: "  + lastOffense.offense_type.type_name
+                    val counter = it.data.sumOf { it.marks_deducted }
+                    binding.tvTotalDeductionValue.text = "$counter"
+                }else {
+                    binding.tvTotalDeductionValue.text = "0"
+                    binding.tvLastOffense.text = ""
+                }
+
+            }catch (e: Exception) {
+
+            }
+
+        })
+
+        cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
+            Log.i("INSPECTOR-LOG", "OBSERVING $it")
         })
 
         // Add event to add deduction
@@ -207,7 +226,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
             }
 
         }
-        dialog.setCancelable(false)
+        dialog.setCancelable(true)
         // set content view to our view.
         dialog.setContentView(view)
         // call a show method to display a dialog
@@ -230,7 +249,6 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 appDatabase.academicTermDao().insert(academicEntity)
                 academicTermID = academicEntity.termID
                 academicYearID = academicEntity.yearID
-                Log.i("ACADEMIC-TERM", "$studentID -- ${academicModel.data.id}")
                 offenseViewModel.getStudentOffense(token, studentID, academicModel.data.id)
 
             }catch (e: Exception){

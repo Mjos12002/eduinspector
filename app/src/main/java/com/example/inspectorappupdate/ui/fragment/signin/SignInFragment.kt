@@ -96,7 +96,6 @@ class SignInFragment : Fragment() {
                     binding.tvUsernameError.visibility = View.VISIBLE
                 }
             }
-
         })
 
         // Observe the changes in the login response

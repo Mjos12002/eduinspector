@@ -1,11 +1,15 @@
 package com.example.inspectorappupdate.ui.fragment.student
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.example.inspectorappupdate.R
+import com.example.inspectorappupdate.viewmodel.card.CardViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,6 +26,9 @@ class CardTopUpFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    // Initialize the card view model
+    private val cardViewModel : CardViewModel by activityViewModels ()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -35,6 +42,12 @@ class CardTopUpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+
+        // Observe the change from the card view model's card detaills
+        cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
+            Log.i("INSPECTOR-LOG", "OBSERVEDDD - $it")
+        })
+
         return inflater.inflate(R.layout.fragment_card_top_up, container, false)
     }
 

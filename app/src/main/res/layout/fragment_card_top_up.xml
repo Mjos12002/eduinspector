@@ -93,22 +93,67 @@
             android:layout_below="@id/rl_search_student"
             android:padding="10dp"
             android:background="@color/main_background_color"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <TextView
                 android:id="@+id/tv_student_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:textSize="30sp"
+                android:textSize="20sp"
+                android:text="UWIMANA Aime"
                 android:fontFamily="sans-serif-black"/>
 
             <TextView
-                android:id="@+id/tv_student_reg_number"
+                android:id="@+id/tv_card_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_student_name"
+                android:text="1992adfs88f"
                 android:layout_marginTop="5sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_card_number"
+                android:layout_marginTop="20sp">
+                <TextView
+                    android:layout_alignParentTop="true"
+                    android:id="@+id/tv_transport_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Transport balance: 0"
+                    android:layout_marginTop="5sp"
+                    android:layout_marginBottom="10sp"/>
+
+                <TextView
+                    android:layout_below="@id/tv_transport_balance"
+                    android:id="@+id/tv_schoolfees_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="School fee balance: 0"
+                    android:layout_marginTop="5sp" />
+
+                <TextView
+                    android:layout_alignParentEnd="true"
+                    android:id="@+id/tv_support_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="School fee balance: 0"
+                    android:layout_marginTop="5sp"
+                    android:layout_marginBottom="10sp"/>
+
+                <TextView
+                    android:layout_below="@id/tv_support_balance"
+                    android:layout_alignParentEnd="true"
+                    android:id="@+id/tv_insurance_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="School fee balance: 0"
+                    android:layout_marginTop="5sp" />
+            </RelativeLayout>
+
+
 
         </RelativeLayout>
 
