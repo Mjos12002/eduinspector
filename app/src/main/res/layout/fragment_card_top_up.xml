@@ -45,54 +45,31 @@
             android:id="@+id/tv_main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Card Top Up"
+            android:text="Top Up"
             android:fontFamily="sans-serif-black"
             android:textSize="20sp"
             android:textColor="#014C92"
-            android:layout_marginBottom="20sp"/>
+            android:layout_marginBottom="10sp"/>
 
-        <RelativeLayout
-            android:id="@+id/rl_search_student"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tv_processing_message"
+            android:layout_below="@+id/tv_main_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_main_title">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/custom_card"
-                android:weightSum="7"
-                android:padding="1sp">
-
-                <ImageView
-                    android:id="@+id/imv_search"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/outline_search_24"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"/>
-
-                <EditText
-                    android:id="@+id/et_search_student"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/search"
-                    android:layout_weight="6"
-                    android:background="@drawable/search_edittext_style"/>
-
-            </LinearLayout>
-
-        </RelativeLayout>
+            android:text="@string/tapcard"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-black"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/black"/>
 
         <RelativeLayout
             android:id="@+id/rl_student_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4sp"
-            android:layout_below="@id/rl_search_student"
-            android:padding="10dp"
-            android:background="@color/main_background_color"
+            android:layout_marginTop="10sp"
+            android:layout_below="@id/tv_processing_message"
+            android:padding="10sp"
+            android:background="@drawable/custom_card"
             android:visibility="visible">
 
             <TextView
@@ -102,7 +79,7 @@
                 android:layout_alignParentTop="true"
                 android:textSize="20sp"
                 android:text="UWIMANA Aime"
-                android:fontFamily="sans-serif-black"/>
+                android:textColor="@color/secondaryBlue"/>
 
             <TextView
                 android:id="@+id/tv_card_number"
@@ -110,21 +87,40 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_student_name"
                 android:text="1992adfs88f"
+                android:textColor="#034418"
                 android:layout_marginTop="5sp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_card_number"
-                android:layout_marginTop="20sp">
+                android:layout_marginTop="10sp"
+                android:background="@drawable/main_information_display"
+                android:padding="5sp">
+
                 <TextView
+                    android:id="@+id/tv_wallet_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wallet balance"
                     android:layout_alignParentTop="true"
+                    android:textColor="@color/mainGreen"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="19sp"
+                    android:layout_marginBottom="18sp"
+                    android:layout_marginTop="10sp"/>
+
+                <TextView
+                    android:layout_below="@id/tv_wallet_balance"
                     android:id="@+id/tv_transport_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Transport balance: 0"
                     android:layout_marginTop="5sp"
-                    android:layout_marginBottom="10sp"/>
+                    android:layout_marginBottom="10sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="16sp"/>
 
                 <TextView
                     android:layout_below="@id/tv_transport_balance"
@@ -132,16 +128,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="School fee balance: 0"
-                    android:layout_marginTop="5sp" />
+                    android:layout_marginTop="5sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="16sp"/>
 
                 <TextView
+                    android:layout_below="@id/tv_wallet_balance"
                     android:layout_alignParentEnd="true"
                     android:id="@+id/tv_support_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="School fee balance: 0"
+                    android:text="Support balance: 0"
                     android:layout_marginTop="5sp"
-                    android:layout_marginBottom="10sp"/>
+                    android:layout_marginBottom="10sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="16sp"/>
 
                 <TextView
                     android:layout_below="@id/tv_support_balance"
@@ -149,8 +152,11 @@
                     android:id="@+id/tv_insurance_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="School fee balance: 0"
-                    android:layout_marginTop="5sp" />
+                    android:text="Insurance balance: 0"
+                    android:layout_marginTop="5sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="16sp"/>
             </RelativeLayout>
 
 
@@ -163,7 +169,7 @@
             android:padding="10sp"
             android:layout_below="@+id/rl_student_details"
             android:background="@drawable/custom_card"
-            android:layout_marginTop="20sp">
+            android:layout_marginTop="10sp">
 
             <TextView
                 android:id="@+id/tv_transaction_type_title"
@@ -171,8 +177,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/transaction_type"
                 android:layout_alignParentTop="true"
-                android:textColor="#717171"
-                android:textSize="16sp"/>
+                android:textColor="#717171" />
             <Spinner
                 android:id="@+id/spn_transaction_type"
                 android:layout_width="match_parent"
@@ -187,8 +192,7 @@
                 android:text="@string/payment_type"
                 android:layout_below="@id/spn_transaction_type"
                 android:textColor="#717171"
-                android:textSize="16sp"
-                android:layout_marginTop="15sp"/>
+                android:layout_marginTop="10sp"/>
             <Spinner
                 android:id="@+id/spn_payment_type"
                 android:layout_width="match_parent"
@@ -196,35 +200,38 @@
                 android:layout_below="@id/tv_payment_type_title"
                 android:layout_marginTop="10sp"/>
 
-            <TextView
-                android:id="@+id/tv_phone_number"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/et_phone_number"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/phone_number"
+                android:hint="@string/phone_number"
                 android:layout_below="@id/spn_payment_type"
                 android:textColor="#717171"
-                android:textSize="16sp"
-                android:layout_marginTop="15sp"/>
+                android:layout_marginTop="10sp"
+                android:background="@drawable/search_edittext_style"/>
 
             <EditText
-                android:id="@+id/tv_amount"
+                android:id="@+id/et_amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/amount"
-                android:layout_below="@id/tv_phone_number"
+                android:layout_below="@id/et_phone_number"
                 android:textColor="#717171"
-                android:textSize="16sp"
-                android:layout_marginTop="15sp"
+                android:layout_marginTop="10sp"
                 android:background="@drawable/search_edittext_style"/>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_topup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/topup"
-                android:layout_below="@id/tv_amount"
+                android:layout_below="@id/et_amount"
                 android:textColor="@color/white"
                 android:layout_marginTop="20sp"
+                android:minHeight="0sp"
+                android:padding="8sp"
                 android:background="@drawable/search_transaction_button_background"/>
+
 
         </RelativeLayout>
 

@@ -1,6 +1,6 @@
 package com.example.inspectorappupdate.model.student
 
-data class StudentData(
+data class StudentModelData(
     val id: Int,
     val first_name: String,
     val last_name: String,

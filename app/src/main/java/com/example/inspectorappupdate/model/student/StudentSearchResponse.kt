@@ -1,13 +1,8 @@
 package com.example.inspectorappupdate.model.student
 
-// A model to describe the data returned the api request
-data class StudentModel(
+data class StudentSearchResponse(
     val status: Int,
     val error: Boolean,
     val message: String,
-    val data: StudentModelData
+    val data: UserResponseModel
 )
-
-
-
-

@@ -11,6 +11,7 @@
     <color  name="main_background_color">#f1f1f1</color>
     <color name="footercolor">#FF5722</color>
     <color name="loginButtonBGColor">#014075</color>
+    <color name="secondaryBlue">#031C44</color>
     <color name="loginButtonTextColor">#02c00e</color>
     <color  name="validateButtonBgColor">#021424</color>
     <color name="assignButtonBgColor">#02c00e</color>
