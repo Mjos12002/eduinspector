@@ -18,6 +18,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.compose.ui.graphics.Color
@@ -34,6 +36,7 @@ import com.example.inspectorappupdate.model.offense_type.OffenseTypeData
 import com.example.inspectorappupdate.repository.academic_term.AcademicTermRepository
 import com.example.inspectorappupdate.repository.offense.OffenseRepository
 import com.example.inspectorappupdate.repository.offense_type.OffenseTypeRepository
+import com.example.inspectorappupdate.repository.signin.LoginRepository
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
@@ -75,6 +78,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
     var studentID = 0
     var academicYearID = 0
     var academicTermID = 0
+    var instituteID = 0
 
     var userToken = ""
 
@@ -97,6 +101,18 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Initialize the local database utility
         appDatabase = DbUtility().dbBuilder(requireContext())
+
+        // Get the institute id
+        lifecycleScope.launch {
+            if (appDatabase.loggedInUserDao().getLastLogin().role == "inspector") {
+                val res = LoginRepository().getDeployedUser(appDatabase.loggedInUserDao().getLastLogin().token, appDatabase.loggedInUserDao().getLastLogin().id.toInt())
+                if(res.status == 200 || res.status == 201) {
+                    Log.i("INSPECTOR-LOG", "${res.status} -- ${res.data.institute_id}")
+                    instituteID = res.data.institute_id
+                }
+            }
+        }
+
 
         // Get from the local database the first name and last name of the user logged in
         lifecycleScope.launch {
@@ -131,7 +147,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
             studentName.append(" ")
             studentName.append(it.data.last_name)
             binding.tvStudentName.text = studentName.toString()
-            binding.tvStudentRegNumber.text = it.data.reg_number
+            binding.tvStudentRegNumber.text = "Reg Number: ${it.data.reg_number}"
 
             // Set the student id value
             studentID = it.data.id
@@ -165,6 +181,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Add event to add deduction
         binding.imgAddDeduction.setOnClickListener {
+//            binding.tvStudentName.text = getString(R.string.waitwhileprocessing)
             showViewToDeductMarks(requireContext())
         }
         return binding.root
@@ -226,12 +243,23 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         val x = view.findViewById<AppCompatButton>(R.id.btn_add_offense)
         x.setOnClickListener {
-            lifecycleScope.launch {
-                val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-                val resp = OffenseRepository().createStudentOffense(userToken, studentID, offenseTypeID, academicYearID, academicTermID, date, 1)
-                dialog.dismiss()
-            }
+            val processing = view.findViewById<TextView>(R.id.tv_processing_message)
+            Log.i("INSPECTOR-LOG", "$instituteID")
+            if(instituteID > 0) {
 
+                lifecycleScope.launch {
+
+                    processing.visibility = View.VISIBLE
+                    val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+                    val resp = OffenseRepository().createStudentOffense(userToken, studentID, offenseTypeID, academicYearID, academicTermID, date, instituteID)
+                    processing.text = resp.message
+                    //dialog.dismiss()
+                }
+
+            }else {
+                processing.visibility = View.VISIBLE
+                processing.text = getString(R.string.invalid_institute)
+            }
         }
         dialog.setCancelable(true)
         // set content view to our view.

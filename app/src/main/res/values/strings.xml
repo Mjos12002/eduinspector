@@ -152,5 +152,9 @@
     <string name="phone_number">Phone number</string>
     <string name="marks_deduction">Marks deducted</string>
     <string name="report_issue">Report Issue</string>
+    <string name="displine">Discipline</string>
+    <string name="invalid_institute">Invalid institute for the user</string>
+    <string name="wallet_details">Wallet Balance</string>
+    <string name="unregistered_card">Card Not Registered</string>
 
 </resources>

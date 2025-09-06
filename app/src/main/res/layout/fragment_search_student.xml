@@ -50,10 +50,21 @@
         android:padding="10dp"
         android:layout_marginTop="10dp">
 
+        <TextView
+            android:id="@+id/tv_main_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/displine"
+            android:fontFamily="sans-serif-black"
+            android:textSize="20sp"
+            android:textColor="#014C92"
+            android:layout_marginBottom="20sp"/>
+
         <RelativeLayout
             android:id="@+id/rl_search_student"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_main_title">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,6 +88,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/search_student"
                     android:layout_weight="6"
+                    android:textColor="@color/black"
                     android:background="@drawable/search_edittext_style"/>
 
             </LinearLayout>
@@ -109,6 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_student_name"
                 android:layout_marginTop="5sp"
+                android:textColor="@color/mainGreen"
                 android:fontFamily="sans-serif-smallcaps"/>
 
         </RelativeLayout>

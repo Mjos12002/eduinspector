@@ -12,14 +12,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/tv_processing_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/spn_offense"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20dp"
+        android:textColor="@color/mainGreen"
+        android:layout_marginTop="12sp"
+        android:visibility="gone"/>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_add_offense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add"
-        android:layout_below="@id/spn_offense"
+        android:layout_below="@id/tv_processing_message"
         android:layout_marginTop="20dp"
         android:textColor="@color/white"
+        android:minHeight="0sp"
+        android:padding="8sp"
         android:background="@drawable/search_transaction_button_background"/>
 
 </RelativeLayout>

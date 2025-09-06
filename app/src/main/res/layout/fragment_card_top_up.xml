@@ -49,17 +49,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/rl_header_title"
         android:padding="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="5dp">
 
         <TextView
             android:id="@+id/tv_main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Top Up"
+            android:text="@string/topup"
             android:fontFamily="sans-serif-black"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textColor="#014C92"
-            android:layout_marginBottom="10sp"/>
+            android:layout_marginBottom="6sp"/>
 
         <TextView
             android:id="@+id/tv_processing_message"
@@ -73,22 +73,22 @@
             android:textColor="@color/black"/>
 
         <RelativeLayout
-            android:id="@+id/rl_student_details"
+            android:id="@+id/rl_topup_student_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10sp"
             android:layout_below="@id/tv_processing_message"
-            android:padding="10sp"
+            android:padding="8sp"
             android:background="@drawable/custom_card"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_student_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:textSize="20sp"
-                android:text="UWIMANA Aime"
+                android:textSize="17sp"
+                android:text="Uwimanna aime"
                 android:textColor="@color/secondaryBlue"/>
 
             <TextView
@@ -96,52 +96,53 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_student_name"
-                android:text="1992adfs88f"
-                android:textColor="#034418"
-                android:layout_marginTop="5sp" />
+                android:textColor="#02A84B"
+                android:text="Card No: 128929"
+                android:layout_marginTop="5sp"
+                android:fontFamily="sans-serif-medium"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_card_number"
-                android:layout_marginTop="10sp"
+                android:layout_marginTop="15sp"
                 android:background="@drawable/main_information_display"
-                android:padding="5sp">
+                android:padding="8sp">
 
                 <TextView
                     android:id="@+id/tv_wallet_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Wallet balance"
                     android:layout_alignParentTop="true"
                     android:textColor="@color/mainGreen"
                     android:fontFamily="sans-serif-medium"
-                    android:textSize="19sp"
-                    android:layout_marginBottom="18sp"
-                    android:layout_marginTop="10sp"/>
+                    android:textSize="16sp"
+                    android:text="@string/wallet_details"
+                    android:layout_marginBottom="10sp"
+                    android:layout_marginTop="5sp"/>
 
                 <TextView
                     android:layout_below="@id/tv_wallet_balance"
                     android:id="@+id/tv_transport_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Transport balance: 0"
                     android:layout_marginTop="5sp"
-                    android:layout_marginBottom="10sp"
+                    android:layout_marginBottom="5sp"
                     android:textColor="@color/white"
                     android:fontFamily="sans-serif-light"
-                    android:textSize="16sp"/>
+                    android:textSize="14sp"
+                    android:text="Wallet: 0"/>
 
                 <TextView
                     android:layout_below="@id/tv_transport_balance"
                     android:id="@+id/tv_schoolfees_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="School fee balance: 0"
                     android:layout_marginTop="5sp"
                     android:textColor="@color/white"
                     android:fontFamily="sans-serif-light"
-                    android:textSize="16sp"/>
+                    android:textSize="14sp"
+                    android:text="Transport: 0"/>
 
                 <TextView
                     android:layout_below="@id/tv_wallet_balance"
@@ -149,12 +150,12 @@
                     android:id="@+id/tv_support_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Support balance: 0"
                     android:layout_marginTop="5sp"
-                    android:layout_marginBottom="10sp"
+                    android:layout_marginBottom="5sp"
                     android:textColor="@color/white"
                     android:fontFamily="sans-serif-light"
-                    android:textSize="16sp"/>
+                    android:textSize="14sp"
+                    android:text="Support: 0"/>
 
                 <TextView
                     android:layout_below="@id/tv_support_balance"
@@ -162,88 +163,100 @@
                     android:id="@+id/tv_insurance_balance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Insurance balance: 0"
                     android:layout_marginTop="5sp"
                     android:textColor="@color/white"
                     android:fontFamily="sans-serif-light"
-                    android:textSize="16sp"/>
+                    android:textSize="14sp"
+                    android:text="Insurance: 0"/>
             </RelativeLayout>
 
-
-
         </RelativeLayout>
 
-        <RelativeLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10sp"
-            android:layout_below="@+id/rl_student_details"
-            android:background="@drawable/custom_card"
-            android:layout_marginTop="10sp">
-
-            <TextView
-                android:id="@+id/tv_transaction_type_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/transaction_type"
-                android:layout_alignParentTop="true"
-                android:textColor="#717171" />
-            <Spinner
-                android:id="@+id/spn_transaction_type"
+            android:layout_below="@+id/rl_topup_student_details">
+            <RelativeLayout
+                android:id="@+id/rl_topup_payment_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tv_transaction_type_title"
-                android:layout_marginTop="10sp"/>
-
-            <TextView
-                android:id="@+id/tv_payment_type_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/payment_type"
-                android:layout_below="@id/spn_transaction_type"
-                android:textColor="#717171"
-                android:layout_marginTop="10sp"/>
-            <Spinner
-                android:id="@+id/spn_payment_type"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_payment_type_title"
-                android:layout_marginTop="10sp"/>
-
-            <EditText
-                android:id="@+id/et_phone_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/phone_number"
-                android:layout_below="@id/spn_payment_type"
-                android:textColor="#717171"
-                android:layout_marginTop="10sp"
-                android:background="@drawable/search_edittext_style"/>
-
-            <EditText
-                android:id="@+id/et_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/amount"
-                android:layout_below="@id/et_phone_number"
-                android:textColor="#717171"
-                android:layout_marginTop="10sp"
-                android:background="@drawable/search_edittext_style"/>
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_topup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/topup"
-                android:layout_below="@id/et_amount"
-                android:textColor="@color/white"
-                android:layout_marginTop="20sp"
-                android:minHeight="0sp"
                 android:padding="8sp"
-                android:background="@drawable/search_transaction_button_background"/>
+                android:background="@drawable/custom_card"
+                android:layout_marginTop="10sp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_transaction_type_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/transaction_type"
+                    android:layout_alignParentTop="true"
+                    android:textColor="@color/black" />
+                <Spinner
+                    android:id="@+id/spn_transaction_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_transaction_type_title"
+                    android:layout_marginTop="5sp"/>
+
+                <TextView
+                    android:id="@+id/tv_payment_type_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/payment_type"
+                    android:layout_below="@id/spn_transaction_type"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="10sp"
+                    />
+                <Spinner
+                    android:id="@+id/spn_payment_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_payment_type_title"
+                    android:layout_marginTop="5sp"/>
+
+                <EditText
+                    android:id="@+id/et_phone_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/phone_number"
+                    android:layout_below="@id/spn_payment_type"
+                    android:textColor="#717171"
+                    android:layout_marginTop="10sp"
+                    android:padding="5sp"
+                    android:inputType="phone"
+                    android:background="@drawable/search_edittext_style" />
+
+                <EditText
+                    android:id="@+id/et_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/amount"
+                    android:layout_below="@id/et_phone_number"
+                    android:textColor="#717171"
+                    android:layout_marginTop="10sp"
+                    android:inputType="numberDecimal"
+                    android:padding="5sp"
+                    android:background="@drawable/search_edittext_style"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_topup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/topup"
+                    android:layout_below="@id/et_amount"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="10sp"
+                    android:minHeight="0sp"
+                    android:padding="8sp"
+                    android:background="@drawable/search_transaction_button_background"/>
 
 
-        </RelativeLayout>
+            </RelativeLayout>
+        </ScrollView>
+
+
+
 
     </RelativeLayout>
 

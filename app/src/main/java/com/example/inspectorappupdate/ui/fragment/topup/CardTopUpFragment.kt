@@ -104,7 +104,7 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
             msgBuilder.append(firstName)
             msgBuilder.append(" ")
             msgBuilder.append(lastName)
-            root.findViewById<RelativeLayout>(R.id.rl_student_details).visibility = View.VISIBLE
+            //root.findViewById<RelativeLayout>(R.id.rl_topup_student_details).visibility = View.VISIBLE
             root.findViewById<TextView>(R.id.tv_search_student_header).text = msgBuilder.toString()
         }
 
@@ -114,28 +114,53 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Observe the change from the card view model's card details
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
+
+            // Initialize the container elements
+            val rlStudentDetails = root.findViewById<RelativeLayout>(R.id.rl_topup_student_details)
+            val rlPaymentDetails = root.findViewById<RelativeLayout>(R.id.rl_topup_payment_details)
+            rlStudentDetails.visibility = View.GONE
+            rlPaymentDetails.visibility = View.GONE
+            val tvMsg = root.findViewById<TextView>(R.id.tv_processing_message)
+            tvMsg.text = getString(R.string.waitwhileprocessing)
+            tvMsg.setTextColor("#01043B".toColorInt())
             try{
-                val name = StringBuilder()
-                name.append(it.data.first_name)
-                name.append(" ")
-                name.append(it.data.last_name)
                 if(it != null) {
-                    root.findViewById<TextView>(R.id.tv_student_name)?.text = name.toString()
+
                     if(it.data != null) {
+                        // If the card details is found
+                        val name = StringBuilder()
+                        name.append(it.data.first_name)
+                        name.append(" ")
+                        name.append(it.data.last_name)
+                        root.findViewById<TextView>(R.id.tv_student_name)?.text = name.toString()
+                        tvMsg.text = getString(R.string.card_details)
+                        rlStudentDetails.visibility = View.VISIBLE
+                        rlPaymentDetails.visibility = View.VISIBLE
                         cardNumber = it.data.card_number
+
                         lifecycleScope.launch {
                             getStudentDetails(appDatabase.loggedInUserDao().getLastLogin().token, it.data.reg_number)
                         }
-                        root.findViewById<TextView>(R.id.tv_card_number)?.text = it.data.card_number
+
+                        root.findViewById<TextView>(R.id.tv_card_number)?.text = "Card No: ${it.data.card_number}"
                         root.findViewById<TextView>(R.id.tv_transport_balance)?.text = "Transport: ${it.data.transport_fees_balance}"
                         root.findViewById<TextView>(R.id.tv_schoolfees_balance)?.text = "School fees: ${it.data.school_fees_balance}"
                         root.findViewById<TextView>(R.id.tv_support_balance)?.text = "Support: ${it.data.support_fees_balance}"
                         root.findViewById<TextView>(R.id.tv_insurance_balance)?.text = "Insurance: ${it.data.transport_fees_balance}"
+
                     }
+
+                    if(it.data == null){
+                        tvMsg.text = getString(R.string.unregistered_card)
+                        tvMsg.setTextColor("#CC2A02".toColorInt())
+                    }
+
+                }else {
+                    tvMsg.text = getString(R.string.unknown_error)
                 }
 
             }catch (e: Exception){
-
+                Log.i("INSPECTOR-LOG", "${e.message}")
             }
         })
 
@@ -200,6 +225,9 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         })
         val btnPay = root.findViewById<Button>(R.id.btn_topup)
+        // Declaring containers for student and payment details
+
+        // Execute payment process
         btnPay.setOnClickListener {
             btnPay.text = getString(R.string.waitwhileprocessing)
             val amount = root.findViewById<EditText>(R.id.et_amount).text.toString()
@@ -212,8 +240,11 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
             // Make payment
             lifecycleScope.launch {
                 val res = PaymentRepository().makePayment(appDatabase.loggedInUserDao().getLastLogin().token, paymentDTO)
+                // If the response is not null
+
                 if(res != null) {
                     btnPay.text = res.message
+                    // If the status is 200 it means there is a response returned
                     if(res.status == 200) {
                         btnPay.setBackgroundColor("#039E37".toColorInt())
                     }else {
@@ -221,7 +252,6 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
                     }
                 }
             }
-            Log.i("INSPECTOR-LOG", "$amount - $walletTypeID - $paymentTypeID - $parentID - $studentID - $cardNumber - $phoneNUmber")
 
         }
 

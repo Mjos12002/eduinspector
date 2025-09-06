@@ -9,10 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.IndexActivity
 import com.example.inspectorappupdate.R
@@ -52,7 +54,7 @@ class ReportCardFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_report_card, container, false)
 
         // Logout button
-        root.findViewById<Button>(R.id.img_logout).setOnClickListener {
+        root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
             startActivity(Intent(requireContext(), IndexActivity::class.java))
         }
 

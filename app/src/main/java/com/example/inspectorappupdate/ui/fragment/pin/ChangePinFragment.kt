@@ -3,12 +3,14 @@ package com.example.inspectorappupdate.ui.fragment.pin
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -56,7 +58,7 @@ class ChangePinFragment : Fragment() {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_change_pin, container, false)
 
-        root.findViewById<Button>(R.id.img_logout).setOnClickListener {
+        root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
             startActivity(Intent(requireContext(), IndexActivity::class.java))
         }
 
@@ -90,6 +92,7 @@ class ChangePinFragment : Fragment() {
 
         // Observe the change in card view model
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
+            Log.i("INSPECTOR-LOG", "$it")
             cardNumber = it.data.card_number
         })
 
