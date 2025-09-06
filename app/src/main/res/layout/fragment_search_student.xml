@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_centerVertical="true"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_alignParentStart="true">
 
             <TextView
                 android:id="@+id/tv_search_student_header"
@@ -31,6 +32,15 @@
                 android:textSize="@dimen/fifteen"
                 android:gravity="center_vertical"/>
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/img_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/outline_logout_24"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -182,8 +192,5 @@
         </LinearLayout>
 
     </RelativeLayout>
-
-
-
 
 </RelativeLayout>

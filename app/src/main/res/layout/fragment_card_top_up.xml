@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.student.CardTopUpFragment"
+    tools:context=".ui.fragment.topup.CardTopUpFragment"
     android:background="@color/main_background_color">
 
     <!-- TODO: Update blank fragment layout -->
@@ -21,17 +21,27 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_centerVertical="true"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_alignParentStart="true">
 
             <TextView
-                android:id="@+id/tv_card_topup_header"
+                android:id="@+id/tv_search_student_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="@dimen/fifteen"
+                android:text="Welcome, man"
                 android:gravity="center_vertical"/>
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/img_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/outline_logout_24"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
 
     <RelativeLayout

@@ -15,19 +15,19 @@
 
     <fragment
         android:id="@+id/ChangePinFragment"
-        android:name="com.example.inspectorappupdate.ui.fragment.student.ChangePinFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.pin.ChangePinFragment"
         android:label="Change Pin"
         tools:layout="@layout/fragment_change_pin"/>
 
     <fragment
         android:id="@+id/CardTopUpFragment"
-        android:name="com.example.inspectorappupdate.ui.fragment.student.CardTopUpFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.topup.CardTopUpFragment"
         android:label="Top up"
         tools:layout="@layout/fragment_card_top_up"/>
 
     <fragment
         android:id="@+id/ReportCardFragment"
-        android:name="com.example.inspectorappupdate.ui.fragment.student.ReportCardFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.issue.ReportCardFragment"
         android:label="Report Card"
         tools:layout="@layout/fragment_report_card"/>
 

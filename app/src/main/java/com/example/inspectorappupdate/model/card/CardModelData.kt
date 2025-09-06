@@ -1,6 +1,6 @@
 package com.example.inspectorappupdate.model.card
 
-data class CardResponseData(
+data class CardModelData(
     val first_name: String,
     val last_name: String,
     val card_number: String,

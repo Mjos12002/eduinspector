@@ -2,6 +2,7 @@ package com.example.inspectorappupdate.ui.fragment.student
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Spinner
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
@@ -24,6 +26,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.example.inspectorappupdate.IndexActivity
 import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.databinding.FragmentSearchStudentBinding
 import com.example.inspectorappupdate.entity.academic_term.AcademicTermEntity
@@ -87,6 +90,10 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
     ): View? {
         // Initialize the fragment
         _binding = FragmentSearchStudentBinding.inflate(inflater, container, false)
+
+        binding.imgLogout.setOnClickListener {
+            startActivity(Intent(requireContext(), IndexActivity::class.java))
+        }
 
         // Initialize the local database utility
         appDatabase = DbUtility().dbBuilder(requireContext())

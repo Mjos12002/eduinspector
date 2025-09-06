@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.student.ChangePinFragment"
+    tools:context=".ui.fragment.pin.ChangePinFragment"
     android:background="@color/main_background_color">
 
     <!-- TODO: Update blank fragment layout -->
@@ -21,17 +21,27 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_centerVertical="true"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_alignParentStart="true">
 
             <TextView
-                android:id="@+id/tv_change_pin_header"
+                android:id="@+id/tv_search_student_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="@dimen/fifteen"
+                android:text="Welcome, man"
                 android:gravity="center_vertical"/>
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/img_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/outline_logout_24"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -50,47 +60,13 @@
             android:textColor="#014C92"
             android:layout_marginBottom="20sp"/>
 
-        <RelativeLayout
-            android:id="@+id/rl_search_student"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_main_title">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/custom_card"
-                android:weightSum="7"
-                android:padding="1sp">
-
-                <ImageView
-                    android:id="@+id/imv_search"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/outline_search_24"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"/>
-
-                <EditText
-                    android:id="@+id/et_search_student"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/search"
-                    android:layout_weight="6"
-                    android:background="@drawable/search_edittext_style"/>
-
-            </LinearLayout>
-
-
-        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/rl_student_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4sp"
-            android:layout_below="@id/rl_search_student"
+            android:layout_below="@id/tv_main_title"
             android:padding="10dp"
             android:background="@color/main_background_color"
             android:visibility="gone">
@@ -122,7 +98,7 @@
             android:layout_marginTop="20sp">
 
             <EditText
-                android:id="@+id/tv_old_pin"
+                android:id="@+id/et_old_pin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/old_pin"
@@ -133,21 +109,22 @@
                 android:background="@drawable/search_edittext_style"/>
 
             <EditText
-                android:id="@+id/tv_new_pin"
+                android:id="@+id/et_new_pin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/new_pin"
-                android:layout_below="@+id/tv_old_pin"
+                android:layout_below="@+id/et_old_pin"
                 android:textColor="#717171"
                 android:textSize="16sp"
                 android:layout_marginTop="15sp"
                 android:background="@drawable/search_edittext_style"/>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/save"
-                android:layout_below="@id/tv_new_pin"
+                android:layout_below="@id/et_new_pin"
                 android:textColor="@color/white"
                 android:layout_marginTop="20sp"
                 android:background="@drawable/search_transaction_button_background"/>

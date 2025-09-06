@@ -1,9 +1,9 @@
 package com.example.inspectorappupdate.model.card
 
 // Model of the card
-data class CardResponse(
+data class CardModel(
     val status: Int,
     val error: Boolean,
     val message: String,
-    val data: CardResponseData
+    val data: CardModelData
 )

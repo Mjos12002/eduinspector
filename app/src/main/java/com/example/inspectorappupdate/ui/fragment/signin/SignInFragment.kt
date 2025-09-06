@@ -68,7 +68,7 @@ class SignInFragment : Fragment() {
                     signInViewModel.userLogin(strUsername, strPassword)
                 }
             }catch (e: Exception) {
-                Log.i("USER-LOGIN", "${e.message}")
+                binding.tvprocessing.text = getString(R.string.unknown_error)
             }
         }
 

@@ -1,5 +1,6 @@
-package com.example.inspectorappupdate.ui.fragment.student
+package com.example.inspectorappupdate.ui.fragment.topup
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -18,12 +21,13 @@ import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.example.inspectorappupdate.IndexActivity
 import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.apirequest.dto.payment.PaymentDTO
 import com.example.inspectorappupdate.model.payment.PaymentTypeModelData
 import com.example.inspectorappupdate.model.wallet.WalletModelData
 import com.example.inspectorappupdate.repository.payment.PaymentRepository
-import com.example.inspectorappupdate.ui.fragment.signin.SignInFragment
+import com.example.inspectorappupdate.ui.fragment.student.SearchStudentFragment
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
@@ -31,7 +35,6 @@ import com.example.inspectorappupdate.viewmodel.payment.PaymentViewModel
 import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
 import com.example.inspectorappupdate.viewmodel.wallet.WalletViewModel
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -53,21 +56,21 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     // Initialize the wallet view model
     private val walletViewModel: WalletViewModel by activityViewModels()
-
     // Initialize the payment view model
     private val paymentViewModel: PaymentViewModel by activityViewModels()
-
+    // Initialize the student view model
     private val studentViewModel: StudentViewModel by activityViewModels()
-
+    // Initialize the selected walled id
     var selectedWalletID = 0
-
+    // Initialize the list of wallet types
     lateinit var walletList: List<WalletModelData>
+    // Initialize the list of payment types
     lateinit var paymentList: List<PaymentTypeModelData>
-
+    // Initialize the ID of the parent, student id, card number and token
     var parentID = 0
-
     var studentID = 0
     var cardNumber = ""
+    var userToken = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,8 +84,29 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
     ): View? {
 
         val root = inflater.inflate(R.layout.fragment_card_top_up, container, false)
+
+        // Logout
+        root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
+            startActivity(Intent(requireContext(), IndexActivity::class.java))
+        }
+
         // Initialize the database
        appDatabase = DbUtility().dbBuilder(requireContext())
+
+        lifecycleScope.launch {
+            // Create a string builder to create a welcome message
+            val msgBuilder = StringBuilder()
+            val firstName = SearchStudentFragment.Companion.appDatabase.loggedInUserDao().getLastLogin().firstName
+            val lastName = SearchStudentFragment.Companion.appDatabase.loggedInUserDao().getLastLogin().lastName
+            userToken = SearchStudentFragment.Companion.appDatabase.loggedInUserDao().getLastLogin().token
+            msgBuilder.append(getString(R.string.welcome))
+            msgBuilder.append(", ")
+            msgBuilder.append(firstName)
+            msgBuilder.append(" ")
+            msgBuilder.append(lastName)
+            root.findViewById<RelativeLayout>(R.id.rl_student_details).visibility = View.VISIBLE
+            root.findViewById<TextView>(R.id.tv_search_student_header).text = msgBuilder.toString()
+        }
 
         // Initialize the wallet and payment type spinner
         val spnWalletType = root.findViewById<Spinner>(R.id.spn_transaction_type)
