@@ -54,21 +54,30 @@
             android:id="@+id/tv_main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Change PIN"
+            android:text="@string/change_pin"
             android:fontFamily="sans-serif-black"
             android:textSize="20sp"
             android:textColor="#014C92"
             android:layout_marginBottom="20sp"/>
 
+        <TextView
+            android:id="@+id/tv_processing_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tapcard"
+            android:layout_below="@id/tv_main_title"
+            android:layout_marginBottom="20sp"
+            android:textSize="16sp"
+            android:layout_centerHorizontal="true"/>
 
         <RelativeLayout
             android:id="@+id/rl_student_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4sp"
-            android:layout_below="@id/tv_main_title"
+            android:layout_below="@id/tv_processing_message"
             android:padding="10dp"
-            android:background="@color/main_background_color"
+            android:background="@drawable/custom_card"
             android:visibility="gone">
 
             <TextView
@@ -76,15 +85,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:textSize="30sp"
-                android:fontFamily="sans-serif-black"/>
+                android:textSize="20sp"
+                android:textColor="#010547"
+                android:fontFamily="sans-serif-black"
+                android:text="Jean Paul Kalisa"/>
 
             <TextView
                 android:id="@+id/tv_student_reg_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_student_name"
-                android:layout_marginTop="5sp" />
+                android:layout_marginTop="5sp"
+                android:textColor="@color/mainGreen"
+                android:text="Card No: 002839939"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:id="@+id/tv_card_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_student_reg_number"
+                android:layout_marginTop="5sp"
+                android:textColor="#012A47"
+                android:text="Card Status"
+                android:fontFamily="sans-serif-thin"
+                android:textSize="15sp"/>
 
         </RelativeLayout>
 
@@ -106,6 +132,7 @@
                 android:textColor="#717171"
                 android:textSize="16sp"
                 android:layout_marginTop="15sp"
+                android:inputType="numberPassword"
                 android:background="@drawable/search_edittext_style"/>
 
             <EditText
@@ -117,6 +144,7 @@
                 android:textColor="#717171"
                 android:textSize="16sp"
                 android:layout_marginTop="15sp"
+                android:inputType="numberPassword"
                 android:background="@drawable/search_edittext_style"/>
 
             <androidx.appcompat.widget.AppCompatButton
@@ -127,6 +155,8 @@
                 android:layout_below="@id/et_new_pin"
                 android:textColor="@color/white"
                 android:layout_marginTop="20sp"
+                android:minHeight="0sp"
+                android:padding="8sp"
                 android:background="@drawable/search_transaction_button_background"/>
 
         </RelativeLayout>

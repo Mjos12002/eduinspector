@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -58,6 +59,9 @@ class ChangePinFragment : Fragment() {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_change_pin, container, false)
 
+        // Initialize the container elements
+        val rlStudentDetails = root.findViewById<RelativeLayout>(R.id.rl_student_details)
+
         root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
             startActivity(Intent(requireContext(), IndexActivity::class.java))
         }
@@ -75,7 +79,6 @@ class ChangePinFragment : Fragment() {
             msgBuilder.append(firstName)
             msgBuilder.append(" ")
             msgBuilder.append(lastName)
-            root.findViewById<RelativeLayout>(R.id.rl_student_details).visibility = View.VISIBLE
             root.findViewById<TextView>(R.id.tv_search_student_header).text = msgBuilder.toString()
         }
 
@@ -86,14 +89,61 @@ class ChangePinFragment : Fragment() {
         val btnSave = root.findViewById<Button>(R.id.btn_save)
         btnSave.setOnClickListener {
             lifecycleScope.launch {
-                CardRepository().changePIN("", etOldPIN.text.toString(), etrNewPIN.text.toString(), cardNumber)
+                btnSave.text = getString(R.string.waitwhileprocessing)
+                val resp = CardRepository().changePIN(appDatabase.loggedInUserDao().getLastLogin().token, etOldPIN.text.toString(), etrNewPIN.text.toString(), cardNumber)
+                btnSave.text = resp.message
             }
         }
 
         // Observe the change in card view model
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
-            Log.i("INSPECTOR-LOG", "$it")
-            cardNumber = it.data.card_number
+            try {
+                val msgHolder = root.findViewById<TextView>(R.id.tv_processing_message)
+
+                msgHolder.text = getString(R.string.waitwhileprocessing)
+                msgHolder.setTextColor("#000630".toColorInt())
+
+                // If the response is returned
+                if(it != null){
+
+                    // If there response contains data object
+                    if(it.data != null) {
+                        // Initialize the variables
+                        cardNumber = it.data.card_number
+                        val name = StringBuilder()
+                        val cardNumber = StringBuilder()
+                        val status = StringBuilder()
+
+                        name.append(it.data.first_name)
+                        name.append(" ")
+                        name.append(it.data.last_name)
+
+                        cardNumber.append("Card No: ")
+                        cardNumber.append(it.data.card_number)
+
+                        status.append("Status: ")
+                        status.append(it.data.card_status)
+
+                        root.findViewById<TextView>(R.id.tv_student_name).text = name.toString()
+                        root.findViewById<TextView>(R.id.tv_student_reg_number).text = cardNumber.toString()
+                        root.findViewById<TextView>(R.id.tv_card_status).text = status.toString()
+
+                        rlStudentDetails.visibility = View.VISIBLE
+                        msgHolder.text = getString(R.string.card_details)
+
+                    }else {
+                        msgHolder.text = getString(R.string.unregistered_card)
+                        msgHolder.setTextColor("#BA2202".toColorInt())
+                    }
+                }else {
+                    msgHolder.text = getString(R.string.unknown_error)
+                }
+
+            }catch (e: Exception){
+
+            }
+
+
         })
 
         return root

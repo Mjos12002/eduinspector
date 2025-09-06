@@ -156,5 +156,6 @@
     <string name="invalid_institute">Invalid institute for the user</string>
     <string name="wallet_details">Wallet Balance</string>
     <string name="unregistered_card">Card Not Registered</string>
+    <string name="change_pin">Change PIN</string>
 
 </resources>
