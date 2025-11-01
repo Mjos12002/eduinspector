@@ -9,10 +9,10 @@ data class CardModelData(
     val indicator: String,
     val card_status: String,
     val reg_number: String,
-    val support_fees_balance: Int,
-    val transport_fees_balance: Int,
+    val support_fees_balance: Double,
+    val transport_fees_balance: Double,
     val payment_status: String,
-    val school_fees_balance: Int,
-    val insurance_fees_balance: Int,
+    val school_fees_balance: Double,
+    val insurance_fees_balance: Double,
     val student_id: Int
 )

@@ -6,6 +6,7 @@ import com.example.inspectorappupdate.apirequest.card.ICard
 import com.example.inspectorappupdate.model.card.CardModel
 import com.example.inspectorappupdate.model.card.CardModelData
 import com.example.inspectorappupdate.model.card.ChangePinModel
+import com.example.inspectorappupdate.model.card.DisablePinModel
 import com.example.inspectorappupdate.utils.RetrofitInstance
 import com.google.gson.Gson
 
@@ -28,11 +29,28 @@ class CardRepository {
                 val errorResponse = res.errorBody()?.string()
                 val errorResponseObj = Gson().fromJson(errorResponse, CardModel::class.java)
                 return CardModel(errorResponseObj.status, errorResponseObj.error, errorResponseObj.message,
-                    CardModelData("", "", "", "", "", "", "", "", 0, 0, "", 0, 0, 0))
+                    CardModelData("", "", "", "", "", "", "", "", 0.toDouble(), 0.toDouble(), "", 0.toDouble(), 0.toDouble(), 0))
             }
         }catch (e: Exception) {
             return CardModel(500, true, e.message!!,
-                CardModelData("", "", "", "", "", "", "", "", 0, 0, "", 0, 0, 0))
+                CardModelData("", "", "", "", "", "", "", "", 0.toDouble(), 0.toDouble(), "", 0.toDouble(), 0.toDouble(), 0))
+        }
+    }
+
+    // Disable card
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun disableCard(indicator: String, token: String): DisablePinModel {
+        try {
+            val res = cardInterface.disableCard("Bearer ${token}", indicator)
+            if(res.code() == 200) {
+                return res.body()!!
+            }else {
+                val errorResponse = res.errorBody()?.string()
+                var errorResponseObj = Gson().fromJson(errorResponse, DisablePinModel::class.java)
+                return DisablePinModel(errorResponseObj.status, errorResponseObj.error, errorResponseObj.message)
+            }
+        }catch (e: Exception) {
+            return DisablePinModel(500, true, e.message!!)
         }
     }
 

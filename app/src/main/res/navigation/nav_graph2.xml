@@ -31,4 +31,11 @@
         android:label="Report Card"
         tools:layout="@layout/fragment_report_card"/>
 
+    <fragment
+        android:id="@+id/AttendanceFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.attendance.AttendanceFragment"
+        android:label="Student Attendance"
+        tools:layout="@layout/fragment_attendance"/>
+
+
 </navigation>

@@ -48,6 +48,9 @@ class ChangePinFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch {
+            cardViewModel.clearCardDetails()
+        }
 
     }
 
@@ -58,9 +61,9 @@ class ChangePinFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val root = inflater.inflate(R.layout.fragment_change_pin, container, false)
-
         // Initialize the container elements
         val rlStudentDetails = root.findViewById<RelativeLayout>(R.id.rl_student_details)
+        val rlPinDetails = root.findViewById<RelativeLayout>(R.id.rl_pin_details)
 
         root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
             startActivity(Intent(requireContext(), IndexActivity::class.java))
@@ -69,6 +72,8 @@ class ChangePinFragment : Fragment() {
         appDatabase = DbUtility().dbBuilder(requireContext())
 
         lifecycleScope.launch {
+            // Clear card view model
+            cardViewModel.clearCardDetails()
             // Create a string builder to create a welcome message
             val msgBuilder = StringBuilder()
             val firstName = SearchStudentFragment.Companion.appDatabase.loggedInUserDao().getLastLogin().firstName
@@ -91,7 +96,12 @@ class ChangePinFragment : Fragment() {
             lifecycleScope.launch {
                 btnSave.text = getString(R.string.waitwhileprocessing)
                 val resp = CardRepository().changePIN(appDatabase.loggedInUserDao().getLastLogin().token, etOldPIN.text.toString(), etrNewPIN.text.toString(), cardNumber)
-                btnSave.text = resp.message
+                if(resp.message.contains("resolve")) {
+                    btnSave.text = getString(R.string.internet)
+                }else {
+                    btnSave.text = resp.message
+                }
+
             }
         }
 
@@ -102,39 +112,50 @@ class ChangePinFragment : Fragment() {
 
                 msgHolder.text = getString(R.string.waitwhileprocessing)
                 msgHolder.setTextColor("#000630".toColorInt())
-
+                Log.i("INSPECTOR-LOG", " top $it")
                 // If the response is returned
                 if(it != null){
+                    if(it.status == 200 || it.status == 201) {
+                        // If there response contains data object
+                        Log.i("INSPECTOR-LOG", "$it")
+                        if(it.data != null) {
+                            // Initialize the variables
+                            cardNumber = it.data.card_number
+                            val name = StringBuilder()
+                            val cardNumber = StringBuilder()
+                            val status = StringBuilder()
 
-                    // If there response contains data object
-                    if(it.data != null) {
-                        // Initialize the variables
-                        cardNumber = it.data.card_number
-                        val name = StringBuilder()
-                        val cardNumber = StringBuilder()
-                        val status = StringBuilder()
+                            name.append(it.data.first_name)
+                            name.append(" ")
+                            name.append(it.data.last_name)
 
-                        name.append(it.data.first_name)
-                        name.append(" ")
-                        name.append(it.data.last_name)
+                            cardNumber.append("Card No: ")
+                            cardNumber.append(it.data.card_number)
 
-                        cardNumber.append("Card No: ")
-                        cardNumber.append(it.data.card_number)
+                            status.append("Status: ")
+                            status.append(it.data.card_status)
 
-                        status.append("Status: ")
-                        status.append(it.data.card_status)
+                            root.findViewById<TextView>(R.id.tv_student_name).text = name.toString()
+                            root.findViewById<TextView>(R.id.tv_student_reg_number).text = cardNumber.toString()
+                            root.findViewById<TextView>(R.id.tv_card_status).text = status.toString()
 
-                        root.findViewById<TextView>(R.id.tv_student_name).text = name.toString()
-                        root.findViewById<TextView>(R.id.tv_student_reg_number).text = cardNumber.toString()
-                        root.findViewById<TextView>(R.id.tv_card_status).text = status.toString()
+                            rlStudentDetails.visibility = View.VISIBLE
+                            rlPinDetails.visibility = View.VISIBLE
+                            msgHolder.text = getString(R.string.card_details)
 
-                        rlStudentDetails.visibility = View.VISIBLE
-                        msgHolder.text = getString(R.string.card_details)
-
+                        }else {
+                            msgHolder.text = getString(R.string.unregistered_card)
+                            msgHolder.setTextColor("#BA2202".toColorInt())
+                        }
                     }else {
-                        msgHolder.text = getString(R.string.unregistered_card)
                         msgHolder.setTextColor("#BA2202".toColorInt())
+                        if(it.message.contains("resolve")) {
+                            msgHolder.text = getString(R.string.internet)
+                        }else {
+                            msgHolder.text = it.message
+                        }
                     }
+
                 }else {
                     msgHolder.text = getString(R.string.unknown_error)
                 }
@@ -142,8 +163,6 @@ class ChangePinFragment : Fragment() {
             }catch (e: Exception){
 
             }
-
-
         })
 
         return root

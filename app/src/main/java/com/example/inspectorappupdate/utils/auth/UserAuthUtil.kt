@@ -12,7 +12,7 @@ class UserAuthUtil(val username: String, val password: String) {
     fun sanitizeCredentials(): CredentialsTextLengthCheck {
 
         // Set the patterns to check against the credentials, return false if one of fields contains one of the characters indicated in the patterns
-        val strPattern = Regex("[!@#$%^&*()_+\\s]")
+        val strPattern = Regex("[!$%^&*()_+\\s]")
         val usernameMatch = strPattern.find(username)?.value
         val passwordMatch = strPattern.find(password)?.value
 

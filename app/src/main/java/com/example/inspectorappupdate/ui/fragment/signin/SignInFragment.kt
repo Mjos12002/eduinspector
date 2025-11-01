@@ -3,7 +3,6 @@ package com.example.inspectorappupdate.ui.fragment.signin
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,17 +17,12 @@ import com.example.inspectorappupdate.SearchStudentActivity
 import com.example.inspectorappupdate.databinding.FragmentSigninBinding
 import com.example.inspectorappupdate.entity.user.LoggedInUserEntity
 import com.example.inspectorappupdate.utils.AppDatabase
+import com.example.inspectorappupdate.utils.AppVersionViewer
 import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.viewmodel.signin.SignInViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.sign
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -54,7 +48,12 @@ class SignInFragment : Fragment() {
 
         _binding = FragmentSigninBinding.inflate(inflater, container, false)
 
+        // Initialization of the SQLlite
        appDatabase = DbUtility().dbBuilder(requireContext())
+
+        // Get the app version
+        val appVersion = AppVersionViewer.process(requireContext())
+        binding.tvAppVersion.text = appVersion
 
         binding.btnsignin.setOnClickListener {
 

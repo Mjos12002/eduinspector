@@ -3,15 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.issue.ReportCardFragment"
-    android:background="@color/main_background_color">
+    tools:context=".ui.fragment.attendance.AttendanceFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <RelativeLayout
         android:id="@+id/rl_header_title"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@color/footercolor"
+        android:background="@color/main_green_color"
         android:layout_alignParentTop="true"
         android:padding="@dimen/ten">
 
@@ -55,19 +54,30 @@
             android:id="@+id/tv_main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/blockcard"
+            android:text="@string/student_attendance"
             android:fontFamily="sans-serif-black"
             android:textSize="20sp"
-            android:textColor="#FF5722"
+            android:textColor="#014C92"
             android:layout_marginBottom="20sp"/>
+
+        <TextView
+            android:id="@+id/tv_processing_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/student_attendance"
+            android:layout_below="@id/tv_main_title"
+            android:layout_marginBottom="20sp"
+            android:textSize="16sp"
+            android:layout_centerHorizontal="true"/>
 
         <RelativeLayout
             android:id="@+id/rl_student_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4sp"
-            android:layout_below="@id/tv_main_title"
-            android:background="@color/main_background_color"
+            android:layout_below="@id/tv_processing_message"
+            android:padding="10dp"
+            android:background="@drawable/custom_card"
             android:visibility="gone">
 
             <TextView
@@ -75,51 +85,81 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:textSize="24sp"
-                android:fontFamily="sans-serif-medium"/>
+                android:textSize="20sp"
+                android:textColor="#010547"
+                android:fontFamily="sans-serif-black"
+                android:text="Jean Paul Kalisa"/>
 
             <TextView
                 android:id="@+id/tv_student_reg_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tv_student_name" />
-
-            <TextView
-                android:id="@+id/tv_card_number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_student_reg_number"
-                android:layout_marginTop="15sp"
-                android:textColor="#747575"/>
+                android:layout_below="@id/tv_student_name"
+                android:layout_marginTop="5sp"
+                android:textColor="@color/mainGreen"
+                android:text="Card No: 002839939"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="15sp"/>
 
             <TextView
                 android:id="@+id/tv_card_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tv_card_number"
-                android:layout_marginTop="0sp"
+                android:layout_below="@id/tv_student_reg_number"
+                android:layout_marginTop="5sp"
+                android:textColor="#012A47"
+                android:text="Card Status"
                 android:fontFamily="sans-serif-thin"
-                android:textColor="#C17403"/>
+                android:textSize="15sp"/>
 
         </RelativeLayout>
 
+
         <RelativeLayout
-            android:id="@+id/rl_block_action"
+            android:id="@+id/rl_pin_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="10sp"
             android:layout_below="@+id/rl_student_details"
+            android:background="@drawable/custom_card"
             android:layout_marginTop="20sp"
             android:visibility="gone">
+
+            <EditText
+                android:id="@+id/et_old_pin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/old_pin"
+                android:layout_alignParentTop="true"
+                android:textColor="#717171"
+                android:textSize="16sp"
+                android:layout_marginTop="15sp"
+                android:inputType="numberPassword"
+                android:background="@drawable/search_edittext_style"/>
+
+            <EditText
+                android:id="@+id/et_new_pin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/new_pin"
+                android:layout_below="@+id/et_old_pin"
+                android:textColor="#717171"
+                android:textSize="16sp"
+                android:layout_marginTop="15sp"
+                android:inputType="numberPassword"
+                android:background="@drawable/search_edittext_style"/>
+
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_report"
+                android:id="@+id/btn_save"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/disable_card"
+                android:text="@string/save"
+                android:layout_below="@id/et_new_pin"
                 android:textColor="@color/white"
                 android:layout_marginTop="20sp"
                 android:minHeight="0sp"
-                android:padding="7sp"
-                android:background="@drawable/report_card"/>
+                android:padding="8sp"
+                android:background="@drawable/search_transaction_button_background"/>
 
         </RelativeLayout>
 

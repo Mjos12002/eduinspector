@@ -53,6 +53,10 @@ class SearchStudentActivity : AppCompatActivity() {
             navController.navigate(R.id.ReportCardFragment)
         }
 
+        binding.rlStudentAttendance.setOnClickListener {
+            navController.navigate(R.id.AttendanceFragment)
+        }
+
         binding.rlDisplineDeduction.setOnClickListener {
             navController.navigate(R.id.SearchStudentFragment)
         }

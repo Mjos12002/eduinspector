@@ -8,6 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
+import com.example.inspectorappupdate.model.student.StudentUserResponseModel
+import com.example.inspectorappupdate.model.student.UserResponseModel
 import com.example.inspectorappupdate.repository.student.StudentRepository
 
 // View model of the user response
@@ -32,8 +34,14 @@ class StudentViewModel: ViewModel() {
     suspend fun getStudentDetails(bearer: String, regNumber: String) {
         // Get the response from the api and update the mutable live data object
         val response = StudentRepository().getStudentDetails(bearer, regNumber)
-        Log.i("INSPECTOR-LOG", "$response")
         _studentDetailsMutableLiveData.postValue(response)
 
+    }
+
+    // Clear the view model
+    suspend fun clearStudentViewModel(){
+        Log.i("INSPECTOR-LOG", "Student model is cleared here")
+        _studentDetailsMutableLiveData.postValue(StudentSearchResponse(0, true, "",
+            UserResponseModel(0, "", "", "", "", "", "", "", "", "", "", StudentUserResponseModel(0, 0, "", 0))))
     }
 }

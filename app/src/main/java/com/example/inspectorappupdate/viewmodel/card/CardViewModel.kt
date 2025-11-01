@@ -1,11 +1,13 @@
 package com.example.inspectorappupdate.viewmodel.card
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.inspectorappupdate.model.card.CardModel
+import com.example.inspectorappupdate.model.card.CardModelData
 import com.example.inspectorappupdate.repository.card.CardRepository
 
 // View model for managing card information
@@ -19,6 +21,10 @@ class CardViewModel: ViewModel() {
     suspend fun getCardDetails(token: String, cardNumber: String) {
         val resp = CardRepository().getCardDetails(cardNumber, token)
         _cardMutableLiveData.postValue(resp)
+    }
+
+    suspend fun clearCardDetails() {
+        _cardMutableLiveData.postValue(CardModel(0, true, "", CardModelData("", "", "", "", "", "", "", "", 0.toDouble(), 0.toDouble(), "", 0.toDouble(), 0.toDouble(), 0)))
     }
 
 

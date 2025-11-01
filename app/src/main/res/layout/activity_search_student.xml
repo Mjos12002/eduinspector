@@ -13,20 +13,33 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:baselineAligned="false"
-        android:weightSum="4"
+        android:weightSum="5"
         android:background="#E9E9E9">
 
         <RelativeLayout
+            android:id="@+id/rl_displine_deduction"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:id="@+id/rl_displine_deduction"
             android:padding="10sp">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/outline_attribution_24"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_student_attendance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="10sp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/presence"/>
         </RelativeLayout>
 
         <RelativeLayout

@@ -22,9 +22,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -46,7 +43,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 // TODO: Rename parameter arguments, choose names that match
@@ -94,7 +90,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
     ): View? {
         // Initialize the fragment
         _binding = FragmentSearchStudentBinding.inflate(inflater, container, false)
-
+        // Clear view
         binding.imgLogout.setOnClickListener {
             startActivity(Intent(requireContext(), IndexActivity::class.java))
         }
@@ -104,15 +100,20 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Get the institute id
         lifecycleScope.launch {
+            studentViewModel.clearStudentViewModel()
             if (appDatabase.loggedInUserDao().getLastLogin().role == "inspector") {
                 val res = LoginRepository().getDeployedUser(appDatabase.loggedInUserDao().getLastLogin().token, appDatabase.loggedInUserDao().getLastLogin().id.toInt())
                 if(res.status == 200 || res.status == 201) {
-                    Log.i("INSPECTOR-LOG", "${res.status} -- ${res.data.institute_id}")
-                    instituteID = res.data.institute_id
+                    if(res.data != null) {
+                        instituteID = res.data.institute_id
+                    }
+                }else{
+                    if(res.message.contains("resolve")) {
+
+                    }
                 }
             }
         }
-
 
         // Get from the local database the first name and last name of the user logged in
         lifecycleScope.launch {
@@ -124,8 +125,6 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
             msgBuilder.append(getString(R.string.welcome))
             msgBuilder.append(", ")
             msgBuilder.append(firstName)
-            msgBuilder.append(" ")
-            msgBuilder.append(lastName)
             binding.rlStudentDetails.visibility = View.VISIBLE
             binding.tvSearchStudentHeader.text = msgBuilder.toString()
         }
@@ -141,18 +140,31 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Observe the changes in the live data object
         studentViewModel.studentLiveData.observe(viewLifecycleOwner, Observer{
-            // Create the student name object to display
-            val studentName = StringBuilder()
-            studentName.append(it.data.first_name)
-            studentName.append(" ")
-            studentName.append(it.data.last_name)
-            binding.tvStudentName.text = studentName.toString()
-            binding.tvStudentRegNumber.text = "Reg Number: ${it.data.reg_number}"
+            // Create the student name object to display by checking if there is an error
+            Log.i("INSPECTOR-LOG", "$it")
+            if(!it.error) {
+                if(it.data != null) {
+                    val studentName = StringBuilder()
+                    studentName.append(it.data.first_name)
+                    studentName.append(" ")
+                    studentName.append(it.data.last_name)
 
-            // Set the student id value
-            studentID = it.data.id
-            binding.rlDeductionsParent.visibility = View.VISIBLE
-            getCurrentAcademicTerm()
+                    // String builder object for displaying the reg number
+                    val regNumberStrBuilder = StringBuilder()
+                    regNumberStrBuilder.append("Reg Number:")
+                    regNumberStrBuilder.append(" ")
+                    regNumberStrBuilder.append(it.data.reg_number)
+
+                    binding.tvStudentName.text = studentName.toString()
+                    binding.tvStudentRegNumber.text = regNumberStrBuilder.toString()
+
+                    // Set the student id value
+                    studentID = it.data.id
+                    binding.rlDeductionsParent.visibility = View.VISIBLE
+                    getCurrentAcademicTerm()
+                }
+            }
+
 
         })
 
@@ -175,8 +187,16 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         })
 
+        // Observe the card live data
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
-            Log.i("INSPECTOR-LOG", "OBSERVING $it")
+            if (!it.error) {
+                if(it.data != null) {
+                    lifecycleScope.launch {
+                        val token = appDatabase.loggedInUserDao().getLastLogin().token
+                        studentViewModel.searchStudentByRegNumber(token, it.data.reg_number)
+                    }
+                }
+            }
         })
 
         // Add event to add deduction
@@ -244,7 +264,6 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
         val x = view.findViewById<AppCompatButton>(R.id.btn_add_offense)
         x.setOnClickListener {
             val processing = view.findViewById<TextView>(R.id.tv_processing_message)
-            Log.i("INSPECTOR-LOG", "$instituteID")
             if(instituteID > 0) {
 
                 lifecycleScope.launch {

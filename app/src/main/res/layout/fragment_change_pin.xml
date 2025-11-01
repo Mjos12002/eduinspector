@@ -116,12 +116,14 @@
 
 
         <RelativeLayout
+            android:id="@+id/rl_pin_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10sp"
             android:layout_below="@+id/rl_student_details"
             android:background="@drawable/custom_card"
-            android:layout_marginTop="20sp">
+            android:layout_marginTop="20sp"
+            android:visibility="gone">
 
             <EditText
                 android:id="@+id/et_old_pin"

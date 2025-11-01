@@ -84,6 +84,12 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
     ): View? {
 
         val root = inflater.inflate(R.layout.fragment_card_top_up, container, false)
+        val tvMsg = root.findViewById<TextView>(R.id.tv_processing_message)
+
+        // Clear card view model
+        lifecycleScope.launch {
+            cardViewModel.clearCardDetails()
+        }
 
         // Logout
         root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
@@ -92,6 +98,7 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Initialize the database
        appDatabase = DbUtility().dbBuilder(requireContext())
+
 
         lifecycleScope.launch {
             // Create a string builder to create a welcome message
@@ -120,38 +127,47 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
             val rlPaymentDetails = root.findViewById<RelativeLayout>(R.id.rl_topup_payment_details)
             rlStudentDetails.visibility = View.GONE
             rlPaymentDetails.visibility = View.GONE
-            val tvMsg = root.findViewById<TextView>(R.id.tv_processing_message)
+
             tvMsg.text = getString(R.string.waitwhileprocessing)
             tvMsg.setTextColor("#01043B".toColorInt())
             try{
                 if(it != null) {
 
-                    if(it.data != null) {
-                        // If the card details is found
-                        val name = StringBuilder()
-                        name.append(it.data.first_name)
-                        name.append(" ")
-                        name.append(it.data.last_name)
-                        root.findViewById<TextView>(R.id.tv_student_name)?.text = name.toString()
-                        tvMsg.text = getString(R.string.card_details)
-                        rlStudentDetails.visibility = View.VISIBLE
-                        rlPaymentDetails.visibility = View.VISIBLE
-                        cardNumber = it.data.card_number
+                    if(it.status == 200 || it.status == 201) {
+                        if(it.data != null) {
+                            // If the card details is found
+                            val name = StringBuilder()
+                            name.append(it.data.first_name)
+                            name.append(" ")
+                            name.append(it.data.last_name)
+                            root.findViewById<TextView>(R.id.tv_student_name)?.text = name.toString()
+                            tvMsg.text = getString(R.string.card_details)
+                            rlStudentDetails.visibility = View.VISIBLE
+                            rlPaymentDetails.visibility = View.VISIBLE
+                            cardNumber = it.data.card_number
 
-                        lifecycleScope.launch {
-                            getStudentDetails(appDatabase.loggedInUserDao().getLastLogin().token, it.data.reg_number)
+                            lifecycleScope.launch {
+                                getStudentDetails(appDatabase.loggedInUserDao().getLastLogin().token, it.data.reg_number)
+                            }
+
+                            root.findViewById<TextView>(R.id.tv_card_number)?.text = "Card No: ${it.data.card_number}"
+                            root.findViewById<TextView>(R.id.tv_transport_balance)?.text = "Transport: ${it.data.transport_fees_balance}"
+                            root.findViewById<TextView>(R.id.tv_schoolfees_balance)?.text = "School fees: ${it.data.school_fees_balance}"
+                            root.findViewById<TextView>(R.id.tv_support_balance)?.text = "Support: ${it.data.support_fees_balance}"
+                            root.findViewById<TextView>(R.id.tv_insurance_balance)?.text = "Insurance: ${it.data.transport_fees_balance}"
+
                         }
 
-                        root.findViewById<TextView>(R.id.tv_card_number)?.text = "Card No: ${it.data.card_number}"
-                        root.findViewById<TextView>(R.id.tv_transport_balance)?.text = "Transport: ${it.data.transport_fees_balance}"
-                        root.findViewById<TextView>(R.id.tv_schoolfees_balance)?.text = "School fees: ${it.data.school_fees_balance}"
-                        root.findViewById<TextView>(R.id.tv_support_balance)?.text = "Support: ${it.data.support_fees_balance}"
-                        root.findViewById<TextView>(R.id.tv_insurance_balance)?.text = "Insurance: ${it.data.transport_fees_balance}"
-
-                    }
-
-                    if(it.data == null){
-                        tvMsg.text = getString(R.string.unregistered_card)
+                        if(it.data == null){
+                            tvMsg.text = getString(R.string.unregistered_card)
+                            tvMsg.setTextColor("#CC2A02".toColorInt())
+                        }
+                    }else {
+                        if(it.message.contains("resolve")) {
+                            tvMsg.text = getString(R.string.internet)
+                        }else {
+                            tvMsg.text = it.message
+                        }
                         tvMsg.setTextColor("#CC2A02".toColorInt())
                     }
 
@@ -183,45 +199,86 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Observe the changes in the wallet response
         walletViewModel.walletLiveData.observe(viewLifecycleOwner, Observer {
-            val walletArr = it.data.map { dt -> dt.name }
-            walletList = it.data
-            val ad = ArrayAdapter(requireContext(),
-                android.R.layout.simple_spinner_item, walletArr
-            )
+            if(it != null) {
+                if(it.status == 200 || it.status == 201) {
 
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-            spnWalletType?.adapter = ad
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-            spnWalletType?.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
+                    if(it.data != null) {
+                        val walletArr = it.data.map { dt -> dt.name }
+                        walletList = it.data
+                        val ad = ArrayAdapter(requireContext(),
+                            android.R.layout.simple_spinner_item, walletArr
+                        )
+
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        spnWalletType?.adapter = ad
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        spnWalletType?.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
+                    }else {
+                        tvMsg.text = "Wallet data not found"
+                    }
+
+                }else {
+                    if (it.message.contains("resolve")) {
+                        tvMsg.text = getString(R.string.internet)
+                    }else {
+                        tvMsg.text = it.message
+                    }
+                }
+
+            }else {
+                tvMsg.text = getString(R.string.unknown_error)
+            }
+
         })
 
         // Observe the changes in the payment type
         paymentViewModel.paymentLiveData.observe(viewLifecycleOwner, Observer {
-            paymentList = it.data
-            val paymentTypeArr = it.data.map { dt -> dt.name }
-            val ad = ArrayAdapter(requireContext(),
-                android.R.layout.simple_spinner_item, paymentTypeArr
-            )
+            if(it != null) {
 
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-            spnPaymentType?.adapter = ad
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
+                if(it.status == 200 || it.status == 201) {
 
-            spnPaymentType?.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
+                    if(it.data != null) {
+                        paymentList = it.data
+                        val paymentTypeArr = it.data.map { dt -> dt.name }
+                        val ad = ArrayAdapter(requireContext(),
+                            android.R.layout.simple_spinner_item, paymentTypeArr
+                        )
+
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        spnPaymentType?.adapter = ad
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+                        ad.setDropDownViewResource(
+                            android.R.layout.simple_spinner_dropdown_item
+                        )
+
+                        spnPaymentType?.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
+
+                    }else {
+                        tvMsg.text = "Payment type data not found"
+                    }
+
+                }else {
+                    if (it.message.contains("resolve")) {
+                        tvMsg.text = getString(R.string.internet)
+                    }else {
+                        tvMsg.text = it.message
+                    }
+                }
+
+            }else {
+                tvMsg.text = getString(R.string.unknown_error)
+            }
 
         })
         val btnPay = root.findViewById<Button>(R.id.btn_topup)
@@ -243,11 +300,17 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 // If the response is not null
 
                 if(res != null) {
-                    btnPay.text = res.message
+
                     // If the status is 200 it means there is a response returned
                     if(res.status == 200) {
                         btnPay.setBackgroundColor("#039E37".toColorInt())
+                        btnPay.text = res.message
                     }else {
+                        if(res.message.contains("resolve")) {
+                            btnPay.text = getString(R.string.internet)
+                        }else {
+                            btnPay.text = res.message
+                        }
                         btnPay.setBackgroundColor("#9E1F03".toColorInt())
                     }
                 }

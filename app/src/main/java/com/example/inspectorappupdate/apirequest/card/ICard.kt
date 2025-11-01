@@ -2,6 +2,7 @@ package com.example.inspectorappupdate.apirequest.card
 
 import com.example.inspectorappupdate.model.card.CardModel
 import com.example.inspectorappupdate.model.card.ChangePinModel
+import com.example.inspectorappupdate.model.card.DisablePinModel
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -21,5 +22,10 @@ interface ICard {
     @FormUrlEncoded
     @POST("api/change-pin")
     suspend fun changePIN(@Header("Authorization") bearer: String, @Field("old_pin") old_pin: String, @Field("new_pin") new_pin: String, @Field("card_number") card_number: String): Response<ChangePinModel>
+
+    @FormUrlEncoded
+    @POST("api/block-card")
+    suspend fun disableCard(@Header("Authorization") bearer: String, @Field("indicator") indicator: String): Response<DisablePinModel>
+
 
 }
