@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/rl_header_title"
         android:padding="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="5dp">
 
         <TextView
             android:id="@+id/tv_main_title"
@@ -56,16 +56,46 @@
             android:layout_height="wrap_content"
             android:text="@string/student_attendance"
             android:fontFamily="sans-serif-black"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textColor="#014C92"
-            android:layout_marginBottom="20sp"/>
+            android:layout_marginBottom="10sp"/>
+
+        <LinearLayout
+            android:id="@+id/ll_in_out"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/tv_main_title"
+            android:weightSum="2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10sp">
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/attendance_in"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/attendance_out"/>
+                </RelativeLayout>
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_processing_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/student_attendance"
-            android:layout_below="@id/tv_main_title"
+            android:layout_below="@id/ll_in_out"
             android:layout_marginBottom="20sp"
             android:textSize="16sp"
             android:layout_centerHorizontal="true"/>

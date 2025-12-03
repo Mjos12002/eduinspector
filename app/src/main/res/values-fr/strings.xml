@@ -160,7 +160,8 @@
     <string name="poweredby">Develope par RAISIN LTD</string>
     <string name="blockcard">Blocage de carte</string>
     <string name="disable_card">Désactiver la carte</string>
-    <string name="student_attendance">Presence de l etudiant</string>
-
+    <string name="student_attendance">Presence a l ecole</string>
+    <string name="attendance_in">Entree</string>
+    <string name="attendance_out">Sortie</string>
 
 </resources>

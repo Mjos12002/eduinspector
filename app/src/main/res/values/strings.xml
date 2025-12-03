@@ -160,6 +160,8 @@
     <string name="poweredby">Powered by RAISIN LTD</string>
     <string name="blockcard">Block card</string>
     <string name="disable_card">Disable card</string>
-    <string name="student_attendance">Student Attendance</string>
+    <string name="student_attendance">School Attendance</string>
+    <string name="attendance_in">In</string>
+    <string name="attendance_out">Out</string>
 
 </resources>
