@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.ui.fragment.topup
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -86,6 +87,8 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
         val root = inflater.inflate(R.layout.fragment_card_top_up, container, false)
         val tvMsg = root.findViewById<TextView>(R.id.tv_processing_message)
 
+        // Initialize the dialog view
+        val dialog = Dialog(requireContext())
         // Clear card view model
         lifecycleScope.launch {
             cardViewModel.clearCardDetails()

@@ -3,6 +3,7 @@ package com.example.inspectorappupdate.repository.student
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.inspectorappupdate.apirequest.student.IStudent
+import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModelData
 import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
@@ -21,7 +22,7 @@ class StudentRepository() {
         private var studentAPIInterface: IStudent = RetrofitInstance.getInstance().create(IStudent::class.java)
     }
 
-    // Method used to search the student by their registration number (OLD API)
+    // getStudentByRegNo is used to search the student by their registration number (OLD API)
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getStudentByRegNo(bearer: String, regNumber: String): StudentModel {
         // Initialize the response model
@@ -44,6 +45,7 @@ class StudentRepository() {
 
     }
 
+    // getStudentDetails
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getStudentDetails(bearer: String, regNumber: String): StudentSearchResponse {
 
@@ -69,6 +71,46 @@ class StudentRepository() {
 
         }
 
+    }
+
+    //addSchoolAttendanceOut is used to record attendance in
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun addSchoolAttendanceIn(bearer: String, cardNumber: String, deviceID: Int): SchoolAttendanceResponse {
+
+        try{
+            // Get the response from the end point and process the response accordingly
+            val res = studentAPIInterface.addSchoolAttendanceIn("Bearer $bearer", cardNumber, deviceID)
+            if (res.code() == 200 || res.code() == 201) {
+                return res.body()!!
+            }else {
+                val errorBody = res.errorBody()?.string()
+                val errorBodyObj = Gson().fromJson(errorBody, SchoolAttendanceResponse::class.java)
+                return SchoolAttendanceResponse(errorBodyObj.status, errorBodyObj.error, errorBodyObj.message)
+            }
+
+        }catch (e: Exception) {
+            return SchoolAttendanceResponse(true, e.message!!, "Uknown error, try again")
+        }
+    }
+
+    //addSchoolAttendanceOut is used to record attendance out
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun addSchoolAttendanceOut(bearer: String, cardNumber: String, deviceID: Int): SchoolAttendanceResponse {
+
+        try{
+            // Get the response from the end point and process the response accordingly
+            val res = studentAPIInterface.addSchoolAttendanceOut("Bearer $bearer", cardNumber, deviceID)
+            if (res.code() == 200 || res.code() == 201) {
+                return res.body()!!
+            }else {
+                val errorBody = res.errorBody()?.string()
+                val errorBodyObj = Gson().fromJson(errorBody, SchoolAttendanceResponse::class.java)
+                return SchoolAttendanceResponse(errorBodyObj.status, errorBodyObj.error, errorBodyObj.message)
+            }
+
+        }catch (e: Exception) {
+            return SchoolAttendanceResponse(true, e.message!!, "Unknown error, contact admin")
+        }
     }
 
 }

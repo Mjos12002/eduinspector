@@ -32,7 +32,7 @@
     <!-- Strings used for fragments for navigation -->
     <string name="second_fragment_label">Signin</string>
     <string name="next">Next action</string>
-    <string name="unknown_error"> Erreur inconnue, réessayez</string>
+    <string name="unknown_error"> Erreur inconnue, contactez admin</string>
     <string name="previous">Previous</string>
     <string name="canteen">Canteen</string>
     <string name="transaction_list">Transactions</string>
@@ -99,6 +99,7 @@
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="confirm">Confirm</string>
+    <string name="confirm_attendance">Confirmer la presence</string>
     <string name="filter_by_date">Filter by date</string>
     <string name="student_details">Student Details</string>
     <string name="transaction">Transaction</string>

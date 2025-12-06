@@ -1,19 +1,36 @@
 package com.example.inspectorappupdate.apirequest.student
 
+import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
 import retrofit2.Response
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.POST
 import retrofit2.http.Path
 
+//IStudent is an interface used to manage the activities related to student such as search student, get student and attendance management
 interface IStudent {
 
+    // searchStudentByRegistrationNumber is used to search the student by registration number
     @GET("api/show/{reg_number}/student")
     suspend fun searchStudentByRegistrationNumber(@Header("Authorization") bearer: String,  @Path("reg_number") reg_number: String): Response<StudentModel>
 
-
+    //getStudentByRegistrationNumber is used to get the student by registration number
     @GET("api/show/{reg_number}/student")
     suspend fun getStudentByRegistrationNumber(@Header("Authorization") bearer: String,  @Path("reg_number") reg_number: String): Response<StudentSearchResponse>
+
+    //addSchoolAttendance is used to create a new attendance in
+    @FormUrlEncoded
+    @POST("/api/attendance/check-in")
+    suspend fun addSchoolAttendanceIn(@Header("Authorization") bearer: String, @Field("card_number") card_number: String, @Field("device_id") device_id: Int): Response<SchoolAttendanceResponse>
+
+    //addSchoolAttendance is used to create a new attendance out
+    @FormUrlEncoded
+    @POST("/api/attendance/check-out")
+    suspend fun addSchoolAttendanceOut(@Header("Authorization") bearer: String, @Field("card_number") card_number: String, @Field("device_id") device_id: Int): Response<SchoolAttendanceResponse>
+
 
 }

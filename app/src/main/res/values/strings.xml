@@ -32,7 +32,7 @@
     <!-- Strings used for fragments for navigation -->
     <string name="second_fragment_label">Signin</string>
     <string name="next">Next action</string>
-    <string name="unknown_error">Unknown error, try again</string>
+    <string name="unknown_error">Unknown error, contact admin</string>
     <string name="previous">Previous</string>
     <string name="canteen">Canteen</string>
     <string name="transaction_list">Transactions</string>
@@ -99,6 +99,7 @@
     <string name="start_date">Start Date</string>
     <string name="end_date">End Date</string>
     <string name="confirm">Confirm</string>
+    <string name="confirm_attendance">Confirm attendance</string>
     <string name="filter_by_date">Filter by date</string>
     <string name="student_details">Student Details</string>
     <string name="transaction">Transaction</string>
@@ -120,7 +121,7 @@
     <string name="device_id">Device ID:</string>
     <string name="success">Success:</string>
     <string name="cardisnew">Card is new</string>
-    <string name="unregistered">Unregistered</string>
+    <string name="unregistered">Unregistered card</string>
     <string name="successfulpayment">Successfully paid, balance is</string>
     <string name="username_password_invalid_string">Ensure 3 characters for both username and password</string>
     <string name="xxx">xxx</string>

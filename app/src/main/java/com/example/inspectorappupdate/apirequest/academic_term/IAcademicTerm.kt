@@ -12,4 +12,6 @@ interface IAcademicTerm {
     @GET("/api/get-current-term")
     suspend fun getCurrentTerm(@Header("Authorization") bearer: String): Response<AcademicTermModel>
 
+
+
 }
