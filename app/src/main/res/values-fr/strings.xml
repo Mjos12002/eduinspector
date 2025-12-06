@@ -164,5 +164,6 @@
     <string name="student_attendance">Presence a l ecole</string>
     <string name="attendance_in">Entree</string>
     <string name="attendance_out">Sortie</string>
+    <string name="gate_checkinout">Enregistrement entrée et sortie</string>
 
 </resources>

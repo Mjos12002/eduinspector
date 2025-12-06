@@ -54,7 +54,7 @@
             android:id="@+id/tv_main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/student_attendance"
+            android:text="@string/gate_checkinout"
             android:fontFamily="sans-serif-medium"
             android:textSize="20sp"
             android:textColor="#014C92"
