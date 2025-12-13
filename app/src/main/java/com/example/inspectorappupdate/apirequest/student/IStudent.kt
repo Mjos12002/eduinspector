@@ -36,7 +36,6 @@ interface IStudent {
     suspend fun addSchoolAttendanceOut(@Header("Authorization") bearer: String, @Field("card_number") card_number: String, @Field("device_id") device_id: Int): Response<SchoolAttendanceResponse>
 
     // getStudentPermission is used to get the permissions of a student
-    @FormUrlEncoded
     @GET("/api/visit-permissions-student/{student_id}")
     suspend fun getStudentPermission(@Header("Authorization") bearer: String, @Path("student_id") studentID: String): Response<StudentPermissionResponse>
 

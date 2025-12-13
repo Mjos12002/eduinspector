@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -16,18 +15,17 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.transition.Visibility
 import com.example.inspectorappupdate.R
-import com.example.inspectorappupdate.repository.student.StudentRepository
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
 import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
-import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.time.format.DateTimeFormatter
+import java.util.Date
 import kotlin.getValue
 
 // TODO: Rename parameter arguments, choose names that match
@@ -88,6 +86,12 @@ class AttendanceFragment : Fragment() {
         attendanceDate = StringBuilder()
         attendanceTime = StringBuilder()
 
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val dateTimeFormatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val currentDate = LocalDateTime.now().format(dateFormatter)
+        val currentTime = LocalDateTime.now().format(timeFormatter)
+
         studentName.clear()
         cardStatus.clear()
         cardNumber.clear()
@@ -109,6 +113,14 @@ class AttendanceFragment : Fragment() {
         val tvAttendanceOut = root.findViewById<TextView>(R.id.tv_attendance_out)
         val btnCreateAttendance = root.findViewById<AppCompatButton>(R.id.btn_confirm_attendance)
 
+        // Permission details
+        val tvPermissionReason = root.findViewById<TextView>(R.id.tv_permission_reason)
+        val tvPermissionApprovalStatus = root.findViewById<TextView>(R.id.tv_permission_approval_status)
+        val tvPermissionStart = root.findViewById<TextView>(R.id.tv_permission_start)
+        val tvPermissionEnd = root.findViewById<TextView>(R.id.tv_permission_ends)
+        val tvPermissionUsed = root.findViewById<TextView>(R.id.tv_permission_used)
+        val rlPermissionContainer = root.findViewById<RelativeLayout>(R.id.rl_permission_container)
+
         setAttendanceType("In", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlStudentDetails)
 
         // Change active / passive based on user choice
@@ -118,7 +130,7 @@ class AttendanceFragment : Fragment() {
 
         // Change active / passive based on user choice
         rlAttendanceOut.setOnClickListener {
-            setAttendanceType("Out", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlAttendanceIn)
+            setAttendanceType("Out", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlStudentDetails)
 
         }
 
@@ -147,7 +159,33 @@ class AttendanceFragment : Fragment() {
 
         // Observe the changes in the student permission response
         studentViewModel.studentPermissionLiveData.observe(viewLifecycleOwner, Observer {
-            Log.i("TAG-INFORMATION", "$it")
+            if(it.data != null) {
+
+                // Filter the last permission
+                if (it.data.permissions.isNotEmpty()) {
+
+                    try{
+
+                        val lastPermission = it.data.permissions.sortedWith {a, b -> a.id}
+
+                        val permissionEndDate = LocalDateTime.parse(lastPermission[0].end_time, dateTimeFormatter)
+                        val today = LocalDateTime.now()
+                        val diff = Period.between(today.toLocalDate(), permissionEndDate.toLocalDate())
+                        Log.i("TAG-INFORMATION", "${diff.days}")
+                        if( diff.days <= 0) {
+                            rlPermissionContainer.visibility = View.VISIBLE
+                            tvPermissionApprovalStatus.text = "Approval: ${lastPermission[0].status}"
+                            tvPermissionReason.text = "Reason: ${lastPermission[0].reason}"
+                            tvPermissionStart.text = "Starts: ${lastPermission[0].start_time}"
+                            tvPermissionEnd.text = "Ends: ${lastPermission[0].end_time}"
+                            tvPermissionUsed.text = "Expired: ${lastPermission[0].has_exited}"
+                        }
+
+                    }catch (e: Exception) {
+                        Log.i("TAG-INFORMATION", "${e.message!!}")
+                    }
+                }
+            }
         })
 
         // Observe to changes in the student view model's attendance IN
@@ -168,7 +206,7 @@ class AttendanceFragment : Fragment() {
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
             // Try Or fail
             lifecycleScope.launch {
-                studentViewModel.getStudentPermission(userToken, it.data.card_number)
+                studentViewModel.getStudentPermission(userToken, "KSLjh")
             }
             try{
                 tvAttendanceResponse.visibility = View.GONE
@@ -181,10 +219,6 @@ class AttendanceFragment : Fragment() {
                 if (it.data != null) {
                     // Get the time and date formatted
                     strCardNumber = it.data.card_number
-                    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-                    val currentDate = LocalDateTime.now().format(dateFormatter)
-                    val currentTime = LocalDateTime.now().format(timeFormatter)
 
                     studentName.append(it.data.first_name)
                     studentName.append(" ")

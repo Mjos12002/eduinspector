@@ -1,6 +1,7 @@
 package com.example.inspectorappupdate.repository.student
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.inspectorappupdate.apirequest.student.IStudent
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
@@ -128,7 +129,7 @@ class StudentRepository() {
                 return StudentPermissionResponse(errorBodyObj.status, errorBodyObj.error, errorBodyObj.message, null)
             }
         }catch (e: Exception) {
-            return StudentPermissionResponse(true, "Error, contact admin", "Error, contact admin", null)
+            return StudentPermissionResponse(500, "Error, contact admin", e.message!!, null)
         }
     }
 
