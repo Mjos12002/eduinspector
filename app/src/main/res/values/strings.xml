@@ -162,8 +162,8 @@
     <string name="blockcard">Block card</string>
     <string name="disable_card">Disable card</string>
     <string name="student_attendance">School Attendance</string>
-    <string name="gate_checkinout">Gate check in - out</string>
-    <string name="attendance_in">In</string>
-    <string name="attendance_out">Out</string>
+    <string name="gate_checkinout">Gate</string>
+    <string name="attendance_in">Check In</string>
+    <string name="attendance_out">Check Out</string>
 
 </resources>

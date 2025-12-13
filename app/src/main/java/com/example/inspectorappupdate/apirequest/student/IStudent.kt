@@ -1,9 +1,12 @@
 package com.example.inspectorappupdate.apirequest.student
 
+import com.example.inspectorappupdate.apirequest.dto.studentpermissiondto.StudentPermissionDTO
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
+import com.example.inspectorappupdate.model.studentpermission.StudentPermissionResponse
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -32,5 +35,9 @@ interface IStudent {
     @POST("/api/attendance/check-out")
     suspend fun addSchoolAttendanceOut(@Header("Authorization") bearer: String, @Field("card_number") card_number: String, @Field("device_id") device_id: Int): Response<SchoolAttendanceResponse>
 
+    // getStudentPermission is used to get the permissions of a student
+    @FormUrlEncoded
+    @GET("/api/visit-permissions-student/{student_id}")
+    suspend fun getStudentPermission(@Header("Authorization") bearer: String, @Path("student_id") studentID: String): Response<StudentPermissionResponse>
 
 }

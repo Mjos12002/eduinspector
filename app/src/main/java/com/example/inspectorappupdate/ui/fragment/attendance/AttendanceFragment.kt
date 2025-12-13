@@ -52,6 +52,8 @@ class AttendanceFragment : Fragment() {
     lateinit var attendanceDate: StringBuilder
     lateinit var attendanceTime: StringBuilder
 
+    lateinit var userToken: String
+
     private val cardViewModel: CardViewModel by activityViewModels()
     private val studentViewModel: StudentViewModel by activityViewModels()
 
@@ -94,9 +96,10 @@ class AttendanceFragment : Fragment() {
 
         // Initialize the database module
         appDatabase = DbUtility().dbBuilder(requireContext())
-        // Get the details of the users and device id
+        // Get the user auth token and device id
         lifecycleScope.launch {
             deviceID = appDatabase.loggedInUserDao().getLastLogin().userID
+            userToken = appDatabase.loggedInUserDao().getLastLogin().token
         }
 
         // Initialization of the variables used to manage attendance type (IN / OUT)
@@ -106,16 +109,16 @@ class AttendanceFragment : Fragment() {
         val tvAttendanceOut = root.findViewById<TextView>(R.id.tv_attendance_out)
         val btnCreateAttendance = root.findViewById<AppCompatButton>(R.id.btn_confirm_attendance)
 
-        setAttendanceType("In", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut)
+        setAttendanceType("In", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlStudentDetails)
 
         // Change active / passive based on user choice
         rlAttendanceIn.setOnClickListener {
-            setAttendanceType("In", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut)
+            setAttendanceType("In", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlStudentDetails)
         }
 
         // Change active / passive based on user choice
         rlAttendanceOut.setOnClickListener {
-            setAttendanceType("Out", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut)
+            setAttendanceType("Out", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlAttendanceIn)
 
         }
 
@@ -142,23 +145,31 @@ class AttendanceFragment : Fragment() {
 
         }
 
-        // Listen to changes in the student view model's attendance IN
+        // Observe the changes in the student permission response
+        studentViewModel.studentPermissionLiveData.observe(viewLifecycleOwner, Observer {
+            Log.i("TAG-INFORMATION", "$it")
+        })
+
+        // Observe to changes in the student view model's attendance IN
         studentViewModel.classAttendanceInLiveData.observe(viewLifecycleOwner, Observer {
             pbProgressBar.visibility = View.GONE
             tvAttendanceResponse.text = it.message
             tvAttendanceResponse.visibility = View.VISIBLE
         })
 
-        // Listen to changes in the student view model's attendance OUT
+        // Observe to changes in the student view model's attendance OUT
         studentViewModel.classAttendanceOutLiveData.observe(viewLifecycleOwner, Observer {
             pbProgressBar.visibility = View.GONE
             tvAttendanceResponse.text = it.message
             tvAttendanceResponse.visibility = View.VISIBLE
         })
 
-        // Listen to changes in the card information
+        // Observe to changes in the card information
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
-            // Try and fail
+            // Try Or fail
+            lifecycleScope.launch {
+                studentViewModel.getStudentPermission(userToken, it.data.card_number)
+            }
             try{
                 tvAttendanceResponse.visibility = View.GONE
                 tvAttendanceResponse.text = ""
@@ -221,8 +232,9 @@ class AttendanceFragment : Fragment() {
     }
 
     //setAttendanceType is used to change the attendance type
-    fun setAttendanceType(attendance: String, tvIn: TextView, tvOut: TextView, rlIn: RelativeLayout, rlOut: RelativeLayout) {
+    fun setAttendanceType(attendance: String, tvIn: TextView, tvOut: TextView, rlIn: RelativeLayout, rlOut: RelativeLayout, rlAttendanceDetails: RelativeLayout) {
         inOrOut = attendance
+        rlAttendanceDetails.visibility = View.GONE
         if(attendance == "In") {
             tvIn.setTextColor(resources.getColor(R.color.white))
             rlIn.setBackgroundDrawable(resources.getDrawable(R.drawable.active_attendance))

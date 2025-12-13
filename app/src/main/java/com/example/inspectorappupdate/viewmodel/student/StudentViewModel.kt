@@ -11,6 +11,7 @@ import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
 import com.example.inspectorappupdate.model.student.StudentUserResponseModel
 import com.example.inspectorappupdate.model.student.UserResponseModel
+import com.example.inspectorappupdate.model.studentpermission.StudentPermissionResponse
 import com.example.inspectorappupdate.repository.student.StudentRepository
 
 // View model of the user response
@@ -26,7 +27,12 @@ class StudentViewModel: ViewModel() {
     // Initialize the variable of the class attendance in mutable livedata
     private var _classAttendanceOutMutableLiveData = MutableLiveData<SchoolAttendanceResponse>()
 
+    // Initialize the variable of the student permission mutable livedata
+    private var _studentPermissionMutableLiveData = MutableLiveData<StudentPermissionResponse>()
+
+
     // Initialize the variable of the student live data
+    var studentPermissionLiveData: LiveData<StudentPermissionResponse> = _studentPermissionMutableLiveData
     var studentLiveData: LiveData<StudentModel> = _studentMutableLiveData
     // Initialize the variable of student detail live data
     var studentDetailsLiveData: LiveData<StudentSearchResponse> = _studentDetailsMutableLiveData
@@ -37,6 +43,8 @@ class StudentViewModel: ViewModel() {
     // Initialize the variable of the class attendance out live data
     var classAttendanceOutLiveData: LiveData<SchoolAttendanceResponse> = _classAttendanceOutMutableLiveData
 
+
+
     // Function to get the student
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun searchStudentByRegNumber(bearer: String, regNumber: String) {
@@ -44,6 +52,18 @@ class StudentViewModel: ViewModel() {
         val response =  StudentRepository().getStudentByRegNo(bearer, regNumber)
         _studentMutableLiveData.postValue(response)
 
+    }
+
+    // getStudentPermission is used to get the student permission
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getStudentPermission(bearer: String, studentID: String) {
+        try{
+            Log.i("TAG-INFORMATION", studentID)
+            val permissionResponse = StudentRepository().getStudentPermission(bearer, studentID)
+            _studentPermissionMutableLiveData.postValue(permissionResponse)
+        }catch (e: Exception) {
+            Log.i("TAG-INFORMATION", e.message!!)
+        }
     }
 
     // getStudentDetails is used to get the student details

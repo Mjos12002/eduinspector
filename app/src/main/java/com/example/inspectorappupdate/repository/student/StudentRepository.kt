@@ -9,6 +9,7 @@ import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
 import com.example.inspectorappupdate.model.student.StudentUserResponseModel
 import com.example.inspectorappupdate.model.student.UserResponseModel
+import com.example.inspectorappupdate.model.studentpermission.StudentPermissionResponse
 import com.example.inspectorappupdate.utils.RetrofitInstance
 import com.google.gson.Gson
 
@@ -110,6 +111,24 @@ class StudentRepository() {
 
         }catch (e: Exception) {
             return SchoolAttendanceResponse(true, e.message!!, "Unknown error, contact admin")
+        }
+    }
+
+    // getStudentPermission is used to get the student permissions
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getStudentPermission(bearer: String, studentID: String): StudentPermissionResponse {
+        try {
+            // Get the response from the API, if a response is successful return the body otherwise return a structured error response
+            val res = studentAPIInterface.getStudentPermission("Bearer $bearer", studentID)
+            if (res.code() == 200 || res.code() == 201) {
+                return res.body()!!
+            }else {
+                val errorBody = res.errorBody()?.string()
+                val errorBodyObj = Gson().fromJson(errorBody, StudentPermissionResponse::class.java)
+                return StudentPermissionResponse(errorBodyObj.status, errorBodyObj.error, errorBodyObj.message, null)
+            }
+        }catch (e: Exception) {
+            return StudentPermissionResponse(true, "Error, contact admin", "Error, contact admin", null)
         }
     }
 
