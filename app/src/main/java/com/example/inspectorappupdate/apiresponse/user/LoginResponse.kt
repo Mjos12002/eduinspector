@@ -4,5 +4,5 @@ data class LoginResponse(
     var status: String,
     var error: String,
     var message: String,
-    var data: LoginResponseData
+    var data: LoginResponseData?
 ) {}

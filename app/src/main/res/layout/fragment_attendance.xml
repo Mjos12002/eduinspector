@@ -195,18 +195,19 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/rl_tap_time"
                 android:padding="10sp"
-                android:visibility="gone"
+                android:visibility="visible"
+                android:layout_margin="10sp"
                 android:background="@drawable/permissionbackground">
 
                 <TextView
                     android:id="@+id/tv_permission_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Permission details"
-                    android:textColor="#35E802"
+                    android:text="@string/permission_details"
+                    android:textColor="#fff"
                     android:layout_marginBottom="20sp"
                     android:fontFamily="sans-serif-medium"
-                    android:textSize="20sp"/>
+                    android:textSize="23sp"/>
 
                 <TextView
                     android:id="@+id/tv_permission_reason"

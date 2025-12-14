@@ -4,5 +4,5 @@ data class DeployedUserModel(
     val status: Int,
     val error: Boolean,
     val message: String,
-    val data: DeployedUserModelData
+    val data: DeployedUserModelData?
 )

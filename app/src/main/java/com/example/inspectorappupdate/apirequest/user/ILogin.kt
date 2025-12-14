@@ -12,10 +12,13 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ILogin {
+
+    // login is used to login the user
     @FormUrlEncoded
     @POST("api/login")
     suspend fun login(@Field("reg_number") reg_number: String, @Field("password") password: String): Response<LoginResponse>
 
+    //getDeployedUser is used to get deployed users
     @GET("api/show/{user_id}/user-deployed")
     suspend fun getDeployedUser(@Header("Authorization") bearer: String, @Path("user_id") user_id: Int): Response<DeployedUserModel>
 }

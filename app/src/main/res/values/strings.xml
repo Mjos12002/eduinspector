@@ -165,5 +165,6 @@
     <string name="gate_checkinout">Gate</string>
     <string name="attendance_in">Check In</string>
     <string name="attendance_out">Check Out</string>
+    <string name="permission_details">Permission details</string>
 
 </resources>

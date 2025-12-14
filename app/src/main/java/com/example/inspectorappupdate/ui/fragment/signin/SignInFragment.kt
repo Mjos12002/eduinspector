@@ -3,6 +3,7 @@ package com.example.inspectorappupdate.ui.fragment.signin
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -101,6 +102,7 @@ class SignInFragment : Fragment() {
         signInViewModel.loginResponseLiveData.observe(viewLifecycleOwner, Observer{
             try {
                 // Checking the response, if the response is ok then add the info to the local database
+                Log.i("TAG-INFORMATION", "$it")
                 if (it.status.toInt() == 200) {
                     // Getting the today's date
                     val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern(getString(R.string.date_pattern)))
@@ -112,9 +114,10 @@ class SignInFragment : Fragment() {
                     }
                     startActivity(Intent(context, SearchStudentActivity::class.java))
                 }else {
-                    signInViewModel.updateLoginStatusMessage(it.message)
+                    signInViewModel.updateLoginStatusMessage("Error, Contact Admin")
                 }
             }catch (e: Exception) {
+                Log.i("TAG-INFORMATION", "${e.message}")
                 Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             }
 

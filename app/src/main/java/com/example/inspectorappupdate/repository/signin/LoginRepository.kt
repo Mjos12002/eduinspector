@@ -4,9 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.inspectorappupdate.apirequest.user.ILogin
 import com.example.inspectorappupdate.apiresponse.user.LoginResponse
-import com.example.inspectorappupdate.apiresponse.user.LoginResponseData
 import com.example.inspectorappupdate.model.auth.DeployedUserModel
-import com.example.inspectorappupdate.model.auth.DeployedUserModelData
 import com.example.inspectorappupdate.model.auth.LoginModel
 import com.example.inspectorappupdate.utils.RetrofitInstance
 import com.google.gson.Gson
@@ -33,12 +31,11 @@ class LoginRepository() {
                 val message = errorObj.message
                 val err = errorObj.error
                 val status = errorObj.status
-                return LoginResponse(status, err, message,
-                    LoginResponseData("", "", "", "", "", "", "", "")
+                return LoginResponse(status, err, message, null
                 )
             }
         }catch (e: Exception) {
-            return LoginResponse("500", e.message!!, e.message!!, LoginResponseData("", "", "", "", "", "", "", ""))
+            return LoginResponse("500", e.message!!, e.message!!, null)
         }
     }
 
@@ -53,12 +50,10 @@ class LoginRepository() {
             }else {
                 val errorBody = res.errorBody()?.string()
                 val errorBodyObj = Gson().fromJson(errorBody, DeployedUserModel::class.java)
-                return DeployedUserModel(errorBodyObj.status, errorBodyObj.error, errorBodyObj.message,
-                    DeployedUserModelData(0, 0))
+                return DeployedUserModel(errorBodyObj.status, errorBodyObj.error, errorBodyObj.message,null)
             }
         }catch (e: Exception) {
-            return DeployedUserModel(500, true, e.message!!,
-                DeployedUserModelData(0, 0))
+            return DeployedUserModel(500, true, e.message!!, null)
         }
 
     }
