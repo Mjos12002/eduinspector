@@ -112,10 +112,13 @@ class AttendanceFragment : Fragment() {
 
         // Initialize the database module
         appDatabase = DbUtility().dbBuilder(requireContext())
+        // Initialize the view to show the user logged in
+        val tvShowLoggedInUser = root.findViewById<TextView>(R.id.tv_search_student_header)
         // Get the user auth token and device id
         lifecycleScope.launch {
             deviceID = appDatabase.loggedInUserDao().getLastLogin().userID
             userToken = appDatabase.loggedInUserDao().getLastLogin().token
+            tvShowLoggedInUser.text = appDatabase.loggedInUserDao().getLastLogin().lastName
         }
 
         // Initialization of the variables used to manage attendance type (IN / OUT)

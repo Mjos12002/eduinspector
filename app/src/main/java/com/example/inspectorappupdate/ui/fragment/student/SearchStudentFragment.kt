@@ -134,7 +134,6 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
         // Observe the changes in the live data object
         studentViewModel.studentLiveData.observe(viewLifecycleOwner, Observer{
             // Create the student name object to display by checking if there is an error
-            Log.i("INSPECTOR-LOG", "$it")
             if(!it.error) {
                 if(it.data != null) {
                     val studentName = StringBuilder()

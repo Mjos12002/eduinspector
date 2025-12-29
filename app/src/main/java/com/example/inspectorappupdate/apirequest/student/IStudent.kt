@@ -42,5 +42,5 @@ interface IStudent {
 
     //CreateStudentAttendance is used to call the api to create attendance record
     @POST("/api/class-attendance-record")
-    suspend fun CreateStudentAttendance(@Body studentAttendance: StudentAttendanceDTO): Response<StudentAttendanceResponse>
+    suspend fun createStudentAttendance(@Header("Authorization") bearer: String, @Body studentAttendance: StudentAttendanceDTO): Response<StudentAttendanceResponse>
 }

@@ -30,7 +30,6 @@
                 android:textColor="@color/white"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="@dimen/fifteen"
-                android:text="Welcome, man"
                 android:gravity="center_vertical"/>
         </LinearLayout>
 
@@ -60,16 +59,46 @@
             android:textColor="#014C92"
             android:layout_marginBottom="20sp"/>
 
-        <LinearLayout
-            android:id="@+id/ll_in_out"
-            android:layout_width="200sp"
+        <TextView
+            android:id="@+id/tv_divider"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@+id/tv_main_title"
-            android:weightSum="2"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10sp"
-            android:background="@drawable/attendance_in_out_container">
+            android:text="@string/divider"
+            android:layout_toEndOf="@id/tv_main_title"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="20sp"
+            android:textColor="#014C92"
+            android:layout_marginStart="20sp"
+            android:layout_marginBottom="20sp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/classroom"
+            android:layout_toEndOf="@id/tv_divider"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="20sp"
+            android:textColor="#014C92"
+            android:layout_marginBottom="20sp"
+            android:layout_marginStart="20sp"/>
+
+        <RelativeLayout
+            android:id="@+id/rl_attendance_gate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_main_title">
+
+            <LinearLayout
+                android:id="@+id/ll_in_out"
+                android:layout_width="200sp"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10sp"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/attendance_in_out_container">
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -99,183 +128,244 @@
                         android:layout_centerHorizontal="true"
                         android:fontFamily="sans-serif-light"/>
                 </RelativeLayout>
-        </LinearLayout>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_attendance_response"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/footercolor"
-            android:layout_below="@id/ll_in_out"
-            android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-light"
-            android:visibility="visible"
-            android:layout_marginTop="10sp"
-            android:textSize="20sp" />
-
-        <RelativeLayout
-            android:id="@+id/rl_attendance_details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20sp"
-            android:layout_below="@id/tv_attendance_response"
-            android:background="@drawable/custom_card"
-            android:visibility="visible">
-
-            <RelativeLayout
-                android:id="@+id/rl_student_information"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10sp">
-
-                <TextView
-                    android:id="@+id/tv_student_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:textSize="20sp"
-                    android:textColor="#010547"
-                    android:fontFamily="sans-serif-black"
-                    android:text="Jean Paul Kalisa"/>
-
-                <TextView
-                    android:id="@+id/tv_card_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_student_name"
-                    android:layout_marginTop="5sp"
-                    android:textColor="@color/mainGreen"
-                    android:text="Card No: 002839939"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="15sp"/>
-
-                <TextView
-                    android:id="@+id/tv_card_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_card_number"
-                    android:layout_marginTop="5sp"
-                    android:textColor="#012A47"
-                    android:text="Card Status"
-                    android:fontFamily="sans-serif-thin"
-                    android:textSize="15sp"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/rl_tap_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/rl_student_information"
-                android:layout_margin="10sp"
-                android:paddingTop="10sp">
-
-                <TextView
-                    android:id="@+id/tv_attendance_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Date: 2025-12-09"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginBottom="5sp"
-                    android:fontFamily="sans-serif-light"/>
-
-                <TextView
-                    android:id="@+id/tv_attendance_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Time: 14h20"
-                    android:layout_below="@id/tv_attendance_date"
-                    android:fontFamily="sans-serif-light"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/rl_permission_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/rl_tap_time"
-                android:padding="10sp"
-                android:visibility="gone"
-                android:layout_margin="10sp"
-                android:background="@drawable/permissionbackground">
-
-                <TextView
-                    android:id="@+id/tv_permission_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/permission_details"
-                    android:textColor="#fff"
-                    android:layout_marginBottom="20sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textSize="23sp"/>
-
-                <TextView
-                    android:id="@+id/tv_permission_reason"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Reason"
-                    android:layout_marginBottom="8sp"
-                    android:textColor="@color/white"
-                    android:layout_below="@+id/tv_permission_title"
-                    android:fontFamily="sans-serif-light"/>
-
-                <TextView
-                    android:id="@+id/tv_permission_approval_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Approved"
-                    android:layout_below="@id/tv_permission_reason"
-                    android:layout_marginBottom="8sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"/>
-
-                <TextView
-                    android:id="@+id/tv_permission_start"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Starts: 2025-12-20"
-                    android:layout_below="@id/tv_permission_approval_status"
-                    android:layout_marginBottom="8sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"/>
-
-                <TextView
-                    android:id="@+id/tv_permission_ends"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ends: 2025-12-30"
-                    android:layout_below="@id/tv_permission_start"
-                    android:layout_marginBottom="8sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"/>
-
-                <TextView
-                    android:id="@+id/tv_permission_used"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Used: False"
-                    android:layout_below="@id/tv_permission_ends"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"/>
-
-
-            </RelativeLayout>
-
-            <ProgressBar
-                android:id="@+id/pb_processing"
+            <TextView
+                android:id="@+id/tv_attendance_response"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10sp"
-                android:layout_below="@id/rl_permission_container"
+                android:textColor="@color/footercolor"
+                android:layout_below="@id/ll_in_out"
                 android:layout_centerHorizontal="true"
-                android:visibility="gone"/>
+                android:fontFamily="sans-serif-light"
+                android:visibility="visible"
+                android:layout_marginTop="10sp"
+                android:textSize="20sp" />
+
+            <RelativeLayout
+                android:id="@+id/rl_attendance_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:layout_below="@id/tv_attendance_response"
+                android:background="@drawable/custom_card"
+                android:visibility="visible">
+
+                <RelativeLayout
+                    android:id="@+id/rl_student_information"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10sp">
+
+                    <TextView
+                        android:id="@+id/tv_student_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:textSize="20sp"
+                        android:textColor="#010547"
+                        android:fontFamily="sans-serif-black"
+                        android:text="Jean Paul Kalisa"/>
+
+                    <TextView
+                        android:id="@+id/tv_card_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_student_name"
+                        android:layout_marginTop="5sp"
+                        android:textColor="@color/mainGreen"
+                        android:text="Card No: 002839939"
+                        android:fontFamily="sans-serif-light"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_card_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_card_number"
+                        android:layout_marginTop="5sp"
+                        android:textColor="#012A47"
+                        android:text="Card Status"
+                        android:fontFamily="sans-serif-thin"
+                        android:textSize="15sp"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_tap_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/rl_student_information"
+                    android:layout_margin="10sp"
+                    android:paddingTop="10sp">
+
+                    <TextView
+                        android:id="@+id/tv_attendance_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Date: 2025-12-09"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="5sp"
+                        android:fontFamily="sans-serif-light"/>
+
+                    <TextView
+                        android:id="@+id/tv_attendance_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Time: 14h20"
+                        android:layout_below="@id/tv_attendance_date"
+                        android:fontFamily="sans-serif-light"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_permission_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/rl_tap_time"
+                    android:padding="10sp"
+                    android:visibility="gone"
+                    android:layout_margin="10sp"
+                    android:background="@drawable/permissionbackground">
+
+                    <TextView
+                        android:id="@+id/tv_permission_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/permission_details"
+                        android:textColor="#fff"
+                        android:layout_marginBottom="20sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="23sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_permission_reason"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Reason"
+                        android:layout_marginBottom="8sp"
+                        android:textColor="@color/white"
+                        android:layout_below="@+id/tv_permission_title"
+                        android:fontFamily="sans-serif-light"/>
+
+                    <TextView
+                        android:id="@+id/tv_permission_approval_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Approved"
+                        android:layout_below="@id/tv_permission_reason"
+                        android:layout_marginBottom="8sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-light"/>
+
+                    <TextView
+                        android:id="@+id/tv_permission_start"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Starts: 2025-12-20"
+                        android:layout_below="@id/tv_permission_approval_status"
+                        android:layout_marginBottom="8sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-light"/>
+
+                    <TextView
+                        android:id="@+id/tv_permission_ends"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ends: 2025-12-30"
+                        android:layout_below="@id/tv_permission_start"
+                        android:layout_marginBottom="8sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-light"/>
+
+                    <TextView
+                        android:id="@+id/tv_permission_used"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Used: False"
+                        android:layout_below="@id/tv_permission_ends"
+                        android:textColor="@color/white"
+                        android:fontFamily="sans-serif-light"/>
+
+
+                </RelativeLayout>
+
+                <ProgressBar
+                    android:id="@+id/pb_processing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10sp"
+                    android:layout_below="@id/rl_permission_container"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="gone"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_confirm_attendance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/confirm"
+                    android:layout_below="@id/pb_processing"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="15dp"
+                    android:minHeight="28sp"
+                    android:padding="5sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/search_transaction_button_background"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_margin="10sp"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/tl_attendance_classroom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_attendance_gate"
+            android:layout_marginTop="10sp"
+            android:background="@drawable/custom_card"
+            android:padding="10sp">
+
+            <Spinner
+                android:id="@+id/sp_classname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                style="@style/Theme.TaxiSharing.EditText"
+                android:background="@drawable/edittextstyle"/>
+
+            <Spinner
+                android:id="@+id/sp_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/sp_classname"
+                android:layout_marginTop="10sp"
+                style="@style/Theme.TaxiSharing.EditText"
+                android:background="@drawable/edittextstyle"/>
+
+            <EditText
+                android:id="@+id/et_attendance_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Note"
+                android:background="@drawable/edittextstyle"
+                android:layout_below="@id/sp_status"/>
+
+            <TextView
+                android:id="@+id/tv_classroom_attendance_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date: 2025-01-02"
+                android:layout_below="@id/et_attendance_note"
+                android:layout_marginTop="10sp"/>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_confirm_attendance"
+                android:id="@+id/btn_confirm_classroom_attendance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/confirm"
-                android:layout_below="@id/pb_processing"
+                android:layout_below="@id/tv_classroom_attendance_date"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="15dp"
                 android:minHeight="28sp"
@@ -286,6 +376,9 @@
                 android:layout_margin="10sp"/>
 
         </RelativeLayout>
+
+
+
 
     </RelativeLayout>
 

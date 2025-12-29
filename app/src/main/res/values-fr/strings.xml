@@ -166,5 +166,7 @@
     <string name="attendance_out">Sortie</string>
     <string name="gate_checkinout">Enregistrement entrée et sortie</string>
     <string name="permission_details">Permissions</string>
+    <string name="classroom">Classe</string>
+    <string name="divider">|</string>
 
 </resources>

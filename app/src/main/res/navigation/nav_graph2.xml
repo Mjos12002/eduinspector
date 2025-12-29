@@ -37,5 +37,11 @@
         android:label="Student Attendance"
         tools:layout="@layout/fragment_attendance"/>
 
+    <fragment
+        android:id="@+id/AttendanceClassRoomFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.attendance.AttendanceClassRoomFragment"
+        android:label="ClassRoom Attendance"
+        tools:layout="@layout/fragment_attendance_class_room"/>
+
 
 </navigation>

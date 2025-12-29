@@ -135,13 +135,21 @@ class StudentRepository() {
         }
     }
 
+    //createStudentAttendance is used to create teh attendance of the student
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun createStudentAttendance(bearer: String, studentAttendance: StudentAttendanceDTO): StudentAttendanceResponse {
         try {
 
-
-
+            val res = studentAPIInterface.createStudentAttendance("Bearer $bearer", studentAttendance)
+            if (res.code() == 200 || res.code() == 201) {
+                return res.body()!!
+            }else {
+                val errorBody = res.errorBody()?.string()
+                val errorBodyObject = Gson().fromJson(errorBody, StudentAttendanceResponse::class.java)
+                return StudentAttendanceResponse(errorBodyObject.status, errorBodyObject.error, errorBodyObject.message)
+            }
         }catch (e: Exception) {
-
+                return StudentAttendanceResponse(500, true, "Error, Contact Admin")
         }
     }
 
