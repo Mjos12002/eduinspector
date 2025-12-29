@@ -58,7 +58,6 @@ class StudentViewModel: ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getStudentPermission(bearer: String, studentID: String) {
         try{
-            Log.i("TAG-INFORMATION", studentID)
             val permissionResponse = StudentRepository().getStudentPermission(bearer, studentID)
             _studentPermissionMutableLiveData.postValue(permissionResponse)
         }catch (e: Exception) {

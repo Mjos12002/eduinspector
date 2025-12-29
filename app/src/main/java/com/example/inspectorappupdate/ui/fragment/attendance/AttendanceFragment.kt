@@ -12,6 +12,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -100,9 +101,8 @@ class AttendanceFragment : Fragment() {
 
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-        val dateTimeFormatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        val dateTimeFormatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val currentDate = LocalDateTime.now().format(dateFormatter)
-        val currentTime = LocalDateTime.now().format(timeFormatter)
 
         studentName.clear()
         cardStatus.clear()
@@ -171,6 +171,7 @@ class AttendanceFragment : Fragment() {
 
         // Observe the changes in the student permission response
         studentViewModel.studentPermissionLiveData.observe(viewLifecycleOwner, Observer {
+            Log.i("TAG-INFORMATION", "$it")
             if(it.data != null) {
 
                 // Check if the permission is not empty (List of last 5 permission)
@@ -181,33 +182,39 @@ class AttendanceFragment : Fragment() {
                         if (inOrOut == "Out") {
                             // Checking the last student permission
                             val lastStudentPermission = checkLastStudentPermission(it)
-                            val permissionExpiry = checkPermissionExpiryTime(lastStudentPermission!!, dateTimeFormatter)
-                            Log.i("TAG-INFORMATION", "$permissionExpiry")
-//                            if( diff.days == 0 && sortedPermission[0].has_exited == "false") {
-//                                permissionID = sortedPermission[0].id
-//                                studentHasPermission = true
-//                                rlPermissionContainer.visibility = View.VISIBLE
-//                                tvPermissionApprovalStatus.text = "Approval: ${sortedPermission[0].status}"
-//                                tvPermissionReason.text = "Reason: ${sortedPermission[0].reason}"
-//                                tvPermissionStart.text = "Starts: ${sortedPermission[0].start_time}"
-//                                tvPermissionEnd.text = "Ends: ${sortedPermission[0].end_time}"
-//                                tvPermissionUsed.text = "Expired: ${sortedPermission[0].has_exited}"
-//                            }
+                            val permissionEndDateDiff = checkDateDifference(lastStudentPermission!!, dateTimeFormatter, "end")
+                            val permissionStartDateDiff = checkDateDifference(lastStudentPermission, dateTimeFormatter, "start")
 
-                            // Check last student permission
-                            checkLastStudentPermission(it)
+                            if (permissionEndDateDiff > 0 && lastStudentPermission.has_exited == "false") {
+                                permissionID = lastStudentPermission.id
+                                studentHasPermission = true
+                                rlPermissionContainer.visibility = View.VISIBLE
+                                tvPermissionApprovalStatus.text = "Approval: ${lastStudentPermission.status}"
+                                tvPermissionReason.text = "Reason: ${lastStudentPermission.reason}"
+                                tvPermissionStart.text = "Starts: ${lastStudentPermission.start_time}"
+                                tvPermissionEnd.text = "Ends: ${lastStudentPermission.end_time}"
+                                tvPermissionUsed.text = "Expired: ${lastStudentPermission.has_exited}"
+                            }
 
                         }else if(inOrOut == "In") {
-//                            if( (diff.days <= 0) && sortedPermission[0].has_exited == "true") {
-//                                permissionID = sortedPermission[0].id
-//                                studentHasPermission = true
-//                                rlPermissionContainer.visibility = View.VISIBLE
-//                                tvPermissionApprovalStatus.text = "Approval: ${sortedPermission[0].status}"
-//                                tvPermissionReason.text = "Reason: ${sortedPermission[0].reason}"
-//                                tvPermissionStart.text = "Starts: ${sortedPermission[0].start_time}"
-//                                tvPermissionEnd.text = "Ends: ${sortedPermission[0].end_time}"
-//                                tvPermissionUsed.text = "Expired: ${sortedPermission[0].has_exited}"
-//                            }
+                            val lastStudentPermission = checkLastStudentPermission(it)
+                            val permissionEndDateDiff = checkDateDifference(lastStudentPermission!!, dateTimeFormatter, "end")
+                            val permissionStartDateDiff = checkDateDifference(lastStudentPermission, dateTimeFormatter, "start")
+
+                            Log.i("TAG-INFORMATION", "$permissionEndDateDiff")
+                            Log.i("TAG-INFORMATION", "$permissionStartDateDiff")
+                            Log.i("TAG-INFORMATION", "$lastStudentPermission")
+
+                            if (permissionEndDateDiff <= 0 && lastStudentPermission.has_exited == "true") {
+                                permissionID = lastStudentPermission.id
+                                studentHasPermission = true
+                                rlPermissionContainer.visibility = View.VISIBLE
+                                tvPermissionApprovalStatus.text = "Approval: ${lastStudentPermission.status}"
+                                tvPermissionReason.text = "Reason: ${lastStudentPermission.reason}"
+                                tvPermissionStart.text = "Starts: ${lastStudentPermission.start_time}"
+                                tvPermissionEnd.text = "Ends: ${lastStudentPermission.end_time}"
+                                tvPermissionUsed.text = "Expired: ${lastStudentPermission.has_exited}"
+                            }
                         }
 
                     }catch (e: Exception) {
@@ -235,7 +242,8 @@ class AttendanceFragment : Fragment() {
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
             // Try Or fail
             lifecycleScope.launch {
-                studentViewModel.getStudentPermission(userToken, "KSLjh")
+                userToken = appDatabase.loggedInUserDao().getLastLogin().token
+                studentViewModel.getStudentPermission(userToken, it.data.reg_number)
             }
             try{
                 tvAttendanceResponse.visibility = View.GONE
@@ -267,7 +275,7 @@ class AttendanceFragment : Fragment() {
 
                     // append the attendance time
                     attendanceTime.append("Time: ")
-                    attendanceTime.append(currentTime.toString())
+                    attendanceTime.append(LocalDateTime.now().format(timeFormatter).toString())
 
                     root.findViewById<TextView>(R.id.tv_student_name).text = studentName.toString()
                     root.findViewById<TextView>(R.id.tv_card_number).text = cardNumber.toString()
@@ -300,38 +308,39 @@ class AttendanceFragment : Fragment() {
         rlAttendanceDetails.visibility = View.GONE
         if(attendance == "In") {
             tvIn.setTextColor(resources.getColor(R.color.white))
-            rlIn.setBackgroundDrawable(resources.getDrawable(R.drawable.active_attendance))
+            rlIn.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_attendance)
             tvOut.setTextColor(resources.getColor(R.color.black))
-            rlOut.setBackgroundDrawable(resources.getDrawable(R.drawable.inactive_attendance))
+            rlOut.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_attendance)
         }else {
             tvOut.setTextColor(resources.getColor(R.color.white))
-            rlOut.setBackgroundDrawable(resources.getDrawable(R.drawable.active_attendance))
+            rlOut.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_attendance)
             tvIn.setTextColor(resources.getColor(R.color.black))
-            rlIn.setBackgroundDrawable(resources.getDrawable(R.drawable.inactive_attendance))
+            rlIn.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_attendance)
         }
     }
 
     // checkLastStudentPermission is used to check the last permission of the student
     @RequiresApi(Build.VERSION_CODES.O)
     fun checkLastStudentPermission(studentPermission: StudentPermissionResponse): Permission? {
+        Log.i("TAG-INFORMATION", "$studentPermission")
         val sortedPermission = studentPermission.data?.permissions?.sortedWith {a, b -> a.id}
         return sortedPermission?.get(0)
     }
 
     // checkPermissionExpiryTime is used to check the expiry of the permission
     @RequiresApi(Build.VERSION_CODES.O)
-    fun checkPermissionExpiryTime(permission: Permission, dateTimeFormatter: DateTimeFormatter): Int {
-        val strPermissionExpireTime = permission.end_time
+    fun checkDateDifference(permission: Permission, dateTimeFormatter: DateTimeFormatter, type: String): Int {
+
+        var strPermissionDate = permission.end_time
+        if (type == "start") {
+            strPermissionDate = permission.start_time
+        }
         val strNow = LocalDateTime.now().format(dateTimeFormatter)
+        val permissionEndDate = LocalDateTime.parse(strPermissionDate, dateTimeFormatter)
+        val now = LocalDateTime.parse(strNow, dateTimeFormatter)
+        val duration = Duration.between(now, permissionEndDate).toHours().toInt()
+        return duration
 
-        val permissionEndDate = LocalDateTime.parse("2025-12-14 20:20", dateTimeFormatter)
-        val now = LocalDateTime.parse("2025-12-14 23:00", dateTimeFormatter)
-
-        val comparison = now.compareTo(permissionEndDate)
-        val duration = Duration.between(permissionEndDate, now).toHours()
-        Log.i("TAG-INFORMATION", "$permissionEndDate -- $now -- $duration}")
-
-        return comparison
     }
     companion object {
         lateinit var appDatabase: AppDatabase

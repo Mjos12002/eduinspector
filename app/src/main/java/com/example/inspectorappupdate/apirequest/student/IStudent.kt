@@ -1,7 +1,8 @@
 package com.example.inspectorappupdate.apirequest.student
 
-import com.example.inspectorappupdate.apirequest.dto.studentpermissiondto.StudentPermissionDTO
+import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
+import com.example.inspectorappupdate.model.student.StudentAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
 import com.example.inspectorappupdate.model.studentpermission.StudentPermissionResponse
@@ -39,4 +40,7 @@ interface IStudent {
     @GET("/api/visit-permissions-student/{student_id}")
     suspend fun getStudentPermission(@Header("Authorization") bearer: String, @Path("student_id") studentID: String): Response<StudentPermissionResponse>
 
+    //CreateStudentAttendance is used to call the api to create attendance record
+    @POST("/api/class-attendance-record")
+    suspend fun CreateStudentAttendance(@Body studentAttendance: StudentAttendanceDTO): Response<StudentAttendanceResponse>
 }

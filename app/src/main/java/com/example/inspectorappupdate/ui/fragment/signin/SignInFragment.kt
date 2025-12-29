@@ -102,12 +102,14 @@ class SignInFragment : Fragment() {
         signInViewModel.loginResponseLiveData.observe(viewLifecycleOwner, Observer{
             try {
                 // Checking the response, if the response is ok then add the info to the local database
-                Log.i("TAG-INFORMATION", "$it")
                 if (it.status.toInt() == 200) {
                     // Getting the today's date
                     val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern(getString(R.string.date_pattern)))
                     signInViewModel.updateLoginStatusMessage("")
-                    val userLoggedIn = LoggedInUserEntity(0, it.status, it.error, it.message, it.data.first_name, it.data.last_name, it.data.contact_number, it.data.reg_number, it.data.email, it.data.token, it.data.user_id, it.data.role, today)
+                    val userLoggedIn = LoggedInUserEntity(0, it.status, it.error, it.message,
+                        it.data?.first_name!! , it.data!!.last_name,
+                        it.data?.contact_number!!, it.data?.reg_number!! ,
+                        it.data?.email!! , it?.data?.token!!, it.data?.user_id!! , it?.data?.role!!, today)
 
                     lifecycleScope.launch {
                         appDatabase.loggedInUserDao().insert(userLoggedIn)

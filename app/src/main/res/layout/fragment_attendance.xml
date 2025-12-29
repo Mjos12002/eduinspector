@@ -195,7 +195,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/rl_tap_time"
                 android:padding="10sp"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_margin="10sp"
                 android:background="@drawable/permissionbackground">
 

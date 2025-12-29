@@ -4,7 +4,9 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.inspectorappupdate.apirequest.student.IStudent
+import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
+import com.example.inspectorappupdate.model.student.StudentAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModelData
 import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
@@ -130,6 +132,16 @@ class StudentRepository() {
             }
         }catch (e: Exception) {
             return StudentPermissionResponse(500, "Error, contact admin", e.message!!, null)
+        }
+    }
+
+    suspend fun createStudentAttendance(bearer: String, studentAttendance: StudentAttendanceDTO): StudentAttendanceResponse {
+        try {
+
+
+
+        }catch (e: Exception) {
+
         }
     }
 
