@@ -7,16 +7,26 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.R
+import com.example.inspectorappupdate.adapter.SchoolClassAdapter
+import com.example.inspectorappupdate.adapter.SchoolPresentOptionAdapter
+import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
+import com.example.inspectorappupdate.enums.AttendanceCategoryEnum
+import com.example.inspectorappupdate.model.attendance.AttendanceOptionModel
+import com.example.inspectorappupdate.model.schoolclass.SchoolClassModel
 import com.example.inspectorappupdate.model.studentpermission.Permission
 import com.example.inspectorappupdate.model.studentpermission.StudentPermissionResponse
 import com.example.inspectorappupdate.utils.AppDatabase
@@ -28,6 +38,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.getValue
+import kotlin.reflect.typeOf
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,13 +50,14 @@ private const val ARG_PARAM2 = "param2"
  * Use the [AttendanceFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class AttendanceFragment : Fragment() {
+class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
     // TODO: Rename and change types of parameters
 
     // Variable for the device ID
     private var deviceID = ""
     // Variable ro the action taken (In or Out)
     private var inOrOut = ""
+    private var strStudentRegNumber = ""
     // Variable for the card number
     private var strCardNumber = ""
     // Variable for the student name (Showing on the UI)
@@ -118,8 +130,35 @@ class AttendanceFragment : Fragment() {
         lifecycleScope.launch {
             deviceID = appDatabase.loggedInUserDao().getLastLogin().userID
             userToken = appDatabase.loggedInUserDao().getLastLogin().token
-            tvShowLoggedInUser.text = appDatabase.loggedInUserDao().getLastLogin().lastName
+            val loggedInUser: StringBuilder = StringBuilder()
+            loggedInUser.append("Welcome, ")
+            loggedInUser.append(appDatabase.loggedInUserDao().getLastLogin().lastName)
+            loggedInUser.append(" ")
+            loggedInUser.append(appDatabase.loggedInUserDao().getLastLogin().firstName)
+            tvShowLoggedInUser.text = loggedInUser.toString()
         }
+
+        // Initialize the school classname and attendance option model
+        val schoolClassNameModel = listOf<SchoolClassModel>(
+            SchoolClassModel("Choose class name"),
+            SchoolClassModel("S1 A"),
+            SchoolClassModel("S1 B"),
+            SchoolClassModel("S1 C"),
+            SchoolClassModel("S2 A"),
+            SchoolClassModel("S2 B"),
+            SchoolClassModel("S2 C"),
+            SchoolClassModel("S3 A"),
+            SchoolClassModel("S3 B"),
+        )
+
+        val attendanceModel = listOf<AttendanceOptionModel>(
+            AttendanceOptionModel(AttendanceCategoryEnum.ABSENT.value),
+            AttendanceOptionModel(AttendanceCategoryEnum.PRESENT.value)
+        )
+
+        // Initialize school class adapter and school presence option adapter
+        val schoolClassAdapter = SchoolClassAdapter(requireContext(), schoolClassNameModel)
+        val schoolPresenceOptionAdapter = SchoolPresentOptionAdapter(requireContext(), attendanceModel)
 
         // Initialization of the variables used to manage attendance type (IN / OUT)
         val rlAttendanceIn = root.findViewById<RelativeLayout>(R.id.rl_attendance_in)
@@ -127,6 +166,16 @@ class AttendanceFragment : Fragment() {
         val tvAttendanceIn = root.findViewById<TextView>(R.id.tv_attendance_in)
         val tvAttendanceOut = root.findViewById<TextView>(R.id.tv_attendance_out)
         val btnCreateAttendance = root.findViewById<AppCompatButton>(R.id.btn_confirm_attendance)
+        val tvGateChoice = root.findViewById<TextView>(R.id.tv_gate_choice)
+        val tvClassRoomChoice = root.findViewById<TextView>(R.id.tv_classroom_choice)
+        val rlGateAttendance = root.findViewById<RelativeLayout>(R.id.rl_attendance_gate)
+        val rlClassAttendance = root.findViewById<RelativeLayout>(R.id.rl_attendance_classroom)
+        val spAttendanceStatus = root.findViewById<Spinner>(R.id.sp_status)
+        val spClassName = root.findViewById<Spinner>(R.id.sp_classname)
+        val tvClassAttendanceDate = root.findViewById<TextView>(R.id.tv_classroom_attendance_date)
+        val btnCreateSchoolAttendance = root.findViewById<AppCompatButton>(R.id.btn_confirm_classroom_attendance)
+        val pbSchoolAttendance = root.findViewById<ProgressBar>(R.id.pb_classroom_attendance)
+        val etAttendanceNote = root.findViewById<EditText>(R.id.et_attendance_note)
 
         // Permission details
         val tvPermissionReason = root.findViewById<TextView>(R.id.tv_permission_reason)
@@ -135,6 +184,45 @@ class AttendanceFragment : Fragment() {
         val tvPermissionEnd = root.findViewById<TextView>(R.id.tv_permission_ends)
         val tvPermissionUsed = root.findViewById<TextView>(R.id.tv_permission_used)
         val rlPermissionContainer = root.findViewById<RelativeLayout>(R.id.rl_permission_container)
+
+        // Set the adapter of the spinners
+        spAttendanceStatus.adapter = schoolPresenceOptionAdapter
+        spClassName.adapter = schoolClassAdapter
+
+        spAttendanceStatus.onItemSelectedListener = this
+        spClassName.onItemSelectedListener = this
+
+        // Click event for the class room attendance
+        btnCreateSchoolAttendance.setOnClickListener {
+            try{
+                pbSchoolAttendance.visibility = View.VISIBLE
+                lifecycleScope.launch {
+                    val txtAttendanceNote = etAttendanceNote.text.toString()
+                    studentViewModel.createStudentClassRoomAttendance(userToken, StudentAttendanceDTO(strStudentRegNumber, "", "", "", 2, txtAttendanceNote))
+
+                }
+
+            }catch (e: Exception) {
+
+            }
+        }
+
+        // Click event on the gate choice, change background (active/inactive) and show / hide class attendance or gate attendance
+        tvGateChoice.setOnClickListener {
+            it.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_gate_or_classroom)
+            tvClassRoomChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            rlGateAttendance.visibility = View.VISIBLE
+            rlClassAttendance.visibility = View.GONE
+        }
+
+        // Click event on the classroom choice, change background (active/inactive) and show / hide class attendance or gate attendance
+        tvClassRoomChoice.setOnClickListener {
+            tvGateChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            it.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_gate_or_classroom)
+            rlClassAttendance.visibility = View.VISIBLE
+            rlGateAttendance.visibility = View.GONE
+            tvClassAttendanceDate.text = "${LocalDateTime.now().format(dateFormatter).toString()} ${LocalDateTime.now().format(timeFormatter).toString()}"
+        }
 
         setAttendanceType("In", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlStudentDetails)
 
@@ -259,6 +347,7 @@ class AttendanceFragment : Fragment() {
                 if (it.data != null) {
                     // Get the time and date formatted
                     strCardNumber = it.data.card_number
+                    strStudentRegNumber = it.data.reg_number
 
                     studentName.append(it.data.first_name)
                     studentName.append(" ")
@@ -345,6 +434,22 @@ class AttendanceFragment : Fragment() {
         return duration
 
     }
+
+    override fun onItemSelected(
+        p0: AdapterView<*>?,
+        p1: View?,
+        p2: Int,
+        p3: Long
+    ) {
+        var x = p0?.getItemAtPosition(p2)
+
+        Log.i("TAG-INFORMATION", "${x?.javaClass}")
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+        TODO("Not yet implemented")
+    }
+
     companion object {
         lateinit var appDatabase: AppDatabase
     }

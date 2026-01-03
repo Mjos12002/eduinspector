@@ -6,7 +6,9 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
+import com.example.inspectorappupdate.model.student.StudentAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModel
 import com.example.inspectorappupdate.model.student.StudentSearchResponse
 import com.example.inspectorappupdate.model.student.StudentUserResponseModel
@@ -30,6 +32,9 @@ class StudentViewModel: ViewModel() {
     // Initialize the variable of the student permission mutable livedata
     private var _studentPermissionMutableLiveData = MutableLiveData<StudentPermissionResponse>()
 
+    // Initialize the variable of the student attendance response
+    private var _classRoomAttendanceMutableLiveData = MutableLiveData<StudentAttendanceResponse>()
+
 
     // Initialize the variable of the student live data
     var studentPermissionLiveData: LiveData<StudentPermissionResponse> = _studentPermissionMutableLiveData
@@ -42,8 +47,15 @@ class StudentViewModel: ViewModel() {
 
     // Initialize the variable of the class attendance out live data
     var classAttendanceOutLiveData: LiveData<SchoolAttendanceResponse> = _classAttendanceOutMutableLiveData
+    var classRoomAttendanceLiveData: LiveData<StudentAttendanceResponse>  = _classRoomAttendanceMutableLiveData
 
 
+    //createStudentClassRoomAttendance is used to manage the class student room attendance
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun createStudentClassRoomAttendance(bearer: String, classRoomAttendanceDTO: StudentAttendanceDTO){
+        val response = StudentRepository().createStudentAttendance(bearer, classRoomAttendanceDTO)
+        _classRoomAttendanceMutableLiveData.postValue(response)
+    }
 
     // Function to get the student
     @RequiresApi(Build.VERSION_CODES.O)

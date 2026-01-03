@@ -168,5 +168,6 @@
     <string name="permission_details">Permissions</string>
     <string name="classroom">Classe</string>
     <string name="divider">|</string>
+    <string name="class_room_attendance_title">Presence en classe</string>
 
 </resources>
