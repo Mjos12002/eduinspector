@@ -78,6 +78,10 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private val cardViewModel: CardViewModel by activityViewModels()
     // Variable to hold the student view model
     private val studentViewModel: StudentViewModel by activityViewModels()
+    // Variable selected class name
+    private var txtSelectedClassName = ""
+    // Variable selected attendance status
+    private var txtSelectedAtteandanceStatus = ""
     // Variable for the permission ID
     private var permissionID = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -176,6 +180,8 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
         val btnCreateSchoolAttendance = root.findViewById<AppCompatButton>(R.id.btn_confirm_classroom_attendance)
         val pbSchoolAttendance = root.findViewById<ProgressBar>(R.id.pb_classroom_attendance)
         val etAttendanceNote = root.findViewById<EditText>(R.id.et_attendance_note)
+        val tvClassRoomProcessingStatus = root.findViewById<TextView>(R.id.tv_classroom_processing_status)
+        val tvClassRoomAttendanceStudentName = root.findViewById<TextView>(R.id.tv_classroom_attendance_student_name)
 
         // Permission details
         val tvPermissionReason = root.findViewById<TextView>(R.id.tv_permission_reason)
@@ -195,10 +201,11 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
         // Click event for the class room attendance
         btnCreateSchoolAttendance.setOnClickListener {
             try{
+                val recordDate = LocalDateTime.now().format(dateFormatter)
                 pbSchoolAttendance.visibility = View.VISIBLE
                 lifecycleScope.launch {
                     val txtAttendanceNote = etAttendanceNote.text.toString()
-                    studentViewModel.createStudentClassRoomAttendance(userToken, StudentAttendanceDTO(strStudentRegNumber, "", "", "", 2, txtAttendanceNote))
+                    studentViewModel.createStudentClassRoomAttendance(userToken, StudentAttendanceDTO(strStudentRegNumber, txtSelectedClassName, txtSelectedAtteandanceStatus, recordDate, 2, txtAttendanceNote))
 
                 }
 
@@ -206,6 +213,17 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
             }
         }
+
+        // Listen to the change in the student live data
+        studentViewModel.classRoomAttendanceLiveData.observe(viewLifecycleOwner, Observer {
+            try{
+                pbSchoolAttendance.visibility = View.GONE
+                tvClassRoomProcessingStatus.text = it.message
+            }catch (e: Exception) {
+                pbSchoolAttendance.visibility = View.GONE
+                tvClassRoomProcessingStatus.text = e.message
+            }
+        })
 
         // Click event on the gate choice, change background (active/inactive) and show / hide class attendance or gate attendance
         tvGateChoice.setOnClickListener {
@@ -373,6 +391,8 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
                     root.findViewById<TextView>(R.id.tv_card_number).text = cardNumber.toString()
                     root.findViewById<TextView>(R.id.tv_card_status).text = cardStatus.toString()
 
+                    tvClassRoomAttendanceStudentName.text = "Student: ${studentName.toString()}"
+
                     // Display the time and date
                     root.findViewById<TextView>(R.id.tv_attendance_time).text = attendanceTime.toString()
                     root.findViewById<TextView>(R.id.tv_attendance_date).text = attendanceDate.toString()
@@ -414,7 +434,6 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
     // checkLastStudentPermission is used to check the last permission of the student
     @RequiresApi(Build.VERSION_CODES.O)
     fun checkLastStudentPermission(studentPermission: StudentPermissionResponse): Permission? {
-        Log.i("TAG-INFORMATION", "$studentPermission")
         val sortedPermission = studentPermission.data?.permissions?.sortedWith {a, b -> a.id}
         return sortedPermission?.get(0)
     }
@@ -441,9 +460,15 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
         p2: Int,
         p3: Long
     ) {
-        var x = p0?.getItemAtPosition(p2)
+        val txtSelectedItem = p0?.getItemAtPosition(p2)
+        if(txtSelectedItem?.javaClass == AttendanceOptionModel::class.java) {
+            val attendance = txtSelectedItem as AttendanceOptionModel
+            txtSelectedAtteandanceStatus = attendance.name
+        }else {
+            val school = txtSelectedItem as SchoolClassModel
+            txtSelectedClassName = school.name
+        }
 
-        Log.i("TAG-INFORMATION", "${x?.javaClass}")
     }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {

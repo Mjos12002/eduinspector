@@ -141,6 +141,7 @@ class StudentRepository() {
         try {
 
             val res = studentAPIInterface.createStudentAttendance("Bearer $bearer", studentAttendance)
+            Log.i("TAG-INFORMATION", "${studentAttendance}")
             if (res.code() == 200 || res.code() == 201) {
                 return res.body()!!
             }else {

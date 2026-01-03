@@ -166,6 +166,7 @@
     <string name="attendance_in">Check In</string>
     <string name="attendance_out">Check Out</string>
     <string name="classroom">Classroom</string>
+    <string name="prompt_attendance">Prompt</string>
     <string name="divider">|</string>
     <string name="permission_details">Permission details</string>
     <string name="class_room_attendance_title">Classroom attendance</string>
