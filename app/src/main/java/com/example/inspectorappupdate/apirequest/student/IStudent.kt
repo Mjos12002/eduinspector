@@ -1,6 +1,8 @@
 package com.example.inspectorappupdate.apirequest.student
 
 import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
+import com.example.inspectorappupdate.dto.student.StudentPermissionTapOutDTO
+import com.example.inspectorappupdate.dto.student.StudentPromptAttendanceDTO
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModel
@@ -43,4 +45,17 @@ interface IStudent {
     //CreateStudentAttendance is used to call the api to create attendance record
     @POST("/api/class-attendance-record")
     suspend fun createStudentAttendance(@Header("Authorization") bearer: String, @Body studentAttendance: StudentAttendanceDTO): Response<StudentAttendanceResponse>
+
+    //createStudentPromptAttendance is used to call the api to create the prompt attendance record
+    @POST("/api/prompt-attendance-record")
+    suspend fun createStudentPromptAttendance(@Header("Authorization") bearer: String, @Body studentPromptAttendance: StudentPromptAttendanceDTO): Response<StudentAttendanceResponse>
+
+    // createStudentPermissionTapOut is used to call the api to create the tap out for the permission
+    @POST("/api/visit-permissions/tap-out")
+    suspend fun createStudentPermissionTapOut(@Header("Authorization") bearer: String, @Body tapOutDTO: StudentPermissionTapOutDTO): Response<StudentAttendanceResponse>
+
+    // createStudentPermissionTapIn is to used to call the api to create the tap in for the permission
+    @POST("/api/visit-permissions/tap-in")
+    suspend fun createStudentPermissionTapIn(@Header("Authorization") bearer: String, @Body tapOutDTO: StudentPermissionTapOutDTO): Response<StudentAttendanceResponse>
+
 }

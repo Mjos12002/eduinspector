@@ -169,6 +169,7 @@
     <string name="classroom">Classe</string>
     <string name="prompt_attendance">Improvisation</string>
     <string name="divider">|</string>
+    <string name="external">Visiteur</string>
     <string name="class_room_attendance_title">Presence en classe</string>
 
 </resources>

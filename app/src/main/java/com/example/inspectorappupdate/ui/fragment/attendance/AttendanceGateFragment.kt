@@ -16,16 +16,20 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.R
+import com.example.inspectorappupdate.adapter.PromptCategoryAdapter
 import com.example.inspectorappupdate.adapter.SchoolClassAdapter
 import com.example.inspectorappupdate.adapter.SchoolPresentOptionAdapter
 import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
+import com.example.inspectorappupdate.dto.student.StudentPermissionTapOutDTO
+import com.example.inspectorappupdate.dto.student.StudentPromptAttendanceDTO
 import com.example.inspectorappupdate.enums.AttendanceCategoryEnum
+import com.example.inspectorappupdate.enums.PromptCategoryEnum
 import com.example.inspectorappupdate.model.attendance.AttendanceOptionModel
+import com.example.inspectorappupdate.model.promptattendance.PromptCategoryModel
 import com.example.inspectorappupdate.model.schoolclass.SchoolClassModel
 import com.example.inspectorappupdate.model.studentpermission.Permission
 import com.example.inspectorappupdate.model.studentpermission.StudentPermissionResponse
@@ -38,7 +42,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.getValue
-import kotlin.reflect.typeOf
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -80,6 +83,8 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private val studentViewModel: StudentViewModel by activityViewModels()
     // Variable selected class name
     private var txtSelectedClassName = ""
+    // Variable for the prompt category
+    private var txtPromptCategory = ""
     // Variable selected attendance status
     private var txtSelectedAtteandanceStatus = ""
     // Variable for the permission ID
@@ -117,6 +122,7 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val timeWithMicrosecondFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
         val dateTimeFormatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val currentDate = LocalDateTime.now().format(dateFormatter)
 
@@ -155,14 +161,22 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
             SchoolClassModel("S3 B"),
         )
 
+        // Initialize the list of the attendance options
         val attendanceModel = listOf<AttendanceOptionModel>(
             AttendanceOptionModel(AttendanceCategoryEnum.ABSENT.value),
             AttendanceOptionModel(AttendanceCategoryEnum.PRESENT.value)
         )
 
-        // Initialize school class adapter and school presence option adapter
+        // Initialize the list of the prompt
+        val promptCategoryModel = listOf<PromptCategoryModel>(
+            PromptCategoryModel(PromptCategoryEnum.ASSEMBLE.value),
+            PromptCategoryModel(PromptCategoryEnum.DORMITORY.value)
+        )
+
+        // Initialize school class adapter and school presence option adapter and prompt attendance
         val schoolClassAdapter = SchoolClassAdapter(requireContext(), schoolClassNameModel)
         val schoolPresenceOptionAdapter = SchoolPresentOptionAdapter(requireContext(), attendanceModel)
+        val promptCategoryAdapter = PromptCategoryAdapter(requireContext(), promptCategoryModel)
 
         // Initialization of the variables used to manage attendance type (IN / OUT)
         val rlAttendanceIn = root.findViewById<RelativeLayout>(R.id.rl_attendance_in)
@@ -182,6 +196,20 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
         val etAttendanceNote = root.findViewById<EditText>(R.id.et_attendance_note)
         val tvClassRoomProcessingStatus = root.findViewById<TextView>(R.id.tv_classroom_processing_status)
         val tvClassRoomAttendanceStudentName = root.findViewById<TextView>(R.id.tv_classroom_attendance_student_name)
+        val tvPromptAttendance = root.findViewById<TextView>(R.id.tv_prompt_attendance)
+        val rlPromptAttendance = root.findViewById<RelativeLayout>(R.id.rl_prompt_attendance)
+        val tvExternalVisitor = root.findViewById<TextView>(R.id.tv_visitor_choice)
+        val rlExternalVisitor = root.findViewById<RelativeLayout>(R.id.rl_external_visitor)
+
+        // Prompt attendance views variable declaration
+        val spPromptCategory = root.findViewById<Spinner>(R.id.sp_prompt_category)
+        val spPromptAttendanceType = root.findViewById<Spinner>(R.id.sp_prompt_attendance_status)
+        val btnConfirmPromptAttendance = root.findViewById<AppCompatButton>(R.id.btn_prompt_attendance)
+        val etPromptNote = root.findViewById<EditText>(R.id.et_prompt_note)
+        val pbPrompt = root.findViewById<ProgressBar>(R.id.pb_prompt)
+        val tvPromptStatus = root.findViewById<TextView>(R.id.tv_prompt_status)
+        val tvPromptStudentName = root.findViewById<TextView>(R.id.tv_prompt_student_name)
+        // End of prompt attendance views variable declaration
 
         // Permission details
         val tvPermissionReason = root.findViewById<TextView>(R.id.tv_permission_reason)
@@ -194,9 +222,26 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
         // Set the adapter of the spinners
         spAttendanceStatus.adapter = schoolPresenceOptionAdapter
         spClassName.adapter = schoolClassAdapter
+        spPromptCategory.adapter = promptCategoryAdapter
+        spPromptAttendanceType.adapter = schoolPresenceOptionAdapter
 
         spAttendanceStatus.onItemSelectedListener = this
         spClassName.onItemSelectedListener = this
+        spPromptCategory.onItemSelectedListener = this
+        spPromptAttendanceType.onItemSelectedListener = this
+
+        //Click event for the prompt attendance confirmation
+        btnConfirmPromptAttendance.setOnClickListener {
+            pbPrompt.visibility = View.VISIBLE
+            lifecycleScope.launch {
+                val promptDate = LocalDateTime.now().format(dateFormatter)
+                val promptTime = LocalDateTime.now().format(timeWithMicrosecondFormatter)
+                val txtPromptNote = etPromptNote.text.toString()
+
+                val requestDTO = StudentPromptAttendanceDTO(strStudentRegNumber, txtPromptCategory, txtPromptCategory, txtSelectedAtteandanceStatus, promptDate, 2, promptTime, "", txtPromptNote)
+                studentViewModel.createStudentPromptAttendance(userToken, requestDTO)
+            }
+        }
 
         // Click event for the class room attendance
         btnCreateSchoolAttendance.setOnClickListener {
@@ -225,20 +270,73 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
             }
         })
 
+        // Listen to the change in the prompt attendance changes
+        studentViewModel.classRoomPromptAttendanceLiveData.observe(viewLifecycleOwner, Observer {
+            pbPrompt.visibility = View.GONE
+            tvPromptStatus.text = it.message
+            Log.i("TAG-INFORMATION", "$it")
+        })
+
+        // Listen to the change in the tap out live data
+        studentViewModel.studentPermissionTapOutLiveData.observe(viewLifecycleOwner, Observer {
+            pbProgressBar.visibility = View.GONE
+            tvAttendanceResponse.text = it.message
+            tvAttendanceResponse.visibility = View.VISIBLE
+        })
+
+        // Listen to the change in the tap out live data
+        studentViewModel.studentPermissionTapInLiveData.observe(viewLifecycleOwner, Observer {
+            pbProgressBar.visibility = View.GONE
+            tvAttendanceResponse.text = it.message
+            tvAttendanceResponse.visibility = View.VISIBLE
+        })
+
+        tvExternalVisitor.setOnClickListener {
+            it.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_gate_or_classroom)
+            tvGateChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvPromptAttendance.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvClassRoomChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            rlExternalVisitor.visibility = View.VISIBLE
+            rlGateAttendance.visibility = View.GONE
+            rlPromptAttendance.visibility = View.GONE
+            rlClassAttendance.visibility = View.GONE
+        }
+
+        // Click event on the prompt choice, change background (active/inactive) and show / hide others
+        tvPromptAttendance.setOnClickListener {
+            it.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_gate_or_classroom)
+            tvClassRoomChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvGateChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvExternalVisitor.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            rlPromptAttendance.visibility = View.VISIBLE
+            rlGateAttendance.visibility = View.GONE
+            rlClassAttendance.visibility = View.GONE
+            rlExternalVisitor.visibility = View.GONE
+
+        }
+
         // Click event on the gate choice, change background (active/inactive) and show / hide class attendance or gate attendance
         tvGateChoice.setOnClickListener {
             it.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_gate_or_classroom)
             tvClassRoomChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvPromptAttendance.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvExternalVisitor.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
             rlGateAttendance.visibility = View.VISIBLE
             rlClassAttendance.visibility = View.GONE
+            rlPromptAttendance.visibility = View.GONE
+            rlExternalVisitor.visibility = View.GONE
         }
 
         // Click event on the classroom choice, change background (active/inactive) and show / hide class attendance or gate attendance
         tvClassRoomChoice.setOnClickListener {
-            tvGateChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
             it.background = ContextCompat.getDrawable(requireContext(), R.drawable.active_gate_or_classroom)
+            tvGateChoice.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvPromptAttendance.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
+            tvExternalVisitor.background = ContextCompat.getDrawable(requireContext(), R.drawable.inactive_gate_or_classroom)
             rlClassAttendance.visibility = View.VISIBLE
             rlGateAttendance.visibility = View.GONE
+            rlPromptAttendance.visibility = View.GONE
+            rlExternalVisitor.visibility = View.GONE
             tvClassAttendanceDate.text = "${LocalDateTime.now().format(dateFormatter).toString()} ${LocalDateTime.now().format(timeFormatter).toString()}"
         }
 
@@ -261,12 +359,25 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 pbProgressBar.visibility = View.VISIBLE
                 tvAttendanceResponse.text = ""
                 if(inOrOut == "In") {
-                    lifecycleScope.launch {
-                        studentViewModel.createSchoolAttendanceIn(appDatabase.loggedInUserDao().getLastLogin().token, strCardNumber, 17)
+                    if(permissionID > 0) {
+                        lifecycleScope.launch {
+                            studentViewModel.createStudentPermissionTapIn(userToken, StudentPermissionTapOutDTO(strCardNumber, deviceID, permissionID))
+                        }
+                    }else {
+                        lifecycleScope.launch {
+                            studentViewModel.createSchoolAttendanceIn(appDatabase.loggedInUserDao().getLastLogin().token, strCardNumber, deviceID.toInt())
+                        }
                     }
+
                 }else {
-                    lifecycleScope.launch {
-                        studentViewModel.createSchoolAttendanceOut(appDatabase.loggedInUserDao().getLastLogin().token, strCardNumber, 17)
+                    if(permissionID > 0) {
+                        lifecycleScope.launch {
+                            studentViewModel.createStudentPermissionTapOut(userToken, StudentPermissionTapOutDTO(strCardNumber, deviceID, permissionID))
+                        }
+                    }else{
+                        lifecycleScope.launch {
+                            studentViewModel.createSchoolAttendanceOut(appDatabase.loggedInUserDao().getLastLogin().token, strCardNumber, deviceID.toInt())
+                        }
                     }
                 }
 
@@ -278,9 +389,10 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         }
 
+
+
         // Observe the changes in the student permission response
         studentViewModel.studentPermissionLiveData.observe(viewLifecycleOwner, Observer {
-            Log.i("TAG-INFORMATION", "$it")
             if(it.data != null) {
 
                 // Check if the permission is not empty (List of last 5 permission)
@@ -291,10 +403,8 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
                         if (inOrOut == "Out") {
                             // Checking the last student permission
                             val lastStudentPermission = checkLastStudentPermission(it)
-                            val permissionEndDateDiff = checkDateDifference(lastStudentPermission!!, dateTimeFormatter, "end")
-                            val permissionStartDateDiff = checkDateDifference(lastStudentPermission, dateTimeFormatter, "start")
 
-                            if (permissionEndDateDiff > 0 && lastStudentPermission.has_exited == "false") {
+                            if (lastStudentPermission?.has_exited == "false") {
                                 permissionID = lastStudentPermission.id
                                 studentHasPermission = true
                                 rlPermissionContainer.visibility = View.VISIBLE
@@ -308,11 +418,6 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
                         }else if(inOrOut == "In") {
                             val lastStudentPermission = checkLastStudentPermission(it)
                             val permissionEndDateDiff = checkDateDifference(lastStudentPermission!!, dateTimeFormatter, "end")
-                            val permissionStartDateDiff = checkDateDifference(lastStudentPermission, dateTimeFormatter, "start")
-
-                            Log.i("TAG-INFORMATION", "$permissionEndDateDiff")
-                            Log.i("TAG-INFORMATION", "$permissionStartDateDiff")
-                            Log.i("TAG-INFORMATION", "$lastStudentPermission")
 
                             if (permissionEndDateDiff <= 0 && lastStudentPermission.has_exited == "true") {
                                 permissionID = lastStudentPermission.id
@@ -392,6 +497,7 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
                     root.findViewById<TextView>(R.id.tv_card_status).text = cardStatus.toString()
 
                     tvClassRoomAttendanceStudentName.text = "Student: ${studentName.toString()}"
+                    tvPromptStudentName.text = "Student: ${studentName.toString()}"
 
                     // Display the time and date
                     root.findViewById<TextView>(R.id.tv_attendance_time).text = attendanceTime.toString()
@@ -464,9 +570,15 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
         if(txtSelectedItem?.javaClass == AttendanceOptionModel::class.java) {
             val attendance = txtSelectedItem as AttendanceOptionModel
             txtSelectedAtteandanceStatus = attendance.name
-        }else {
+        }else if(txtSelectedItem?.javaClass == SchoolClassModel::class.java){
             val school = txtSelectedItem as SchoolClassModel
             txtSelectedClassName = school.name
+        }else if(txtSelectedItem?.javaClass == PromptCategoryModel::class.java) {
+            val promptCategory = txtSelectedItem as PromptCategoryModel
+            txtPromptCategory = promptCategory.name
+        }else {
+            val promptAttendanceCategory = txtSelectedItem as AttendanceOptionModel
+            txtSelectedClassName = promptAttendanceCategory.name
         }
 
     }

@@ -165,7 +165,8 @@
     <string name="gate_checkinout">Gate</string>
     <string name="attendance_in">Check In</string>
     <string name="attendance_out">Check Out</string>
-    <string name="classroom">Classroom</string>
+    <string name="classroom">Class</string>
+    <string name="external">Visitor</string>
     <string name="prompt_attendance">Prompt</string>
     <string name="divider">|</string>
     <string name="permission_details">Permission details</string>

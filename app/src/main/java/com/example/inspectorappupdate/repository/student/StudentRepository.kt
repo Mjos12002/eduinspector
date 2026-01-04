@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.inspectorappupdate.apirequest.student.IStudent
 import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
+import com.example.inspectorappupdate.dto.student.StudentPermissionTapOutDTO
+import com.example.inspectorappupdate.dto.student.StudentPromptAttendanceDTO
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModelData
@@ -135,13 +137,12 @@ class StudentRepository() {
         }
     }
 
-    //createStudentAttendance is used to create teh attendance of the student
+    //createStudentAttendance is used to create the attendance of the student
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun createStudentAttendance(bearer: String, studentAttendance: StudentAttendanceDTO): StudentAttendanceResponse {
         try {
 
             val res = studentAPIInterface.createStudentAttendance("Bearer $bearer", studentAttendance)
-            Log.i("TAG-INFORMATION", "${studentAttendance}")
             if (res.code() == 200 || res.code() == 201) {
                 return res.body()!!
             }else {
@@ -151,6 +152,57 @@ class StudentRepository() {
             }
         }catch (e: Exception) {
                 return StudentAttendanceResponse(500, true, "Error, Contact Admin")
+        }
+    }
+
+    // createStudentPromptAttendance is used to create the prompt attendance
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun createStudentPromptAttendance(bearer: String, studentPromptAttendanceDTO: StudentPromptAttendanceDTO): StudentAttendanceResponse {
+        try{
+            val res = studentAPIInterface.createStudentPromptAttendance("Bearer $bearer", studentPromptAttendanceDTO)
+            if(res.isSuccessful) {
+                return res.body()!!
+            }else {
+                val errorBody = res.errorBody()?.string()
+                val errorBodyObject = Gson().fromJson(errorBody, StudentAttendanceResponse::class.java)
+                return StudentAttendanceResponse(errorBodyObject.status, errorBodyObject.error, errorBodyObject.message)
+            }
+        }catch (e: Exception) {
+            return StudentAttendanceResponse(500, true, "Error, Contact Admin")
+        }
+    }
+
+    // createStudentPermissionTapOut is used to create the permission tap out
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun createStudentPermissionTapOut(bearer: String, tapOutDTO: StudentPermissionTapOutDTO): StudentAttendanceResponse {
+        try{
+            val res = studentAPIInterface.createStudentPermissionTapOut("Bearer $bearer", tapOutDTO)
+            if (res.isSuccessful) {
+                return res.body()!!
+            }else {
+                val errorBody = res.errorBody()?.string()
+                val errorBodyObject = Gson().fromJson(errorBody, StudentAttendanceResponse::class.java)
+                return StudentAttendanceResponse(errorBodyObject.status, errorBodyObject.error, errorBodyObject.message)
+            }
+        }catch (e: Exception) {
+                return StudentAttendanceResponse(500, true, "Error, Contact Admin")
+        }
+    }
+
+    // createStudentPermissionTapIn is used to create the permission tap out
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun createStudentPermissionTapIn(bearer: String, tapOutDTO: StudentPermissionTapOutDTO): StudentAttendanceResponse {
+        try{
+            val res = studentAPIInterface.createStudentPermissionTapIn("Bearer $bearer", tapOutDTO)
+            if (res.isSuccessful) {
+                return res.body()!!
+            }else {
+                val errorBody = res.errorBody()?.string()
+                val errorBodyObject = Gson().fromJson(errorBody, StudentAttendanceResponse::class.java)
+                return StudentAttendanceResponse(errorBodyObject.status, errorBodyObject.error, errorBodyObject.message)
+            }
+        }catch (e: Exception) {
+            return StudentAttendanceResponse(500, true, "Error, Contact Admin")
         }
     }
 

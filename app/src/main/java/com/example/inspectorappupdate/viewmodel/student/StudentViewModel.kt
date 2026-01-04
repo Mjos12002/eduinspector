@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.inspectorappupdate.dto.student.StudentAttendanceDTO
+import com.example.inspectorappupdate.dto.student.StudentPermissionTapOutDTO
+import com.example.inspectorappupdate.dto.student.StudentPromptAttendanceDTO
 import com.example.inspectorappupdate.model.student.SchoolAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentAttendanceResponse
 import com.example.inspectorappupdate.model.student.StudentModel
@@ -35,6 +37,15 @@ class StudentViewModel: ViewModel() {
     // Initialize the variable of the student attendance response
     private var _classRoomAttendanceMutableLiveData = MutableLiveData<StudentAttendanceResponse>()
 
+    // Initialize the variable of the student attendance response
+    private var _classRoomPromptAttendanceMutableLiveData = MutableLiveData<StudentAttendanceResponse>()
+
+    // Initialize the variable of the student permission tap in mutable live data
+    private val _studentPermissionTapInMutableLiveData = MutableLiveData<StudentAttendanceResponse>()
+
+    // Initialize the variable of the student permission tap out mutable live data
+    private val _studentPermissionTapOutMutableLiveData = MutableLiveData<StudentAttendanceResponse>()
+
 
     // Initialize the variable of the student live data
     var studentPermissionLiveData: LiveData<StudentPermissionResponse> = _studentPermissionMutableLiveData
@@ -47,8 +58,39 @@ class StudentViewModel: ViewModel() {
 
     // Initialize the variable of the class attendance out live data
     var classAttendanceOutLiveData: LiveData<SchoolAttendanceResponse> = _classAttendanceOutMutableLiveData
+
+    // Initialize the variable of the student attendance
     var classRoomAttendanceLiveData: LiveData<StudentAttendanceResponse>  = _classRoomAttendanceMutableLiveData
 
+    // Initialize the variable of the student prompt attendance
+    var classRoomPromptAttendanceLiveData: LiveData<StudentAttendanceResponse> = _classRoomPromptAttendanceMutableLiveData
+
+    // Initialize the variable of the student permission tap in
+    var studentPermissionTapInLiveData: LiveData<StudentAttendanceResponse> = _studentPermissionTapInMutableLiveData
+
+    // Initialize the variable of the student permission tap out
+    var studentPermissionTapOutLiveData: LiveData<StudentAttendanceResponse> = _studentPermissionTapOutMutableLiveData
+
+    // createStudentPermissionTapOut is used to create student permission tap out
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun createStudentPermissionTapOut(bearer: String, tapOutDTO: StudentPermissionTapOutDTO) {
+        val response = StudentRepository().createStudentPermissionTapOut(bearer, tapOutDTO)
+        Log.i("TAG-INFORMATION", "$tapOutDTO")
+        _studentPermissionTapOutMutableLiveData.postValue(response)
+    }
+
+    // createStudentPermissionTapIn is used to create student permission tap in
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun createStudentPermissionTapIn(bearer: String, tapOutDTO: StudentPermissionTapOutDTO) {
+        val response = StudentRepository().createStudentPermissionTapIn(bearer, tapOutDTO)
+    }
+
+    //createStudentPromptAttendance is used to make an api call to create a record of the prompt attendance
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun createStudentPromptAttendance(bearer: String, promptAttendanceDTO: StudentPromptAttendanceDTO) {
+        val response = StudentRepository().createStudentPromptAttendance(bearer, promptAttendanceDTO)
+        _classRoomPromptAttendanceMutableLiveData.postValue(response)
+    }
 
     //createStudentClassRoomAttendance is used to manage the class student room attendance
     @RequiresApi(Build.VERSION_CODES.O)
