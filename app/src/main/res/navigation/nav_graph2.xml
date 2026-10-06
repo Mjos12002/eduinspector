@@ -43,5 +43,23 @@
         android:label="ClassRoom Attendance"
         tools:layout="@layout/fragment_attendance_class_room"/>
 
+    <fragment
+        android:id="@+id/CardToolsFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.card.CardToolsFragment"
+        android:label="Card"
+        tools:layout="@layout/fragment_card_tools"/>
+
+    <fragment
+        android:id="@+id/PermissionsFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.permission.PermissionsFragment"
+        android:label="Permissions"
+        tools:layout="@layout/fragment_permissions"/>
+
+    <fragment
+        android:id="@+id/VisitorGateFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.visitor.VisitorGateFragment"
+        android:label="Visitor gate"
+        tools:layout="@layout/fragment_visitor_gate"/>
+
 
 </navigation>

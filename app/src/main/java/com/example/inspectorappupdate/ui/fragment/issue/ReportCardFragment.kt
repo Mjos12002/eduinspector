@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.ui.fragment.issue
 
+import com.example.inspectorappupdate.utils.signOut
 import android.content.Intent
 import android.database.DatabaseUtils
 import android.os.Build
@@ -82,7 +83,7 @@ class ReportCardFragment : Fragment() {
 
         // Logout button
         root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
-            startActivity(Intent(requireContext(), IndexActivity::class.java))
+            signOut()
         }
 
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
@@ -104,8 +105,12 @@ class ReportCardFragment : Fragment() {
                     root.findViewById<TextView>(R.id.tv_card_number).text = "Card No: ${it.data.card_number}"
                     root.findViewById<TextView>(R.id.tv_card_status).text = "Card Status: ${it.data.card_status}"
 
-                    // Show the container views
-                    root.findViewById<RelativeLayout>(R.id.rl_block_action).visibility = View.VISIBLE
+                    // Only an active card can be blocked
+                    val btn = root.findViewById<Button>(R.id.btn_report)
+                    btn.isEnabled = true
+                    btn.text = getString(R.string.disable_card)
+                    root.findViewById<RelativeLayout>(R.id.rl_block_action).visibility =
+                        if (it.data.card_status.equals("active", ignoreCase = true)) View.VISIBLE else View.GONE
                     root.findViewById<RelativeLayout>(R.id.rl_student_details).visibility = View.VISIBLE
                 }else {
                     Toast.makeText(requireContext(), "Card Information Not Found", Toast.LENGTH_LONG).show()
@@ -122,11 +127,12 @@ class ReportCardFragment : Fragment() {
                     btnReport.text = getString(R.string.waitwhileprocessing)
                     val token = appDatabase.loggedInUserDao().getLastLogin().token
                     val res = CardRepository().disableCard(cardIndicator, token)
-                    Log.i("INSPECTOR-LOG", cardIndicator)
                     if (res.error) {
                         btnReport.text = res.message
                     }else {
-                        btnReport.text = res.message
+                        btnReport.text = getString(R.string.card_blocked)
+                        btnReport.isEnabled = false
+                        root.findViewById<TextView>(R.id.tv_card_status).text = "Card Status: blocked"
                     }
                 }catch (e: Exception){
                         btnReport.text = getString(R.string.error_try_again)

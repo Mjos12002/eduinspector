@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.ui.fragment.pin
 
+import com.example.inspectorappupdate.utils.signOut
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -66,7 +67,7 @@ class ChangePinFragment : Fragment() {
         val rlPinDetails = root.findViewById<RelativeLayout>(R.id.rl_pin_details)
 
         root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
-            startActivity(Intent(requireContext(), IndexActivity::class.java))
+            signOut()
         }
 
         appDatabase = DbUtility().dbBuilder(requireContext())
