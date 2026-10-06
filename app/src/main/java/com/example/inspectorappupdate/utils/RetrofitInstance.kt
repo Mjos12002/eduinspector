@@ -14,15 +14,23 @@ object RetrofitInstance {
 
     private val BASE_URL = HttpRequestEnums.BASEURL.value
 
+    /** Called when the API rejects the stored token (blocked account or expired token). */
+    @Volatile
+    var onUnauthorized: (() -> Unit)? = null
+
     private val customInterceptor = Interceptor { chain ->
         val request = chain.request()
-        chain.proceed(request)
+        val response = chain.proceed(request)
+        if (response.code == 401 && request.header("Authorization") != null) {
+            onUnauthorized?.invoke()
+        }
+        response
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private val okhttp = OkHttpClient.Builder()
         .addInterceptor(customInterceptor)
-        .callTimeout(duration = Duration.ofSeconds(4L))
+        .callTimeout(duration = Duration.ofSeconds(15L))
         .build()
 
     @RequiresApi(Build.VERSION_CODES.O)

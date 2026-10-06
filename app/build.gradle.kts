@@ -19,8 +19,18 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Backend origin. Override for a local backend with -PeducardApiUrl=http://<lan-ip>:8000/
+    val apiUrlOverride = project.findProperty("educardApiUrl") as String?
+
     buildTypes {
+        debug {
+            // Installs next to the production app on the same phone.
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "API_BASE_URL", "\"${apiUrlOverride ?: "https://test-api.educard.rw/"}\"")
+        }
         release {
+            buildConfigField("String", "API_BASE_URL", "\"${apiUrlOverride ?: "https://api.educard.rw/"}\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -38,6 +48,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
 }
 

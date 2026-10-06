@@ -18,4 +18,10 @@ interface LoginDao {
     @Query("SELECT * FROM loggedinuser ORDER BY id DESC LIMIT 1")
     suspend fun getLastLogin(): LoggedInUserEntity
 
+    @Query("SELECT * FROM loggedinuser ORDER BY id DESC LIMIT 1")
+    suspend fun findLastLogin(): LoggedInUserEntity?
+
+    @Query("DELETE FROM loggedinuser")
+    suspend fun clear()
+
 }

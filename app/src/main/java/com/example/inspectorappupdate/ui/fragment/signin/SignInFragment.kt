@@ -20,6 +20,8 @@ import com.example.inspectorappupdate.entity.user.LoggedInUserEntity
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.AppVersionViewer
 import com.example.inspectorappupdate.utils.DbUtility
+import com.example.inspectorappupdate.utils.AppRole
+import com.example.inspectorappupdate.utils.Session
 import com.example.inspectorappupdate.viewmodel.signin.SignInViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -102,7 +104,9 @@ class SignInFragment : Fragment() {
         signInViewModel.loginResponseLiveData.observe(viewLifecycleOwner, Observer{
             try {
                 // Checking the response, if the response is ok then add the info to the local database
-                if (it.status.toInt() == 200) {
+                if (it.status.toInt() == 200 && !AppRole.canSignIn(it.data?.role)) {
+                    signInViewModel.updateLoginStatusMessage(getString(R.string.role_not_allowed))
+                } else if (it.status.toInt() == 200) {
                     // Getting the today's date
                     val today = LocalDateTime.now().format(DateTimeFormatter.ofPattern(getString(R.string.date_pattern)))
                     signInViewModel.updateLoginStatusMessage("")
@@ -112,9 +116,10 @@ class SignInFragment : Fragment() {
                         it.data?.email!! , it?.data?.token!!, it.data?.user_id!! , it?.data?.role!!, today)
 
                     lifecycleScope.launch {
+                        appDatabase.loggedInUserDao().clear()
                         appDatabase.loggedInUserDao().insert(userLoggedIn)
+                        Session.openHome(requireActivity(), userLoggedIn.role)
                     }
-                    startActivity(Intent(context, SearchStudentActivity::class.java))
                 }else {
                     signInViewModel.updateLoginStatusMessage("Error, Contact Admin")
                 }
