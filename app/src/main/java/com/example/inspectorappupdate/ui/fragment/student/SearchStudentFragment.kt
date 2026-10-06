@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.ui.fragment.student
 
+import com.example.inspectorappupdate.utils.signOut
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -85,7 +86,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
         _binding = FragmentSearchStudentBinding.inflate(inflater, container, false)
         // Clear view
         binding.imgLogout.setOnClickListener {
-            startActivity(Intent(requireContext(), IndexActivity::class.java))
+            signOut()
         }
 
         // Initialize the local database utility

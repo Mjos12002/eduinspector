@@ -1,5 +1,7 @@
 package com.example.inspectorappupdate.ui.fragment.attendance
 
+import android.widget.ImageView
+import com.example.inspectorappupdate.utils.signOut
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -339,6 +341,15 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
             rlExternalVisitor.visibility = View.GONE
             tvClassAttendanceDate.text = "${LocalDateTime.now().format(dateFormatter).toString()} ${LocalDateTime.now().format(timeFormatter).toString()}"
         }
+
+        root.findViewById<ImageView>(R.id.img_logout).setOnClickListener { signOut() }
+
+        // Only gate in/out is offered for now: the classroom, prompt and visitor tabs are hidden and gate is shown.
+        listOf(
+            R.id.tv_gate_choice, R.id.tv_divider, R.id.tv_classroom_choice, R.id.tv_divider_one,
+            R.id.tv_prompt_attendance, R.id.tv_divider_visitor, R.id.tv_visitor_choice
+        ).forEach { root.findViewById<View>(it).visibility = View.GONE }
+        tvGateChoice.performClick()
 
         setAttendanceType("In", tvAttendanceIn, tvAttendanceOut, rlAttendanceIn, rlAttendanceOut, rlStudentDetails)
 

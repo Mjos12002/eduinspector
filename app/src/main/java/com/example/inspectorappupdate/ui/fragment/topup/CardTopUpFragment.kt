@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.ui.fragment.topup
 
+import com.example.inspectorappupdate.utils.signOut
 import android.app.Dialog
 import android.content.Intent
 import android.os.Build
@@ -96,7 +97,7 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Logout
         root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
-            startActivity(Intent(requireContext(), IndexActivity::class.java))
+            signOut()
         }
 
         // Initialize the database
