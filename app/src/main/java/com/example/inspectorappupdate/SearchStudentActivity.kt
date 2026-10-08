@@ -24,6 +24,7 @@ import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.utils.RetrofitInstance
 import com.example.inspectorappupdate.utils.Session
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
+import com.example.inspectorappupdate.viewmodel.gate.StudentGateViewModel
 import com.example.inspectorappupdate.viewmodel.visitor.VisitorGateViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -44,6 +45,7 @@ class SearchStudentActivity : AppCompatActivity() {
 
     val cardViewModel: CardViewModel by viewModels()
     val visitorGateViewModel: VisitorGateViewModel by viewModels()
+    val studentGateViewModel: StudentGateViewModel by viewModels()
 
     private var nfcAdapter: NfcAdapter? = null
 
@@ -96,7 +98,7 @@ class SearchStudentActivity : AppCompatActivity() {
         }
 
         binding.rlStudentAttendance.setOnClickListener {
-            navController.navigate(R.id.AttendanceFragment)
+            navController.navigate(R.id.StudentGateFragment)
         }
 
         binding.rlVisitorGate.setOnClickListener {
@@ -155,6 +157,22 @@ class SearchStudentActivity : AppCompatActivity() {
 
             // On the visitor gate screen any tag type is accepted; the chip UID identifies the card.
             val navController = findNavController(R.id.nav_host_fragment_content_search_student)
+            // The student gate records the tap itself; the chip UID identifies the card.
+            if (tag != null && navController.currentDestination?.id == R.id.StudentGateFragment) {
+                val uid = tag.id.toHexString()
+                val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+                lifecycleScope.launch {
+                    val token = try {
+                        appDatabase.loggedInUserDao().getLastLogin().token
+                    } catch (e: Exception) {
+                        Toast.makeText(baseContext, "Sign in again", Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+                    studentGateViewModel.onCardTapped(token, uid, deviceId)
+                }
+                watchCardPresence(tag) { studentGateViewModel.onCardRemoved() }
+                return
+            }
             if (tag != null && navController.currentDestination?.id == R.id.VisitorGateFragment) {
                 val uid = tag.id.toHexString()
                 val chipType = tag.techList.firstOrNull()?.substringAfterLast('.')
@@ -168,7 +186,7 @@ class SearchStudentActivity : AppCompatActivity() {
                     }
                     visitorGateViewModel.onCardTapped(token, uid, chipType, deviceId)
                 }
-                watchCardPresence(tag)
+                watchCardPresence(tag) { visitorGateViewModel.onCardRemoved() }
                 return
             }
 
@@ -195,13 +213,13 @@ class SearchStudentActivity : AppCompatActivity() {
 
     private var presenceJob: Job? = null
 
-    // Tells the visitor gate whether the tapped card is still against the phone, so its screen stays up
-    // until the card is taken away. Reconnecting fails once the card is gone.
-    private fun watchCardPresence(tag: Tag) {
+    // Tells a gate screen when the tapped card is taken away, so its result stays up until then.
+    // Reconnecting fails once the card is gone.
+    private fun watchCardPresence(tag: Tag, onRemoved: () -> Unit) {
         presenceJob?.cancel()
         val chip = NfcA.get(tag)
         if (chip == null) {
-            visitorGateViewModel.onCardRemoved()
+            onRemoved()
             return
         }
         visitorGateViewModel.onCardPresent()
@@ -216,7 +234,7 @@ class SearchStudentActivity : AppCompatActivity() {
                         break
                     }
                 }
-                if (isActive) withContext(Dispatchers.Main) { visitorGateViewModel.onCardRemoved() }
+                if (isActive) withContext(Dispatchers.Main) { onRemoved() }
             } finally {
                 try { chip.close() } catch (_: Exception) { }
             }

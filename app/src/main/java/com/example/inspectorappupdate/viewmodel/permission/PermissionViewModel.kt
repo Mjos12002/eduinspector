@@ -76,6 +76,26 @@ class PermissionViewModel : ViewModel() {
         }
     }
 
+    // Message of the last cancel, shown once.
+    private val _cancelResult = MutableLiveData<String?>()
+    val cancelResult: LiveData<String?> = _cancelResult
+
+    fun cancel(token: String, id: Int) {
+        if (_loading.value == true) return
+        _loading.value = true
+        viewModelScope.launch {
+            _cancelResult.value = when (val result = repository.cancel(token, id, null)) {
+                is VisitorResult.Success -> result.data ?: "Permission cancelled"
+                is VisitorResult.Failure -> result.message
+            }
+            load(token)
+        }
+    }
+
+    fun cancelResultShown() {
+        _cancelResult.value = null
+    }
+
     fun saveResultShown() {
         _saveResult.value = null
     }

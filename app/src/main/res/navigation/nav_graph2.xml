@@ -32,6 +32,12 @@
         tools:layout="@layout/fragment_report_card"/>
 
     <fragment
+        android:id="@+id/StudentGateFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.gate.StudentGateFragment"
+        android:label="Student Gate"
+        tools:layout="@layout/fragment_student_gate"/>
+
+    <fragment
         android:id="@+id/AttendanceFragment"
         android:name="com.example.inspectorappupdate.ui.fragment.attendance.AttendanceFragment"
         android:label="Student Attendance"

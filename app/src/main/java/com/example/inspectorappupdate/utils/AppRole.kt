@@ -33,5 +33,5 @@ object AppRole {
     }
 
     fun startDestination(role: String?): Int =
-        if (role == GATEKEEPER) R.id.AttendanceFragment else R.id.SearchStudentFragment
+        if (role == GATEKEEPER) R.id.StudentGateFragment else R.id.SearchStudentFragment
 }
