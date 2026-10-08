@@ -221,4 +221,17 @@
     <string name="card_tools_topup">Top up</string>
     <string name="card_tools_block">Block card</string>
     <string name="card_tools_pin">Change PIN</string>
+    <string name="student_gate_title">Student gate</string>
+    <string name="student_gate_subtitle">Choose In or Out, then tap the student\'s card</string>
+    <string name="student_gate_in">In</string>
+    <string name="student_gate_out">Out</string>
+    <string name="student_gate_tap_prompt">Tap a student card</string>
+    <string name="student_gate_hint_in">Arrivals and returns from a permission are recorded on the tap.</string>
+    <string name="student_gate_hint_out">Students leave with a permission in its time window; day scholars check out.</string>
+    <string name="student_gate_unread">Couldn\'t record the tap</string>
+    <string name="sign_out">Sign out</string>
+    <string name="permission_cancel">Cancel permission</string>
+    <string name="permission_keep">Keep it</string>
+    <string name="permission_cancel_title">Cancel %1$s\'s permission?</string>
+    <string name="permission_cancel_out_note">The student is out now. Their return will still be recorded when they tap In at the gate.</string>
 </resources>

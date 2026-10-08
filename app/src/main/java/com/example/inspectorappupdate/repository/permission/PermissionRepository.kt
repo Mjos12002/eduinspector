@@ -3,6 +3,7 @@ package com.example.inspectorappupdate.repository.permission
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.inspectorappupdate.apirequest.permission.IPermission
+import com.example.inspectorappupdate.model.permission.CancelPermissionRequest
 import com.example.inspectorappupdate.model.permission.CreatePermissionRequest
 import com.example.inspectorappupdate.model.permission.Permission
 import com.example.inspectorappupdate.repository.visitor.VisitorResult
@@ -27,6 +28,10 @@ class PermissionRepository {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun create(token: String, request: CreatePermissionRequest): VisitorResult<String?> =
         call { api.create("Bearer $token", request) }.map { it.message }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun cancel(token: String, id: Int, reason: String?): VisitorResult<String?> =
+        call { api.cancel("Bearer $token", id, CancelPermissionRequest(reason)) }.map { it.message }
 
     private fun <T, R> VisitorResult<T>.map(transform: (T) -> R): VisitorResult<R> = when (this) {
         is VisitorResult.Success -> VisitorResult.Success(transform(data), message)

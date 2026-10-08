@@ -41,8 +41,13 @@ data class Permission(
     // When the student left the school and when they came back.
     @SerializedName("exit_time") val exitTime: String?,
     @SerializedName("entry_time") val entryTime: String?,
-    @SerializedName("requested_by") val requestedBy: String?
+    @SerializedName("requested_by") val requestedBy: String?,
+    // upcoming, open (may leave now), out, returned, expired or cancelled.
+    @SerializedName("gate_state") val gateState: String?,
+    @SerializedName("returned_late") val returnedLate: Boolean?
 )
+
+data class CancelPermissionRequest(val reason: String?)
 
 /** The student whose card was tapped. */
 data class PermissionStudent(

@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.apirequest.permission
 
+import com.example.inspectorappupdate.model.permission.CancelPermissionRequest
 import com.example.inspectorappupdate.model.permission.CreatePermissionRequest
 import com.example.inspectorappupdate.model.permission.CreatePermissionResponse
 import com.example.inspectorappupdate.model.permission.PermissionListResponse
@@ -8,6 +9,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 // Student permissions to leave the school, issued by staff.
@@ -20,6 +22,10 @@ interface IPermission {
         @Query("active_on") day: String,
         @Query("per_page") perPage: Int = 100
     ): Response<PermissionListResponse>
+
+    // Cancels a permission, also while the student is out (their return is still recorded at the gate).
+    @POST("api/visit-permissions/{id}/cancel")
+    suspend fun cancel(@Header("Authorization") bearer: String, @Path("id") id: Int, @Body body: CancelPermissionRequest): Response<CreatePermissionResponse>
 
     // The school is the one the signed-in user is deployed at.
     @POST("api/visit-permissions-create")

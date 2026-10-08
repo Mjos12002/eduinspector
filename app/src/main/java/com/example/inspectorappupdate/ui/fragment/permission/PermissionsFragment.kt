@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.ui.fragment.permission
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.Color
@@ -92,6 +93,11 @@ class PermissionsFragment : Fragment() {
             binding.btnIssue.isEnabled = !busy
         }
         viewModel.permissions.observe(viewLifecycleOwner) { renderList(it) }
+        viewModel.cancelResult.observe(viewLifecycleOwner) { message ->
+            if (message == null) return@observe
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            viewModel.cancelResultShown()
+        }
         viewModel.student.observe(viewLifecycleOwner) { renderStudent(it) }
         viewModel.saveResult.observe(viewLifecycleOwner) { result ->
             if (result == null) return@observe
@@ -193,12 +199,19 @@ class PermissionsFragment : Fragment() {
 
     private fun permissionRow(permission: Permission): View {
         val type = types.firstOrNull { it.first == permission.permissionType }?.second ?: permission.permissionType.orEmpty()
-        val out = permission.exitTime != null
+        val out = permission.gateState == "out"
         val overdue = out && parse(permission.endTime)?.before(Date()) == true
+        val cancelled = permission.status == "cancelled"
         val (state, tone) = when {
             overdue -> "OVERDUE · out since ${clock(permission.exitTime)}, due back ${clock(permission.endTime)}" to OVERDUE
+            out && cancelled -> "CANCELLED · still out since ${clock(permission.exitTime)}" to OVERDUE
             out -> "IN USE · out since ${clock(permission.exitTime)}" to IN_USE
-            else -> "VALID · not left yet" to VALID
+            permission.gateState == "returned" && permission.returnedLate == true -> "BACK LATE at ${clock(permission.entryTime)}" to OVERDUE
+            permission.gateState == "returned" -> "BACK at ${clock(permission.entryTime)}" to VALID
+            cancelled -> "CANCELLED" to MUTED
+            permission.gateState == "expired" -> "EXPIRED · not used" to MUTED
+            permission.gateState == "upcoming" -> "STARTS at ${clock(permission.startTime)}" to VALID
+            else -> "VALID · may leave now" to VALID
         }
 
         val row = LinearLayout(requireContext()).apply {
@@ -223,7 +236,27 @@ class PermissionsFragment : Fragment() {
             14f,
             ContextCompat.getColor(requireContext(), R.color.text_color_hint)
         ))
+        // A permission can be cancelled until the student is back, also while they are out.
+        if (!cancelled && permission.gateState in setOf("upcoming", "open", "out")) {
+            row.addView(TextView(requireContext()).apply {
+                text = getString(R.string.permission_cancel)
+                textSize = 14f
+                setTextColor(OVERDUE)
+                setPadding(0, dp(10), 0, 0)
+                setOnClickListener { confirmCancel(permission) }
+            })
+        }
         return row
+    }
+
+    private fun confirmCancel(permission: Permission) {
+        val message = if (permission.gateState == "out") getString(R.string.permission_cancel_out_note) else null
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.permission_cancel_title, permission.studentName.orEmpty()))
+            .setMessage(message)
+            .setPositiveButton(R.string.permission_cancel) { _, _ -> token?.let { viewModel.cancel(it, permission.id) } }
+            .setNegativeButton(R.string.permission_keep, null)
+            .show()
     }
 
     private fun showIssuedMessage(message: String) {
@@ -368,5 +401,6 @@ class PermissionsFragment : Fragment() {
         private val VALID = Color.parseColor("#01865A")
         private val IN_USE = Color.parseColor("#1565C0")
         private val OVERDUE = Color.parseColor("#C62828")
+        private val MUTED = Color.parseColor("#757575")
     }
 }
