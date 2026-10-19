@@ -34,7 +34,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.runBlocking
+import android.view.Menu
+import android.view.MotionEvent
 import android.view.View
+import android.widget.PopupMenu
+import androidx.navigation.NavOptions
+import com.example.inspectorappupdate.utils.Keyboard
 import androidx.navigation.fragment.NavHostFragment
 import kotlin.collections.contains
 import java.util.concurrent.atomic.AtomicBoolean
@@ -61,14 +66,6 @@ class SearchStudentActivity : AppCompatActivity() {
         // The signed-in role decides the bottom bar and the first screen.
         val role = intent.getStringExtra(Session.EXTRA_ROLE)
             ?: runBlocking { Session.current(this@SearchStudentActivity)?.role }
-        val visibleTiles = AppRole.tiles(role)
-        listOf(
-            binding.rlDisplineDeduction, binding.rlStudentAttendance, binding.rlVisitorGate,
-            binding.rlReportLost, binding.rlCardTopup, binding.rlEditPin,
-            binding.rlCardTools, binding.rlPermissions, binding.rlCardIssue, binding.rlAgentStats
-        ).forEach { tile ->
-            tile?.visibility = if (tile?.id in visibleTiles) View.VISIBLE else View.GONE
-        }
 
         visitorGateViewModel.setAllowedModes(AppRole.visitorModes(role))
 
@@ -80,44 +77,14 @@ class SearchStudentActivity : AppCompatActivity() {
         navController.setGraph(graph, null)
         appBarConfiguration = AppBarConfiguration(navController.graph)
 
-        binding.rlCardTools.setOnClickListener {
-            navController.navigate(R.id.CardToolsFragment)
-        }
+        setUpBottomBar(navController, AppRole.tabs(role))
+        Keyboard.closeOnDone(this)
+        Keyboard.hideBarWhileTyping(binding.root, binding.bottomNav)
 
-        binding.rlPermissions.setOnClickListener {
-            navController.navigate(R.id.PermissionsFragment)
-        }
-
-        binding.rlCardIssue.setOnClickListener {
-            navController.navigate(R.id.CardIssueFragment)
-        }
-
-        binding.rlAgentStats.setOnClickListener {
-            navController.navigate(R.id.AgentStatsFragment)
-        }
-
-        binding.rlEditPin.setOnClickListener {
-            navController.navigate(R.id.ChangePinFragment)
-        }
-
-        binding.rlCardTopup.setOnClickListener {
-            navController.navigate(R.id.CardTopUpFragment)
-        }
-
-        binding.rlReportLost.setOnClickListener {
-            navController.navigate(R.id.ReportCardFragment)
-        }
-
-        binding.rlStudentAttendance.setOnClickListener {
-            navController.navigate(R.id.StudentGateFragment)
-        }
-
-        binding.rlVisitorGate.setOnClickListener {
-            navController.navigate(R.id.VisitorGateFragment)
-        }
-
-        binding.rlDisplineDeduction.setOnClickListener {
-            navController.navigate(R.id.SearchStudentFragment)
+        // A card read belongs to the screen it was made on; switching screens drops it and closes the keyboard.
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            cardViewModel.onScreenChanged(destination.id)
+            Keyboard.hide(this)
         }
 
         // Adapter of the NFC
@@ -130,6 +97,55 @@ class SearchStudentActivity : AppCompatActivity() {
         // Initialize the room database
         appDatabase = DbUtility().dbBuilder(baseContext)
 
+    }
+
+    /**
+     * A standard bottom navigation bar with the role's tabs. Android allows five tabs, so a longer list shows its
+     * first four and a More tab listing the rest.
+     */
+    private fun setUpBottomBar(navController: androidx.navigation.NavController, tabs: List<AppRole.Tab>) {
+        val bar = binding.bottomNav
+        val shown = if (tabs.size > MAX_TABS) tabs.take(MAX_TABS - 1) else tabs
+        val overflow = tabs.drop(shown.size)
+        shown.forEachIndexed { index, tab ->
+            bar.menu.add(Menu.NONE, tab.destination, index, tab.label).setIcon(tab.icon)
+        }
+        if (overflow.isNotEmpty()) {
+            bar.menu.add(Menu.NONE, R.id.tab_more, MAX_TABS, R.string.tab_more).setIcon(R.drawable.ic_more_horiz)
+        }
+        if (tabs.size < 2) {
+            bar.visibility = View.GONE
+            bar.tag = Keyboard.HIDDEN_BY_ROLE
+        }
+
+        val open = { destination: Int ->
+            if (navController.currentDestination?.id != destination) {
+                navController.navigate(destination, null, NavOptions.Builder()
+                    .setLaunchSingleTop(true)
+                    .setPopUpTo(navController.graph.startDestinationId, false)
+                    .build())
+            }
+        }
+        bar.setOnItemSelectedListener { item ->
+            if (item.itemId == R.id.tab_more) {
+                val popup = PopupMenu(this, bar.findViewById(R.id.tab_more))
+                overflow.forEach { tab -> popup.menu.add(Menu.NONE, tab.destination, Menu.NONE, tab.label).setIcon(tab.icon) }
+                popup.setOnMenuItemClickListener { open(it.itemId); true }
+                popup.show()
+                false
+            } else {
+                open(item.itemId)
+                true
+            }
+        }
+        bar.setOnItemReselectedListener { if (it.itemId == R.id.tab_more) bar.selectedItemId = R.id.tab_more }
+
+        // The open screen's tab stays highlighted, also when the screen came from More or a link inside another.
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val item = bar.menu.findItem(destination.id)
+                ?: bar.menu.findItem(R.id.tab_more).takeIf { overflow.any { it.destination == destination.id } }
+            item?.isChecked = true
+        }
     }
 
     override fun onStart() {
@@ -146,6 +162,12 @@ class SearchStudentActivity : AppCompatActivity() {
     override fun onStop() {
         RetrofitInstance.onUnauthorized = null
         super.onStop()
+    }
+
+    // Tapping anywhere outside the field being typed in closes the keyboard.
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_DOWN) Keyboard.closeIfOutside(this, event)
+        return super.dispatchTouchEvent(event)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -305,6 +327,7 @@ class SearchStudentActivity : AppCompatActivity() {
 
     companion object {
         lateinit var appDatabase: AppDatabase
+        private const val MAX_TABS = 5
         private const val PRESENCE_CHECK_MS = 400L
     }
 }

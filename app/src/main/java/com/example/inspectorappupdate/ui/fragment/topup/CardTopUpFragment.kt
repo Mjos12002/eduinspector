@@ -21,6 +21,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.IndexActivity
@@ -61,7 +62,7 @@ class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
     // Initialize the payment view model
     private val paymentViewModel: PaymentViewModel by activityViewModels()
     // Initialize the student view model
-    private val studentViewModel: StudentViewModel by activityViewModels()
+    private val studentViewModel: StudentViewModel by viewModels()
     // Initialize the selected walled id
     var selectedWalletID = 0
     // Initialize the list of wallet types

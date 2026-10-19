@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The bottom bar's More tab, when a role has more than five screens. -->
+    <item name="tab_more" type="id" />
+</resources>

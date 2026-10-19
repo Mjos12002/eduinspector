@@ -107,10 +107,23 @@
             android:background="@drawable/custom_card"
             android:visibility="gone">
 
+            <!-- Until a student is tapped or found. -->
+            <TextView
+                android:id="@+id/tv_tap_prompt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:minHeight="120dp"
+                android:text="@string/permissions_tap_card"
+                android:textColor="@color/card_details_text_color"
+                android:textSize="20sp" />
+
             <TextView
                 android:id="@+id/tv_student_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_alignParentTop="true"
                 android:textSize="22sp"
                 android:fontFamily="sans-serif-black"
@@ -120,6 +133,7 @@
                 android:id="@+id/tv_student_reg_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_below="@id/tv_student_name"
                 android:layout_marginTop="5sp"
                 android:textColor="@color/mainGreen"
