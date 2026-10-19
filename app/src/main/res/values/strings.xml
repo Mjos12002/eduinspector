@@ -201,6 +201,10 @@
     <string name="visitor_attach_another">Attach another card</string>
     <string name="session_ended">Your session has ended. Sign in again.</string>
     <string name="card_blocked">Card blocked</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="sign_in_wrong_password">The email, phone or password is wrong. Check them, or ask your school to reset your password.</string>
+    <string name="sign_in_failed">Couldn\'t sign in. Check your connection and try again.</string>
     <string name="role_not_allowed">This account can\'t use the inspector app. Ask your school to give you the inspector or gatekeeper role, or Educard the card agent role.</string>
     <string name="visitor_attach_hint">Or tap any card to see whose it is.</string>
     <string name="permissions_title">Permissions</string>
