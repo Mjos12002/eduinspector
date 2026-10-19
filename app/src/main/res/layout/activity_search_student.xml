@@ -91,6 +91,38 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/rl_card_issue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@drawable/left_border"
+            android:contentDescription="@string/issue_title"
+            android:padding="10sp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/issue_title"
+                android:src="@drawable/outline_add_card_24"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_agent_stats"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@drawable/left_border"
+            android:contentDescription="@string/agent_stats_title"
+            android:padding="10sp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/agent_stats_title"
+                android:src="@drawable/outline_bar_chart_24"/>
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/rl_card_topup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

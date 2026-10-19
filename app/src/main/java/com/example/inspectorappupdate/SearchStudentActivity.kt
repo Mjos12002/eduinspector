@@ -23,6 +23,7 @@ import com.example.inspectorappupdate.utils.AppRole
 import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.utils.RetrofitInstance
 import com.example.inspectorappupdate.utils.Session
+import com.example.inspectorappupdate.viewmodel.agent.CardIssueViewModel
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
 import com.example.inspectorappupdate.viewmodel.gate.StudentGateViewModel
 import com.example.inspectorappupdate.viewmodel.visitor.VisitorGateViewModel
@@ -46,6 +47,8 @@ class SearchStudentActivity : AppCompatActivity() {
     val cardViewModel: CardViewModel by viewModels()
     val visitorGateViewModel: VisitorGateViewModel by viewModels()
     val studentGateViewModel: StudentGateViewModel by viewModels()
+    @get:RequiresApi(Build.VERSION_CODES.O)
+    val cardIssueViewModel: CardIssueViewModel by viewModels()
 
     private var nfcAdapter: NfcAdapter? = null
 
@@ -62,7 +65,7 @@ class SearchStudentActivity : AppCompatActivity() {
         listOf(
             binding.rlDisplineDeduction, binding.rlStudentAttendance, binding.rlVisitorGate,
             binding.rlReportLost, binding.rlCardTopup, binding.rlEditPin,
-            binding.rlCardTools, binding.rlPermissions
+            binding.rlCardTools, binding.rlPermissions, binding.rlCardIssue, binding.rlAgentStats
         ).forEach { tile ->
             tile?.visibility = if (tile?.id in visibleTiles) View.VISIBLE else View.GONE
         }
@@ -83,6 +86,14 @@ class SearchStudentActivity : AppCompatActivity() {
 
         binding.rlPermissions.setOnClickListener {
             navController.navigate(R.id.PermissionsFragment)
+        }
+
+        binding.rlCardIssue.setOnClickListener {
+            navController.navigate(R.id.CardIssueFragment)
+        }
+
+        binding.rlAgentStats.setOnClickListener {
+            navController.navigate(R.id.AgentStatsFragment)
         }
 
         binding.rlEditPin.setOnClickListener {
@@ -171,6 +182,20 @@ class SearchStudentActivity : AppCompatActivity() {
                     studentGateViewModel.onCardTapped(token, uid, deviceId)
                 }
                 watchCardPresence(tag) { studentGateViewModel.onCardRemoved() }
+                return
+            }
+            // Issuing a card reads only the chip UID of the new card.
+            if (tag != null && navController.currentDestination?.id == R.id.CardIssueFragment) {
+                val uid = tag.id.toHexString()
+                lifecycleScope.launch {
+                    val token = try {
+                        appDatabase.loggedInUserDao().getLastLogin().token
+                    } catch (e: Exception) {
+                        Toast.makeText(baseContext, "Sign in again", Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+                    cardIssueViewModel.onCardTapped(token, uid)
+                }
                 return
             }
             if (tag != null && navController.currentDestination?.id == R.id.VisitorGateFragment) {

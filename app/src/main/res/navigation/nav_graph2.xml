@@ -67,5 +67,17 @@
         android:label="Visitor gate"
         tools:layout="@layout/fragment_visitor_gate"/>
 
+    <fragment
+        android:id="@+id/CardIssueFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.agent.CardIssueFragment"
+        android:label="Issue cards"
+        tools:layout="@layout/fragment_card_issue"/>
+
+    <fragment
+        android:id="@+id/AgentStatsFragment"
+        android:name="com.example.inspectorappupdate.ui.fragment.agent.AgentStatsFragment"
+        android:label="My cards"
+        tools:layout="@layout/fragment_agent_stats"/>
+
 
 </navigation>
