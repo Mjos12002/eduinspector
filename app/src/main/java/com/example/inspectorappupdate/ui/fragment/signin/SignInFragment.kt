@@ -100,6 +100,17 @@ class SignInFragment : Fragment() {
             }
         })
 
+        // The eye button shows or hides the password, keeping the cursor where it was.
+        binding.btnTogglePassword.setOnClickListener {
+            val field = binding.etLoginPassword
+            val showing = field.transformationMethod !is android.text.method.PasswordTransformationMethod
+            val cursor = field.selectionEnd
+            field.transformationMethod = if (showing) android.text.method.PasswordTransformationMethod.getInstance() else null
+            field.setSelection(cursor.coerceAtLeast(0))
+            binding.btnTogglePassword.setImageResource(if (showing) R.drawable.ic_eye_off else R.drawable.ic_eye)
+            binding.btnTogglePassword.contentDescription = getString(if (showing) R.string.show_password else R.string.hide_password)
+        }
+
         // Observe the changes in the login response
         signInViewModel.loginResponseLiveData.observe(viewLifecycleOwner, Observer{
             try {
@@ -121,7 +132,12 @@ class SignInFragment : Fragment() {
                         Session.openHome(requireActivity(), userLoggedIn.role)
                     }
                 }else {
-                    signInViewModel.updateLoginStatusMessage("Error, Contact Admin")
+                    // 401: wrong identifier or password; 403: the server says why (a blocked account).
+                    signInViewModel.updateLoginStatusMessage(when (it.status.toIntOrNull()) {
+                        401 -> getString(R.string.sign_in_wrong_password)
+                        403, 422 -> it.message.ifBlank { getString(R.string.sign_in_failed) }
+                        else -> getString(R.string.sign_in_failed)
+                    })
                 }
             }catch (e: Exception) {
                 Log.i("TAG-INFORMATION", "${e.message}")

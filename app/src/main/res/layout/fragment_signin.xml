@@ -64,7 +64,19 @@
             android:layout_marginBottom="5dp"
             android:textColor="@color/black"
             android:inputType="textPassword"
+            android:paddingEnd="48dp"
             android:layout_marginTop="5dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_toggle_password"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            android:layout_alignTop="@id/et_login_password"
+            android:layout_alignBottom="@id/et_login_password"
+            android:layout_alignEnd="@id/et_login_password"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/show_password"
+            android:src="@drawable/ic_eye_off" />
 
         <TextView
             android:id="@+id/tv_password_error"
