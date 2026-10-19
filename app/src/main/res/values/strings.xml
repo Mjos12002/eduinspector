@@ -201,7 +201,7 @@
     <string name="visitor_attach_another">Attach another card</string>
     <string name="session_ended">Your session has ended. Sign in again.</string>
     <string name="card_blocked">Card blocked</string>
-    <string name="role_not_allowed">This account can\'t use the inspector app. Ask your school to give you the inspector or gatekeeper role.</string>
+    <string name="role_not_allowed">This account can\'t use the inspector app. Ask your school to give you the inspector or gatekeeper role, or Educard the card agent role.</string>
     <string name="visitor_attach_hint">Or tap any card to see whose it is.</string>
     <string name="permissions_title">Permissions</string>
     <string name="permissions_tab_issued">Issued</string>
@@ -234,4 +234,27 @@
     <string name="permission_keep">Keep it</string>
     <string name="permission_cancel_title">Cancel %1$s\'s permission?</string>
     <string name="permission_cancel_out_note">The student is out now. Their return will still be recorded when they tap In at the gate.</string>
+    <string name="issue_title">Issue cards</string>
+    <string name="issue_back">Back</string>
+    <string name="issue_photo">Student photo</string>
+    <string name="issue_search_hint">Student name or code</string>
+    <string name="issue_search_prompt">Search a student at your schools by name or student code.</string>
+    <string name="issue_details">Student details</string>
+    <string name="issue_class">Class</string>
+    <string name="issue_gender">Gender</string>
+    <string name="issue_save">Save details</string>
+    <string name="issue_card">Card</string>
+    <string name="issue_block">Block this card</string>
+    <string name="issue_register">Register new card</string>
+    <string name="issue_tap_title">Tap the new card</string>
+    <string name="issue_tap_hint">Hold the student\'s new card on the back of the phone.</string>
+    <string name="issue_pin_first">Student: choose a 4-digit PIN</string>
+    <string name="issue_pin_again">Enter the same PIN again</string>
+    <string name="issue_pin_hint">Hand the phone to the student. Nobody else should see the PIN.</string>
+    <string name="issue_confirm_title">Activate this card?</string>
+    <string name="issue_activate">Activate card</string>
+    <string name="issue_done_title">CARD ACTIVE</string>
+    <string name="issue_next">Next student</string>
+    <string name="agent_stats_title">My cards</string>
+    <string name="agent_stats_refresh">Refresh</string>
 </resources>

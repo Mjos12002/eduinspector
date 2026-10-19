@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_background_color"
+    android:orientation="vertical"
+    tools:context=".ui.fragment.agent.CardIssueFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/main_blue_color"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp">
+
+        <ImageView
+            android:id="@+id/img_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/issue_back"
+            android:padding="6dp"
+            android:src="@drawable/outline_arrow_back_24"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/issue_title"
+                android:textColor="@color/white"
+                android:textSize="@dimen/header_main_title" />
+
+            <TextView
+                android:id="@+id/tv_step"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#CCFFFFFF"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/img_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/sign_out"
+            android:padding="6dp"
+            android:src="@drawable/outline_logout_24" />
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/pb_issue"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
+    <!-- Step 1: find the student. -->
+    <LinearLayout
+        android:id="@+id/ll_search"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:autofillHints="name"
+            android:background="@drawable/edittextstyle"
+            android:drawableStart="@drawable/outline_search_24"
+            android:drawablePadding="8dp"
+            android:hint="@string/issue_search_hint"
+            android:textColorHint="@color/text_color_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="textPersonName|textNoSuggestions"
+            android:textColor="@color/card_details_text_color"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_search_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/issue_search_prompt"
+            android:textColor="@color/text_color_hint"
+            android:textSize="14sp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="70dp">
+
+            <LinearLayout
+                android:id="@+id/ll_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/sv_steps"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="70dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- The student, on every step after search. -->
+            <LinearLayout
+                android:id="@+id/ll_student_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/visitor_panel_background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/img_photo"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@color/main_gray_color"
+                    android:contentDescription="@string/issue_photo"
+                    android:scaleType="centerCrop" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/card_details_text_color"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/tv_meta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/text_color_hint"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 2: class, gender and the current card. -->
+            <LinearLayout
+                android:id="@+id/ll_student"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/IssueSectionTitle"
+                    android:text="@string/issue_details" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/visitor_panel_background"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/issue_class"
+                        android:textColor="@color/text_color_hint"
+                        android:textSize="13sp" />
+
+                    <Spinner
+                        android:id="@+id/sp_class"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/edittextstyle" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/issue_gender"
+                        android:textColor="@color/text_color_hint"
+                        android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_gender"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal" />
+
+                    <Button
+                        android:id="@+id/btn_save"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="12dp"
+                        android:enabled="false"
+                        android:text="@string/issue_save"
+                        android:textAllCaps="false" />
+                </LinearLayout>
+
+                <TextView
+                    style="@style/IssueSectionTitle"
+                    android:text="@string/issue_card" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/visitor_panel_background"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/tv_card_state"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/tv_card_meta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:lineSpacingExtra="3dp"
+                        android:textColor="@color/card_details_text_color"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btn_block"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/issue_block"
+                        android:textAllCaps="false" />
+
+                    <Button
+                        android:id="@+id/btn_register"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/issue_register"
+                        android:textAllCaps="false"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 3: tap the new card. -->
+            <LinearLayout
+                android:id="@+id/ll_tap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/visitor_panel_background"
+                android:gravity="center_horizontal"
+                android:minHeight="220dp"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:contentDescription="@string/issue_tap_title"
+                    android:src="@drawable/outline_add_card_24" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/issue_tap_title"
+                    android:textColor="@color/card_details_text_color"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="@string/issue_tap_hint"
+                    android:textColor="@color/text_color_hint"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <!-- Step 4: the student enters the PIN twice on the keypad. -->
+            <LinearLayout
+                android:id="@+id/ll_pin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/visitor_panel_background"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tv_pin_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/card_details_text_color"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_pin_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:textColor="@color/text_color_hint"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_pin_dots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal" />
+
+                <GridLayout
+                    android:id="@+id/gl_keypad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:columnCount="3" />
+            </LinearLayout>
+
+            <!-- Step 5: confirm. -->
+            <LinearLayout
+                android:id="@+id/ll_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/visitor_panel_background"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/issue_confirm_title"
+                    android:textColor="@color/card_details_text_color"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="@color/card_details_text_color"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btn_activate"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/issue_activate"
+                    android:textAllCaps="false"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Step 6: issued. -->
+            <LinearLayout
+                android:id="@+id/ll_done"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:id="@+id/tv_done_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/issue_done_title"
+                    android:textColor="#01865A"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/tv_done"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="@color/card_details_text_color"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btn_next"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/issue_next"
+                    android:textAllCaps="false"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_step_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="#C62828"
+                android:textSize="15sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

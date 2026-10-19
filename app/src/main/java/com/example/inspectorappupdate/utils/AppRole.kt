@@ -8,6 +8,7 @@ object AppRole {
     const val ADMIN = "admin"
     const val INSPECTOR = "inspector"
     const val GATEKEEPER = "gatekeeper"
+    const val AGENT = "agent"
 
     /** Discipline, student permissions, visitors (register, activate cards), card tools (top up, block card, change PIN). */
     private val inspectorTiles = listOf(
@@ -17,12 +18,16 @@ object AppRole {
     /** Student in/out and visitors at the gate. */
     private val gatekeeperTiles = listOf(R.id.rl_student_attendance, R.id.rl_visitor_gate)
 
-    fun canSignIn(role: String?) = role in setOf(ADMIN, INSPECTOR, GATEKEEPER)
+    /** Card agents: issue and activate students' cards, and their own numbers. */
+    private val agentTiles = listOf(R.id.rl_card_issue, R.id.rl_agent_stats)
+
+    fun canSignIn(role: String?) = role in setOf(ADMIN, INSPECTOR, GATEKEEPER, AGENT)
 
     fun tiles(role: String?): List<Int> = when (role) {
         GATEKEEPER -> gatekeeperTiles
         INSPECTOR -> inspectorTiles
-        else -> (inspectorTiles + gatekeeperTiles).distinct()
+        AGENT -> agentTiles
+        else -> (inspectorTiles + gatekeeperTiles + agentTiles).distinct()
     }
 
     /** Gatekeepers record visitors at the gate; inspectors register visitors and attach physical cards; admins do all. The first mode opens first. */
@@ -32,6 +37,9 @@ object AppRole {
         else -> listOf(Mode.GATE, Mode.REGISTER, Mode.ATTACH)
     }
 
-    fun startDestination(role: String?): Int =
-        if (role == GATEKEEPER) R.id.StudentGateFragment else R.id.SearchStudentFragment
+    fun startDestination(role: String?): Int = when (role) {
+        GATEKEEPER -> R.id.StudentGateFragment
+        AGENT -> R.id.CardIssueFragment
+        else -> R.id.SearchStudentFragment
+    }
 }

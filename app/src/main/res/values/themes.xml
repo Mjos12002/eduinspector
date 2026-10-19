@@ -34,4 +34,15 @@
         <item name="android:textColor">@color/card_details_text_color</item>
         <item name="android:textSize">15sp</item>
     </style>
+    <!-- Section heading on the card issue screen. -->
+    <style name="IssueSectionTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/text_color_hint</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>
