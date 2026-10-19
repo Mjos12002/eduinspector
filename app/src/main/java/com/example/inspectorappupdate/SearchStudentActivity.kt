@@ -237,6 +237,23 @@ class SearchStudentActivity : AppCompatActivity() {
                 return
             }
 
+            // Discipline keeps the student up while the card is held, and clears after it is taken away.
+            if (tag != null && navController.currentDestination?.id == R.id.SearchStudentFragment) {
+                val uid = tag.id.toHexString()
+                cardViewModel.onCardPresent()
+                lifecycleScope.launch {
+                    val token = try {
+                        appDatabase.loggedInUserDao().getLastLogin().token
+                    } catch (e: Exception) {
+                        Toast.makeText(baseContext, "Sign in again", Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+                    cardViewModel.getCardDetails(token, uid)
+                }
+                watchCardPresence(tag) { cardViewModel.onCardRemoved() }
+                return
+            }
+
             try {
                 val tagFromIntent = tag
                 val techList = tagFromIntent?.techList?.toList()

@@ -269,4 +269,21 @@
     <string name="issue_next">Next student</string>
     <string name="agent_stats_title">My cards</string>
     <string name="agent_stats_refresh">Refresh</string>
+    <string name="discipline_term_total">Marks deducted this term</string>
+    <string name="discipline_last_fault">Last fault: %1$s</string>
+    <string name="discipline_no_faults_yet">No faults this term</string>
+    <string name="discipline_reg">Reg number: %1$s</string>
+    <string name="discipline_choose_fault">Choose the fault</string>
+    <string name="discipline_no_fault_types">No faults are set up for this school yet. Add them in the school portal.</string>
+    <string name="discipline_marks">−%1$s marks</string>
+    <string name="discipline_punishment">Punishment: %1$s</string>
+    <string name="discipline_confirm_title">Record this fault</string>
+    <string name="discipline_confirm">Confirm</string>
+    <string name="discipline_back">Choose another fault</string>
+    <string name="discipline_recording">Recording…</string>
+    <string name="discipline_recorded">Fault recorded</string>
+    <string name="discipline_looking_up">Looking up the student…</string>
+    <string name="discipline_failed">Something went wrong. Check the connection and try again.</string>
+    <string name="discipline_loading_faults">Loading faults…</string>
+    <string name="discipline_clear">Clear student</string>
 </resources>

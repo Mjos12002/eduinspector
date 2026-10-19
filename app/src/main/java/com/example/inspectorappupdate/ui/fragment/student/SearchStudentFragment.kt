@@ -1,325 +1,344 @@
 package com.example.inspectorappupdate.ui.fragment.student
 
 import com.example.inspectorappupdate.utils.signOut
-import android.content.Context
-import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.example.inspectorappupdate.IndexActivity
 import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.databinding.FragmentSearchStudentBinding
 import com.example.inspectorappupdate.entity.academic_term.AcademicTermEntity
 import com.example.inspectorappupdate.model.offense_type.OffenseTypeData
+import com.example.inspectorappupdate.model.student.StudentModelData
 import com.example.inspectorappupdate.repository.academic_term.AcademicTermRepository
 import com.example.inspectorappupdate.repository.offense.OffenseRepository
 import com.example.inspectorappupdate.repository.offense_type.OffenseTypeRepository
 import com.example.inspectorappupdate.repository.signin.LoginRepository
 import com.example.inspectorappupdate.utils.AppDatabase
 import com.example.inspectorappupdate.utils.DbUtility
+import com.example.inspectorappupdate.utils.Keyboard
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
-import com.example.inspectorappupdate.viewmodel.offense.OffenseViewModel
 import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+/** Discipline: tap the student's card, choose the fault, confirm. Clears 2 s after the card is taken away. */
+class SearchStudentFragment : Fragment() {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SearchStudentFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
-
-    // Binding to the fragment UI
     private var _binding : FragmentSearchStudentBinding? = null
     private val binding get() = _binding!!
 
-    // Initialize the view model for the student search
     private val studentViewModel: StudentViewModel by viewModels()
-
-    // Initialize the view model for the card details
     private val cardViewModel: CardViewModel by activityViewModels()
 
-    // Initialise the view model for the student offense
-    private val offenseViewModel: OffenseViewModel by activityViewModels()
+    private var academicYearID = 0
+    private var academicTermID = 0
+    private var instituteID = 0
+    private var userToken = ""
 
-    // Variable holding the student id
-    var studentID = 0
-    var academicYearID = 0
-    var academicTermID = 0
-    var instituteID = 0
+    private var faultTypes: List<OffenseTypeData>? = null
+    private var faultTypesError: String? = null
 
-    var userToken = ""
-
-    // Offense Typese List
-    lateinit var offenseTypeList : List<OffenseTypeData>
-
-    var offenseTypeID = 0
+    // The student on screen, and whether they came from a card tap (cleared when the card leaves).
+    private var student: StudentModelData? = null
+    private var fromCard = false
+    private var cardHeld = false
+    private var fault: OffenseTypeData? = null
+    private var saving = false
+    private var resetJob: Job? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Initialize the fragment
+    ): View {
         _binding = FragmentSearchStudentBinding.inflate(inflater, container, false)
-        // Clear view
-        binding.imgLogout.setOnClickListener {
-            signOut()
-        }
+        binding.imgLogout.setOnClickListener { signOut() }
 
-        // Initialize the local database utility
         appDatabase = DbUtility().dbBuilder(requireContext())
 
-        // Get the institute id
         lifecycleScope.launch {
-            studentViewModel.clearStudentViewModel()
-            if (appDatabase.loggedInUserDao().getLastLogin().role == "inspector") {
-                val res = LoginRepository().getDeployedUser(appDatabase.loggedInUserDao().getLastLogin().token, appDatabase.loggedInUserDao().getLastLogin().id.toInt())
-                if(res.status == 200 || res.status == 201) {
-                    if(res.data != null) {
-                        instituteID = res.data.institute_id
-                    }
-                }else{
-                    if(res.message.contains("resolve")) {
+            val login = appDatabase.loggedInUserDao().getLastLogin()
+            userToken = login.token
+            binding.tvSearchStudentHeader.text = "${getString(R.string.welcome)}, ${login.firstName}"
+            if (login.role == "inspector") {
+                val res = LoginRepository().getDeployedUser(login.token, login.id.toInt())
+                if ((res.status == 200 || res.status == 201) && res.data != null) instituteID = res.data.institute_id
+            }
+            loadTerm()
+            loadFaultTypes()
+        }
 
-                    }
+        binding.imvSearch.setOnClickListener { searchTyped() }
+        // Posted so it replaces the shared Done handler set after the view is created.
+        binding.etSearchStudent.post {
+            _binding?.etSearchStudent?.setOnEditorActionListener { _, actionId, event ->
+                val enterKey = actionId == EditorInfo.IME_NULL && event?.action == KeyEvent.ACTION_DOWN
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || enterKey) {
+                    searchTyped()
+                    true
+                } else false
+            }
+        }
+        binding.imgClearStudent.setOnClickListener { reset() }
+        binding.btnBack.setOnClickListener { chooseFault(null) }
+        binding.btnConfirm.setOnClickListener { record() }
+
+        cardViewModel.cardPresent.observe(viewLifecycleOwner) { present ->
+            cardHeld = present
+            if (present) {
+                // A new tap replaces whatever was on screen.
+                resetJob?.cancel()
+                if (!saving) {
+                    fromCard = true
+                    showWaiting(getString(R.string.discipline_looking_up))
                 }
+            } else if (fromCard && !saving) {
+                resetSoon()
             }
         }
 
-        // Get from the local database the first name and last name of the user logged in
-        lifecycleScope.launch {
-            // Create a string builder to create a welcome message
-            val msgBuilder = StringBuilder()
-            val firstName = appDatabase.loggedInUserDao().getLastLogin().firstName
-            val lastName = appDatabase.loggedInUserDao().getLastLogin().lastName
-            userToken = appDatabase.loggedInUserDao().getLastLogin().token
-            msgBuilder.append(getString(R.string.welcome))
-            msgBuilder.append(", ")
-            msgBuilder.append(firstName)
-            binding.rlStudentDetails.visibility = View.VISIBLE
-            binding.tvSearchStudentHeader.text = msgBuilder.toString()
+        cardViewModel.cardLiveData.observe(viewLifecycleOwner) { card ->
+            if (cardViewModel.isNoCard(card) || !fromCard || saving) return@observe
+            if (card.error || card.data == null) {
+                showWaiting(card.message.ifBlank { getString(R.string.discipline_failed) }, error = true)
+                return@observe
+            }
+            binding.tvTapPrompt.text = "${card.data.first_name} ${card.data.last_name}"
+            lifecycleScope.launch { studentViewModel.searchStudentByRegNumber(userToken, card.data.reg_number) }
         }
 
-        // Execute the search action to get the student details
-        binding.imvSearch.setOnClickListener {
-            val regNumber = binding.etSearchStudent.text.toString()
-            lifecycleScope.launch {
-                val token = appDatabase.loggedInUserDao().getLastLogin().token
-                studentViewModel.searchStudentByRegNumber(token, regNumber)
+        studentViewModel.studentLiveData.observe(viewLifecycleOwner) {
+            if (saving) return@observe
+            if (it.error || it.data == null || it.data.student == null) {
+                showWaiting(it.message.ifBlank { getString(R.string.discipline_failed) }, error = true)
+                return@observe
             }
+            showStudent(it.data)
         }
 
-        // Observe the changes in the live data object
-        studentViewModel.studentLiveData.observe(viewLifecycleOwner, Observer{
-            // Create the student name object to display by checking if there is an error
-            if(!it.error) {
-                if(it.data != null) {
-                    val studentName = StringBuilder()
-                    studentName.append(it.data.first_name)
-                    studentName.append(" ")
-                    studentName.append(it.data.last_name)
-
-                    // String builder object for displaying the reg number
-                    val regNumberStrBuilder = StringBuilder()
-                    regNumberStrBuilder.append("Reg Number:")
-                    regNumberStrBuilder.append(" ")
-                    regNumberStrBuilder.append(it.data.reg_number)
-
-                    binding.tvStudentName.text = studentName.toString()
-                    binding.tvStudentRegNumber.text = regNumberStrBuilder.toString()
-                    binding.tvTapPrompt.visibility = View.GONE
-                    binding.tvStudentName.visibility = View.VISIBLE
-                    binding.tvStudentRegNumber.visibility = View.VISIBLE
-
-                    // Set the student id value
-                    studentID = it.data.id
-                    binding.rlDeductionsParent.visibility = View.VISIBLE
-                    getCurrentAcademicTerm()
-                }
-            }
-
-
-        })
-
-        // Observe the changes in the offenses live data
-        offenseViewModel.offenseLiveData.observe(viewLifecycleOwner, Observer{
-            try{
-                if(it.data.isNotEmpty()) {
-                    val lastOffense = it.data.last()
-                    binding.tvLastOffense.text = "Last offense: "  + lastOffense.offense_type.type_name
-                    val counter = it.data.sumOf { it.marks_deducted }
-                    binding.tvTotalDeductionValue.text = "$counter"
-                }else {
-                    binding.tvTotalDeductionValue.text = "0"
-                    binding.tvLastOffense.text = ""
-                }
-
-            }catch (e: Exception) {
-
-            }
-
-        })
-
-        // Observe the card live data
-        cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
-            if (!it.error) {
-                if(it.data != null) {
-                    lifecycleScope.launch {
-                        val token = appDatabase.loggedInUserDao().getLastLogin().token
-                        studentViewModel.searchStudentByRegNumber(token, it.data.reg_number)
-                    }
-                }
-            }
-        })
-
-        // Add event to add deduction
-        binding.imgAddDeduction.setOnClickListener {
-//            binding.tvStudentName.text = getString(R.string.waitwhileprocessing)
-            showViewToDeductMarks(requireContext())
-        }
+        showWaiting(getString(R.string.permissions_tap_card))
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onDestroyView() {
+        resetJob?.cancel()
+        super.onDestroyView()
+        _binding = null
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun loadOffense(): Array<String>{
-
-        lifecycleScope.launch {
-            val token = appDatabase.loggedInUserDao().getLastLogin().token
-            val offenseType = OffenseTypeRepository().getOffenseType(token)
-
-        }
-        return arrayOf("")
-
+    private fun searchTyped() {
+        val regNumber = binding.etSearchStudent.text.toString().trim()
+        if (regNumber.isEmpty()) return
+        Keyboard.hide(requireActivity())
+        resetJob?.cancel()
+        fromCard = false
+        showWaiting(getString(R.string.discipline_looking_up))
+        lifecycleScope.launch { studentViewModel.searchStudentByRegNumber(userToken, regNumber) }
     }
 
+    /** Step 0: no student yet; the prompt, a lookup in progress, or why the card was refused. */
+    private fun showWaiting(message: String, error: Boolean = false) {
+        student = null
+        fault = null
+        binding.tvTapPrompt.text = message
+        binding.tvTapPrompt.setTextColor(
+            if (error) Color.parseColor("#B3261E") else ContextCompat.getColor(requireContext(), R.color.card_details_text_color)
+        )
+        binding.tvTapPrompt.visibility = View.VISIBLE
+        binding.llStudent.visibility = View.GONE
+        binding.llFaults.visibility = View.GONE
+        binding.llConfirm.visibility = View.GONE
+        // The search box is only for finding a student without a card.
+        binding.llSearch.visibility = if (fromCard && cardHeld) View.GONE else View.VISIBLE
+    }
+
+    /** Step 1 and 2: the student's details, then the list of faults. */
     @RequiresApi(Build.VERSION_CODES.O)
-    fun showViewToDeductMarks(context: Context) {
+    private fun showStudent(found: StudentModelData) {
+        student = found
+        binding.llSearch.visibility = View.GONE
+        binding.tvTapPrompt.visibility = View.GONE
+        binding.llStudent.visibility = View.VISIBLE
+        binding.tvStudentName.text = "${found.first_name} ${found.last_name}"
+        binding.tvStudentRegNumber.text = getString(R.string.discipline_reg, found.reg_number)
+        binding.tvTotalDeductionValue.text = "…"
+        binding.tvLastOffense.text = ""
+        loadTermFaults(found.student!!.id)
+        chooseFault(null)
+    }
 
-        val dialog = BottomSheetDialog(context)
-
-        val view = layoutInflater.inflate(R.layout.discipline_deduction, null)
-        val spin = view.findViewById<Spinner>(R.id.spn_offense)
-        loadOffense()
-
-        lifecycleScope.launch {
-            val token = appDatabase.loggedInUserDao().getLastLogin().token
-            val offenseType = OffenseTypeRepository().getOffenseType(token)
-            val arr = offenseType.data.map { it.type_name }
-            // Set the offense type
-            offenseTypeList = offenseType.data
-
-            val ad = ArrayAdapter(context,
-                android.R.layout.simple_spinner_item, arr
-            )
-
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-
-            spin.adapter = ad
-
-            // set simple layout resource file
-            // for each item of spinner
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-            ad.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
+    private fun chooseFault(chosen: OffenseTypeData?) {
+        fault = chosen
+        binding.tvResult.visibility = View.GONE
+        if (chosen == null) {
+            binding.llConfirm.visibility = View.GONE
+            binding.llFaults.visibility = View.VISIBLE
+            renderFaultTypes()
+            return
         }
+        // Step 3: what will be recorded.
+        binding.llFaults.visibility = View.GONE
+        binding.llConfirm.visibility = View.VISIBLE
+        binding.tvConfirmFault.text = chosen.type_name
+        binding.tvConfirmMarks.text = getString(R.string.discipline_marks, marks(chosen))
+        val punishment = chosen.punishment?.takeIf { it.isNotBlank() }
+        binding.tvConfirmPunishment.visibility = if (punishment != null) View.VISIBLE else View.GONE
+        binding.tvConfirmPunishment.text = punishment?.let { getString(R.string.discipline_punishment, it) }
+        binding.btnConfirm.isEnabled = true
+        binding.btnConfirm.text = getString(R.string.discipline_confirm)
+        binding.btnConfirm.visibility = View.VISIBLE
+        binding.btnBack.visibility = View.VISIBLE
+        binding.svDiscipline.post { _binding?.svDiscipline?.smoothScrollTo(0, binding.llConfirm.top) }
+    }
 
-        spin.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
-
-        val x = view.findViewById<AppCompatButton>(R.id.btn_add_offense)
-        x.setOnClickListener {
-            val processing = view.findViewById<TextView>(R.id.tv_processing_message)
-            if(instituteID > 0) {
-
-                lifecycleScope.launch {
-
-                    processing.visibility = View.VISIBLE
-                    val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-                    val resp = OffenseRepository().createStudentOffense(userToken, studentID, offenseTypeID, academicYearID, academicTermID, date, instituteID)
-                    processing.text = resp.message
-                    //dialog.dismiss()
-                }
-
-            }else {
-                processing.visibility = View.VISIBLE
-                processing.text = getString(R.string.invalid_institute)
+    private fun renderFaultTypes() {
+        val list = binding.llFaultList
+        list.removeAllViews()
+        val types = faultTypes
+        val message = when {
+            faultTypesError != null -> faultTypesError
+            types == null -> getString(R.string.discipline_loading_faults)
+            types.isEmpty() -> getString(R.string.discipline_no_fault_types)
+            else -> null
+        }
+        binding.tvFaultsMessage.text = message
+        binding.tvFaultsMessage.visibility = if (message != null) View.VISIBLE else View.GONE
+        types?.forEach { type ->
+            val row = layoutInflater.inflate(R.layout.item_discipline_fault, list, false)
+            row.findViewById<TextView>(R.id.tv_fault_name).text = type.type_name
+            row.findViewById<TextView>(R.id.tv_fault_marks).text = getString(R.string.discipline_marks, marks(type))
+            val category = type.offense_category?.name?.takeIf { it.isNotBlank() }
+            row.findViewById<TextView>(R.id.tv_fault_category).apply {
+                text = category
+                visibility = if (category != null) View.VISIBLE else View.GONE
             }
+            row.setOnClickListener { chooseFault(type) }
+            list.addView(row)
         }
-        dialog.setCancelable(true)
-        // set content view to our view.
-        dialog.setContentView(view)
-        // call a show method to display a dialog
-        dialog.show()
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun record() {
+        val record = student?.student ?: return
+        val chosen = fault ?: return
+        // An inspector records at their school; an admin at the student's school.
+        val school = instituteID.takeIf { it > 0 } ?: record.current_institute_id ?: 0
+        if (school <= 0) {
+            showResult(getString(R.string.invalid_institute), ok = false)
+            return
+        }
+        saving = true
+        binding.btnConfirm.isEnabled = false
+        binding.btnConfirm.text = getString(R.string.discipline_recording)
+        binding.btnBack.visibility = View.GONE
+        lifecycleScope.launch {
+            val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+            val resp = OffenseRepository().createStudentOffense(userToken, record.id, chosen.id, academicYearID, academicTermID, date, school)
+            saving = false
+            if (_binding == null) return@launch
+            if (resp.error) {
+                binding.btnConfirm.isEnabled = true
+                binding.btnConfirm.text = getString(R.string.discipline_confirm)
+                binding.btnBack.visibility = View.VISIBLE
+                showResult(resp.message.ifBlank { getString(R.string.discipline_failed) }, ok = false)
+            } else {
+                binding.btnConfirm.visibility = View.GONE
+                showResult(getString(R.string.discipline_recorded), ok = true)
+                loadTermFaults(record.id)
+                // A typed search has no card to take away, so it clears on its own.
+                if (!fromCard || !cardHeld) resetSoon()
+            }
+            if (fromCard && !cardHeld && resp.error) resetSoon()
+        }
+    }
+
+    private fun showResult(message: String, ok: Boolean) {
+        binding.tvResult.text = message
+        binding.tvResult.setTextColor(
+            if (ok) ContextCompat.getColor(requireContext(), R.color.main_green_color) else Color.parseColor("#B3261E")
+        )
+        binding.tvResult.visibility = View.VISIBLE
+    }
+
+    private fun resetSoon() {
+        resetJob?.cancel()
+        resetJob = lifecycleScope.launch {
+            delay(RESET_AFTER_MS)
+            reset()
+        }
+    }
+
+    private fun reset() {
+        resetJob?.cancel()
+        if (_binding == null || saving) return
+        fromCard = false
+        binding.etSearchStudent.text?.clear()
+        showWaiting(getString(R.string.permissions_tap_card))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun loadTerm() {
+        try {
+            val academicModel = AcademicTermRepository().getAcademicTerm(userToken)
+            val academicEntity = AcademicTermEntity(0, academicModel.data.id, academicModel.data.academic_year_id, academicModel.data.term_name, academicModel.data.start_date, academicModel.data.end_date)
+            appDatabase.academicTermDao().insert(academicEntity)
+            academicTermID = academicEntity.termID
+            academicYearID = academicEntity.yearID
+        } catch (e: Exception) {
+            Log.i("ACADEMIC-TERM", "${e.message}")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun loadFaultTypes() {
+        val res = OffenseTypeRepository().getOffenseType(userToken)
+        if (res.error) {
+            faultTypesError = res.message
+        } else {
+            faultTypes = res.data.filter { it.id > 0 }.sortedBy { it.type_name.lowercase() }
+            faultTypesError = null
+        }
+        if (_binding != null && student != null && fault == null) renderFaultTypes()
+    }
+
+    // This term's deductions for the student on screen; dropped if another student took their place.
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun loadTermFaults(studentID: Int) {
+        lifecycleScope.launch {
+            if (academicTermID == 0) loadTerm()
+            val res = OffenseRepository().getStudentOffense(userToken, studentID, academicTermID)
+            if (_binding == null || student?.student?.id != studentID) return@launch
+            val faults = if (res.error) emptyList() else res.data.filter { it.id > 0 }
+            binding.tvTotalDeductionValue.text = "${faults.sumOf { it.marks_deducted }}"
+            binding.tvLastOffense.text = faults.lastOrNull()?.let { getString(R.string.discipline_last_fault, it.offense_type.type_name) }
+                ?: getString(R.string.discipline_no_faults_yet)
+        }
+    }
+
+    private fun marks(type: OffenseTypeData): String {
+        val value = type.mark_deduction ?: 0.0
+        return if (value % 1.0 == 0.0) value.toLong().toString() else value.toString()
     }
 
     companion object {
         lateinit var appDatabase: AppDatabase
-
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun getCurrentAcademicTerm(){
-        lifecycleScope.launch {
-            try{
-                val token = appDatabase.loggedInUserDao().getLastLogin().token
-                val academicModel = AcademicTermRepository().getAcademicTerm(token)
-                val academicEntity = AcademicTermEntity(0, academicModel.data.id, academicModel.data.academic_year_id, academicModel.data.term_name, academicModel.data.start_date, academicModel.data.end_date)
-                appDatabase.academicTermDao().insert(academicEntity)
-                academicTermID = academicEntity.termID
-                academicYearID = academicEntity.yearID
-                offenseViewModel.getStudentOffense(token, studentID, academicModel.data.id)
-
-            }catch (e: Exception){
-                Log.i("ACADEMIC-TERM", "${e.message}")
-            }
-
-        }
-
-    }
-
-    override fun onItemSelected(
-        p0: AdapterView<*>?,
-        p1: View?,
-        p2: Int,
-        p3: Long
-    ) {
-        offenseTypeID = offenseTypeList[p2].id
-    }
-
-    override fun onNothingSelected(p0: AdapterView<*>?) {
-        TODO("Not yet implemented")
+        private const val RESET_AFTER_MS = 2000L
     }
 }

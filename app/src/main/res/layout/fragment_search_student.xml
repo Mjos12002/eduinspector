@@ -1,224 +1,288 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Discipline: tap the student's card, choose the fault, confirm. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.student.SearchStudentFragment"
-    android:background="@color/main_background_color">
+    android:background="@color/main_background_color"
+    android:orientation="vertical"
+    tools:context=".ui.fragment.student.SearchStudentFragment">
 
     <RelativeLayout
         android:id="@+id/rl_header_title"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/main_green_color"
-        android:layout_alignParentTop="true"
         android:padding="@dimen/ten">
 
-        <LinearLayout
-            android:id="@+id/ll_from_transaction"
+        <TextView
+            android:id="@+id/tv_search_student_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:gravity="center_vertical"
-            android:layout_alignParentStart="true">
-
-            <TextView
-                android:id="@+id/tv_search_student_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="@dimen/fifteen"
-                android:gravity="center_vertical"/>
-        </LinearLayout>
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/white"
+            android:textSize="@dimen/fifteen" />
 
         <ImageView
             android:id="@+id/img_logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/outline_logout_24"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
-
+            android:layout_centerVertical="true"
+            android:src="@drawable/outline_logout_24" />
     </RelativeLayout>
 
-    <RelativeLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/sv_discipline"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rl_header_title"
-        android:padding="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tv_main_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/displine"
-            android:fontFamily="sans-serif-black"
-            android:textSize="20sp"
-            android:textColor="#014C92"
-            android:layout_marginBottom="20sp"/>
-
-
-        <RelativeLayout
-            android:id="@+id/rl_search_student"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_main_title">
+            android:orientation="vertical"
+            android:padding="16dp">
 
+            <TextView
+                android:id="@+id/tv_main_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="sans-serif-black"
+                android:text="@string/displine"
+                android:textColor="#014C92"
+                android:textSize="20sp" />
+
+            <!-- Search by registration number; hidden while a student is showing. -->
             <LinearLayout
+                android:id="@+id/ll_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/custom_card"
-                android:weightSum="7"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:padding="1sp">
 
                 <ImageView
                     android:id="@+id/imv_search"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/outline_search_24"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"/>
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:src="@drawable/outline_search_24" />
 
                 <EditText
                     android:id="@+id/et_search_student"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/search_edittext_style"
                     android:hint="@string/search_student"
-                    android:layout_weight="6"
-                    android:textColor="@color/black"
-                    android:background="@drawable/search_edittext_style"/>
-
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textColor="@color/black" />
             </LinearLayout>
 
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rl_student_details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4sp"
-            android:layout_below="@id/rl_search_student"
-            android:padding="10dp"
-            android:background="@drawable/custom_card"
-            android:visibility="gone">
-
-            <!-- Until a student is tapped or found. -->
-            <TextView
-                android:id="@+id/tv_tap_prompt"
+            <!-- Step 1: the tapped student. -->
+            <LinearLayout
+                android:id="@+id/ll_student_panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center"
-                android:minHeight="120dp"
-                android:text="@string/permissions_tap_card"
-                android:textColor="@color/card_details_text_color"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/tv_student_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_alignParentTop="true"
-                android:textSize="22sp"
-                android:fontFamily="sans-serif-black"
-                android:textColor="#094281"/>
-
-            <TextView
-                android:id="@+id/tv_student_reg_number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_below="@id/tv_student_name"
-                android:layout_marginTop="5sp"
-                android:textColor="@color/mainGreen"
-                android:fontFamily="sans-serif-smallcaps"/>
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/rl_deductions_parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/rl_student_details"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            android:weightSum="5"
-            android:visibility="gone">
-
-            <RelativeLayout
-                android:id="@+id/rl_deduction_title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/mainGreen"
-                android:layout_weight="4">
-                <ImageView
-                    android:id="@+id/img_add_deduction"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/outline_add_24" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/deductions_background"
-                android:padding="10sp"
-                >
-                <TextView
-                    android:id="@+id/tv_total_deduction_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/marks_deduction"
-                    android:textAlignment="center"
-                    android:textSize="25sp"
-                    android:textColor="#013B56"
-                    android:fontFamily="sans-serif-medium"
-                    android:layout_alignParentTop="true"/>
+                android:background="@drawable/visitor_panel_background"
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/tv_total_deduction_value"
+                    android:id="@+id/tv_tap_prompt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_total_deduction_title"
-                    android:layout_marginTop="20sp"
-                    android:textAlignment="center"
-                    android:textSize="40sp"
                     android:fontFamily="sans-serif-medium"
-                    android:layout_marginBottom="20sp"/>
+                    android:gravity="center"
+                    android:minHeight="160dp"
+                    android:text="@string/permissions_tap_card"
+                    android:textColor="@color/card_details_text_color"
+                    android:textSize="20sp" />
 
-                <RelativeLayout
+                <LinearLayout
+                    android:id="@+id/ll_student"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_total_deduction_value">
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_student_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/card_details_text_color"
+                            android:textSize="20sp" />
+
+                        <ImageView
+                            android:id="@+id/img_clear_student"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/discipline_clear"
+                            android:padding="8dp"
+                            android:src="@drawable/ic_close"
+                            android:tint="@color/text_color_hint" />
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/tv_last_offense"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_student_reg_number"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:textColor="#026673"/>
+                        android:textColor="@color/text_color_hint"
+                        android:textSize="14sp" />
 
-                    <TextView
-                        android:id="@+id/tv_offense_term"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="#026673"
-                        android:layout_alignParentEnd="true" />
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                </RelativeLayout>
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-            </RelativeLayout>
+                            <TextView
+                                style="@style/PermissionLabel"
+                                android:text="@string/discipline_term_total" />
 
+                            <TextView
+                                android:id="@+id/tv_last_offense"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/text_color_hint"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_total_deduction_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/card_details_text_color"
+                            android:textSize="28sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Step 2: the fault. -->
+            <LinearLayout
+                android:id="@+id/ll_faults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/PermissionLabel"
+                    android:text="@string/discipline_choose_fault" />
+
+                <TextView
+                    android:id="@+id/tv_faults_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/text_color_hint"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/ll_fault_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
+            <!-- Step 3: confirm. -->
+            <LinearLayout
+                android:id="@+id/ll_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/visitor_panel_background"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/PermissionLabel"
+                    android:text="@string/discipline_confirm_title" />
+
+                <TextView
+                    android:id="@+id/tv_confirm_fault"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/card_details_text_color"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_confirm_marks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#B3261E"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tv_confirm_punishment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/text_color_hint"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btn_confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="14dp"
+                    android:backgroundTint="@color/main_green_color"
+                    android:text="@string/discipline_confirm"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <Button
+                    android:id="@+id/btn_back"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/discipline_back"
+                    android:textAllCaps="false"
+                    android:textColor="@color/main_green_color" />
+            </LinearLayout>
         </LinearLayout>
-
-    </RelativeLayout>
-
-</RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
