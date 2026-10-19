@@ -1,351 +1,184 @@
 package com.example.inspectorappupdate.ui.fragment.topup
 
-import com.example.inspectorappupdate.utils.signOut
-import android.app.Dialog
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.Spinner
-import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.core.graphics.toColorInt
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.example.inspectorappupdate.IndexActivity
 import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.apirequest.dto.payment.PaymentDTO
+import com.example.inspectorappupdate.databinding.FragmentCardTopUpBinding
+import com.example.inspectorappupdate.model.card.CardModelData
 import com.example.inspectorappupdate.model.payment.PaymentTypeModelData
 import com.example.inspectorappupdate.model.wallet.WalletModelData
 import com.example.inspectorappupdate.repository.payment.PaymentRepository
-import com.example.inspectorappupdate.ui.fragment.student.SearchStudentFragment
-import com.example.inspectorappupdate.utils.AppDatabase
+import com.example.inspectorappupdate.repository.student.StudentRepository
+import com.example.inspectorappupdate.ui.fragment.card.CardFormUi
 import com.example.inspectorappupdate.utils.DbUtility
+import com.example.inspectorappupdate.utils.Keyboard
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
 import com.example.inspectorappupdate.viewmodel.payment.PaymentViewModel
-import com.example.inspectorappupdate.viewmodel.student.StudentViewModel
 import com.example.inspectorappupdate.viewmodel.wallet.WalletViewModel
 import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+/** Top up form of the Cards tab: wallet, payment method, paying phone and amount for the tapped card. */
+class CardTopUpFragment : Fragment() {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CardTopUpFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class CardTopUpFragment : Fragment(), AdapterView.OnItemSelectedListener {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var _binding: FragmentCardTopUpBinding? = null
+    private val binding get() = _binding!!
 
-    // Initialize the card view model
-    private val cardViewModel : CardViewModel by activityViewModels()
-
-    // Initialize the wallet view model
+    private val cardViewModel: CardViewModel by activityViewModels()
     private val walletViewModel: WalletViewModel by activityViewModels()
-    // Initialize the payment view model
     private val paymentViewModel: PaymentViewModel by activityViewModels()
-    // Initialize the student view model
-    private val studentViewModel: StudentViewModel by viewModels()
-    // Initialize the selected walled id
-    var selectedWalletID = 0
-    // Initialize the list of wallet types
-    lateinit var walletList: List<WalletModelData>
-    // Initialize the list of payment types
-    lateinit var paymentList: List<PaymentTypeModelData>
-    // Initialize the ID of the parent, student id, card number and token
-    var parentID = 0
-    var studentID = 0
-    var cardNumber = ""
-    var userToken = ""
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private var wallets: List<WalletModelData> = emptyList()
+    private var paymentTypes: List<PaymentTypeModelData> = emptyList()
+    private var wallet = 0
+    private var paymentType = 0
 
+    private var card: CardModelData? = null
+    // The student record and main parent the top-up is credited to.
+    private var studentID = 0
+    private var parentID = 0
+    private var sending = false
+    private var sent = false
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentCardTopUpBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        val root = inflater.inflate(R.layout.fragment_card_top_up, container, false)
-        val tvMsg = root.findViewById<TextView>(R.id.tv_processing_message)
-
-        // Initialize the dialog view
-        val dialog = Dialog(requireContext())
-        // Clear card view model
-        lifecycleScope.launch {
-            cardViewModel.clearCardDetails()
+        // Pocket money and transport only; the other wallets are paid elsewhere.
+        walletViewModel.walletLiveData.observe(viewLifecycleOwner) { res ->
+            wallets = res?.data.orEmpty().filter { it.id > 0 && it.name.lowercase().let { n -> "pocket" in n || "transport" in n } }
+            renderWallets()
+        }
+        paymentViewModel.paymentLiveData.observe(viewLifecycleOwner) { res ->
+            paymentTypes = res?.data.orEmpty().filter { it.id > 0 }
+            renderPaymentTypes()
+        }
+        withToken {
+            walletViewModel.getWallet(it)
+            paymentViewModel.getPaymentType(it)
         }
 
-        // Logout
-        root.findViewById<ImageView>(R.id.img_logout).setOnClickListener {
-            signOut()
+        cardViewModel.cardLiveData.observe(viewLifecycleOwner) { model ->
+            if (cardViewModel.isNoCard(model) || model.error || model.data == null) return@observe
+            if (model.data.card_number == card?.card_number) return@observe
+            card = model.data
+            studentID = 0
+            parentID = 0
+            sent = false
+            binding.etAmount.text?.clear()
+            CardFormUi.result(binding.tvResult, null, ok = true)
+            loadStudent(model.data.reg_number)
+            updateButton()
         }
 
-        // Initialize the database
-       appDatabase = DbUtility().dbBuilder(requireContext())
-
-
-        lifecycleScope.launch {
-            // Create a string builder to create a welcome message
-            val msgBuilder = StringBuilder()
-            val firstName = SearchStudentFragment.Companion.appDatabase.loggedInUserDao().getLastLogin().firstName
-            val lastName = SearchStudentFragment.Companion.appDatabase.loggedInUserDao().getLastLogin().lastName
-            userToken = SearchStudentFragment.Companion.appDatabase.loggedInUserDao().getLastLogin().token
-            msgBuilder.append(getString(R.string.welcome))
-            msgBuilder.append(", ")
-            msgBuilder.append(firstName)
-            msgBuilder.append(" ")
-            msgBuilder.append(lastName)
-            //root.findViewById<RelativeLayout>(R.id.rl_topup_student_details).visibility = View.VISIBLE
-            root.findViewById<TextView>(R.id.tv_search_student_header).text = msgBuilder.toString()
-        }
-
-        // Initialize the wallet and payment type spinner
-        val spnWalletType = root.findViewById<Spinner>(R.id.spn_transaction_type)
-        val spnPaymentType = root.findViewById<Spinner>(R.id.spn_payment_type)
-
-        // Observe the change from the card view model's card details
-        cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
-
-            // Initialize the container elements
-            val rlStudentDetails = root.findViewById<RelativeLayout>(R.id.rl_topup_student_details)
-            val rlPaymentDetails = root.findViewById<RelativeLayout>(R.id.rl_topup_payment_details)
-            rlStudentDetails.visibility = View.GONE
-            rlPaymentDetails.visibility = View.GONE
-
-            tvMsg.text = getString(R.string.waitwhileprocessing)
-            tvMsg.setTextColor("#01043B".toColorInt())
-            try{
-                if(it != null) {
-
-                    if(it.status == 200 || it.status == 201) {
-                        if(it.data != null) {
-                            // If the card details is found
-                            val name = StringBuilder()
-                            name.append(it.data.first_name)
-                            name.append(" ")
-                            name.append(it.data.last_name)
-                            root.findViewById<TextView>(R.id.tv_student_name)?.text = name.toString()
-                            tvMsg.text = getString(R.string.card_details)
-                            rlStudentDetails.visibility = View.VISIBLE
-                            rlPaymentDetails.visibility = View.VISIBLE
-                            cardNumber = it.data.card_number
-
-                            lifecycleScope.launch {
-                                getStudentDetails(appDatabase.loggedInUserDao().getLastLogin().token, it.data.reg_number)
-                            }
-
-                            root.findViewById<TextView>(R.id.tv_card_number)?.text = "Card No: ${it.data.card_number}"
-                            root.findViewById<TextView>(R.id.tv_transport_balance)?.text = "Transport: ${it.data.transport_fees_balance}"
-                            root.findViewById<TextView>(R.id.tv_schoolfees_balance)?.text = "School fees: ${it.data.school_fees_balance}"
-                            root.findViewById<TextView>(R.id.tv_support_balance)?.text = "Support: ${it.data.support_fees_balance}"
-                            root.findViewById<TextView>(R.id.tv_insurance_balance)?.text = "Insurance: ${it.data.transport_fees_balance}"
-
-                        }
-
-                        if(it.data == null){
-                            tvMsg.text = getString(R.string.unregistered_card)
-                            tvMsg.setTextColor("#CC2A02".toColorInt())
-                        }
-                    }else {
-                        if(it.message.contains("resolve")) {
-                            tvMsg.text = getString(R.string.internet)
-                        }else {
-                            tvMsg.text = it.message
-                        }
-                        tvMsg.setTextColor("#CC2A02".toColorInt())
-                    }
-
-                }else {
-                    tvMsg.text = getString(R.string.unknown_error)
-                }
-
-            }catch (e: Exception){
-                Log.i("INSPECTOR-LOG", "${e.message}")
-            }
-        })
-
-        // Observe the change from card view model
-        studentViewModel.studentDetailsLiveData.observe(viewLifecycleOwner, Observer {
-            if(it.data != null) {
-                if(it.data.student !== null) {
-                    parentID = it.data.student.parent_user_id
-                    studentID = it.data.student.id
-                }
-            }
-        })
-
-        // Get the list of wallets and payment types
-        lifecycleScope.launch {
-            val token = appDatabase.loggedInUserDao().getLastLogin().token
-            walletViewModel.getWallet(token)
-            paymentViewModel.getPaymentType(token)
-        }
-
-        // Observe the changes in the wallet response
-        walletViewModel.walletLiveData.observe(viewLifecycleOwner, Observer {
-            if(it != null) {
-                if(it.status == 200 || it.status == 201) {
-
-                    if(it.data != null) {
-                        val walletArr = it.data.map { dt -> dt.name }
-                        walletList = it.data
-                        val ad = ArrayAdapter(requireContext(),
-                            android.R.layout.simple_spinner_item, walletArr
-                        )
-
-                        ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
-                        )
-                        spnWalletType?.adapter = ad
-                        ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
-                        )
-                        ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
-                        )
-                        spnWalletType?.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
-                    }else {
-                        tvMsg.text = "Wallet data not found"
-                    }
-
-                }else {
-                    if (it.message.contains("resolve")) {
-                        tvMsg.text = getString(R.string.internet)
-                    }else {
-                        tvMsg.text = it.message
-                    }
-                }
-
-            }else {
-                tvMsg.text = getString(R.string.unknown_error)
-            }
-
-        })
-
-        // Observe the changes in the payment type
-        paymentViewModel.paymentLiveData.observe(viewLifecycleOwner, Observer {
-            if(it != null) {
-
-                if(it.status == 200 || it.status == 201) {
-
-                    if(it.data != null) {
-                        paymentList = it.data
-                        val paymentTypeArr = it.data.map { dt -> dt.name }
-                        val ad = ArrayAdapter(requireContext(),
-                            android.R.layout.simple_spinner_item, paymentTypeArr
-                        )
-
-                        ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
-                        )
-                        spnPaymentType?.adapter = ad
-                        ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
-                        )
-                        ad.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item
-                        )
-
-                        spnPaymentType?.onItemSelectedListener = this as AdapterView.OnItemSelectedListener?
-
-                    }else {
-                        tvMsg.text = "Payment type data not found"
-                    }
-
-                }else {
-                    if (it.message.contains("resolve")) {
-                        tvMsg.text = getString(R.string.internet)
-                    }else {
-                        tvMsg.text = it.message
-                    }
-                }
-
-            }else {
-                tvMsg.text = getString(R.string.unknown_error)
-            }
-
-        })
-        val btnPay = root.findViewById<Button>(R.id.btn_topup)
-        // Declaring containers for student and payment details
-
-        // Execute payment process
-        btnPay.setOnClickListener {
-            btnPay.text = getString(R.string.waitwhileprocessing)
-            val amount = root.findViewById<EditText>(R.id.et_amount).text.toString()
-            val phoneNUmber = root.findViewById<EditText>(R.id.et_phone_number).text.toString()
-            val walletType = spnWalletType.selectedItemPosition.toString()
-            val paymentType = spnPaymentType.selectedItemPosition.toString()
-            val walletTypeID = walletList[walletType.toInt()].id
-            val paymentTypeID = paymentList[paymentType.toInt()].id
-            val paymentDTO = PaymentDTO(amount.toInt(), walletTypeID, paymentTypeID, phoneNUmber, studentID, parentID, cardNumber)
-            // Make payment
-            lifecycleScope.launch {
-                val res = PaymentRepository().makePayment(appDatabase.loggedInUserDao().getLastLogin().token, paymentDTO)
-                // If the response is not null
-
-                if(res != null) {
-
-                    // If the status is 200 it means there is a response returned
-                    if(res.status == 200) {
-                        btnPay.setBackgroundColor("#039E37".toColorInt())
-                        btnPay.text = res.message
-                    }else {
-                        if(res.message.contains("resolve")) {
-                            btnPay.text = getString(R.string.internet)
-                        }else {
-                            btnPay.text = res.message
-                        }
-                        btnPay.setBackgroundColor("#9E1F03".toColorInt())
-                    }
-                }
-            }
-
-        }
-
-        return root
+        binding.btnTopup.setOnClickListener { send() }
+        updateButton()
     }
 
-    override fun onItemSelected(
-        p0: AdapterView<*>?,
-        p1: View?,
-        p2: Int,
-        p3: Long
-    ) {
-        Log.i("INSPECTOR-LOG", "${p1?.id} ")
-        selectedWalletID = walletList[p2].id
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
-    override fun onNothingSelected(p0: AdapterView<*>?) {
-        TODO("Not yet implemented")
+    private fun renderWallets() {
+        if (_binding == null) return
+        if (wallet >= wallets.size) wallet = 0
+        CardFormUi.pills(binding.llWallets, wallets.map { label(it.details, it.name) }, wallet) {
+            wallet = it
+            renderWallets()
+        }
     }
 
-    companion object {
-        lateinit var appDatabase: AppDatabase
+    private fun renderPaymentTypes() {
+        if (_binding == null) return
+        if (paymentType >= paymentTypes.size) paymentType = 0
+        CardFormUi.pills(binding.llPaymentTypes, paymentTypes.map { label(it.details, it.name) }, paymentType) {
+            paymentType = it
+            renderPaymentTypes()
+        }
+    }
+
+    private fun label(details: String?, name: String) = details?.takeIf { it.isNotBlank() } ?: name
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun loadStudent(regNumber: String) = withToken { token ->
+        val res = StudentRepository().getStudentDetails(token, regNumber)
+        val student = res.data?.student
+        // Dropped when another card was tapped meanwhile.
+        if (_binding == null || card?.reg_number != regNumber || student == null) return@withToken
+        studentID = student.id
+        parentID = student.parent_user_id
+        updateButton()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun getStudentDetails(bearer: String, regNumber: String){
-        studentViewModel.getStudentDetails(bearer, regNumber)
+    private fun send() {
+        val current = card ?: return
+        val phone = normalizePhone(binding.etPhoneNumber.text.toString())
+        val amount = binding.etAmount.text.toString().trim().toIntOrNull()
+        if (phone == null) {
+            CardFormUi.result(binding.tvResult, getString(R.string.topup_bad_phone), ok = false)
+            return
+        }
+        if (amount == null || amount <= 0) {
+            CardFormUi.result(binding.tvResult, getString(R.string.topup_bad_amount), ok = false)
+            return
+        }
+        val walletType = wallets.getOrNull(wallet) ?: return
+        val payment = paymentTypes.getOrNull(paymentType) ?: return
+        Keyboard.hide(requireActivity())
+        sending = true
+        binding.btnTopup.text = getString(R.string.topup_sending)
+        CardFormUi.result(binding.tvResult, null, ok = true)
+        updateButton()
+        withToken { token ->
+            val dto = PaymentDTO(amount, walletType.id, payment.id, phone, studentID, parentID, current.card_number)
+            val res = PaymentRepository().makePayment(token, dto)
+            sending = false
+            if (_binding == null) return@withToken
+            binding.btnTopup.text = getString(R.string.topup)
+            if (res.status == 200 && !res.error) {
+                // One request per tap, so a second press can't send a second payment prompt.
+                sent = true
+                CardFormUi.result(binding.tvResult, getString(R.string.topup_sent, phone), ok = true)
+            } else {
+                CardFormUi.result(binding.tvResult, res.message.ifBlank { getString(R.string.card_form_failed) }, ok = false)
+            }
+            updateButton()
+        }
+    }
+
+    private fun updateButton() {
+        if (_binding == null) return
+        val ready = card != null && studentID > 0 && wallets.isNotEmpty() && paymentTypes.isNotEmpty() && !sending && !sent
+        CardFormUi.styleButton(binding.btnTopup, ready)
+    }
+
+    // 07XXXXXXXX from +2507…, 2507…, 7… with spaces or dashes; null when it isn't a Rwandan mobile number.
+    private fun normalizePhone(input: String): String? {
+        var digits = input.filter { it.isDigit() }
+        if (digits.startsWith("250")) digits = digits.drop(3)
+        if (digits.length == 9 && digits.startsWith("7")) digits = "0$digits"
+        return digits.takeIf { Regex("^07\\d{8}$").matches(it) }
+    }
+
+    private fun withToken(block: suspend (String) -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val token = DbUtility().dbBuilder(requireContext()).loggedInUserDao().getLastLogin().token
+            block(token)
+        }
     }
 }

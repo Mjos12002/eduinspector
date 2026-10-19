@@ -25,7 +25,7 @@ interface ICard {
 
     @FormUrlEncoded
     @POST("api/block-card")
-    suspend fun disableCard(@Header("Authorization") bearer: String, @Field("indicator") indicator: String): Response<DisablePinModel>
+    suspend fun disableCard(@Header("Authorization") bearer: String, @Field("indicator") indicator: String, @Field("reason") reason: String): Response<DisablePinModel>
 
 
 }

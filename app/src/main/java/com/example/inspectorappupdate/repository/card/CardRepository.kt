@@ -39,9 +39,9 @@ class CardRepository {
 
     // Disable card
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun disableCard(indicator: String, token: String): DisablePinModel {
+    suspend fun disableCard(indicator: String, token: String, reason: String = "lost"): DisablePinModel {
         try {
-            val res = cardInterface.disableCard("Bearer ${token}", indicator)
+            val res = cardInterface.disableCard("Bearer ${token}", indicator, reason)
             if(res.code() == 200) {
                 return res.body()!!
             }else {
