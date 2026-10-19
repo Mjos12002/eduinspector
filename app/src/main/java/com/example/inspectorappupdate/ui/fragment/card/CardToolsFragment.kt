@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.R
@@ -25,7 +24,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 // Card tab with top up, block card and change PIN. Each starts with tapping the student's card, then shows
-// the student's details and that tab's form (embedded without its own header and student panel).
+// the student's details and that tab's form.
 // Everything clears 2 s after the card is taken away from the phone.
 class CardToolsFragment : Fragment() {
 
@@ -51,11 +50,6 @@ class CardToolsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        childFragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
-            override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) = hideChildChrome()
-            override fun onFragmentResumed(fm: FragmentManager, f: Fragment) = hideChildChrome()
-        }, false)
-
         binding.btnToolTopup.setOnClickListener { show(Tool.TOPUP) }
         binding.btnToolBlock.setOnClickListener { show(Tool.BLOCK) }
         binding.btnToolPin.setOnClickListener { show(Tool.PIN) }
@@ -65,8 +59,6 @@ class CardToolsFragment : Fragment() {
         val before = cardViewModel.cardLiveData.value
         cardViewModel.cardLiveData.observe(viewLifecycleOwner) { card ->
             if (card !== before && !cardViewModel.isNoCard(card)) renderCard(card)
-            // The chosen screen also reacts to the card and may show its own student panel again.
-            binding.root.post { hideChildChrome() }
         }
 
         cardViewModel.cardPresent.observe(viewLifecycleOwner) { present ->
@@ -90,8 +82,13 @@ class CardToolsFragment : Fragment() {
         cardRead = ok
         binding.flCardTool.visibility = if (ok) View.VISIBLE else View.GONE
         if (!ok) {
-            // The embedded screens clear the card when they open (empty message); only a real lookup error is shown in red.
-            val error = card?.message?.ifBlank { null }
+            // A cleared card has an empty message; only a real lookup error is shown in red.
+            val error = when {
+                card == null || card.status == 0 -> null
+                // An unknown chip comes back as a success without data.
+                !card.error -> getString(R.string.discipline_card_unknown)
+                else -> card.message.ifBlank { getString(R.string.card_form_failed) }
+            }
             binding.tvCardPrompt.text = error ?: getString(R.string.permissions_tap_card)
             binding.tvCardPrompt.setTextColor(
                 if (error != null) Color.parseColor("#C62828") else ContextCompat.getColor(requireContext(), R.color.card_details_text_color)
@@ -108,9 +105,7 @@ class CardToolsFragment : Fragment() {
         )
         binding.tvCardBalances.text = listOf(
             "Pocket money" to data.support_fees_balance,
-            "Transport" to data.transport_fees_balance,
-            "School fees" to data.school_fees_balance,
-            "Insurance" to data.insurance_fees_balance
+            "Transport" to data.transport_fees_balance
         ).joinToString("\n") { (label, amount) -> "$label: ${MONEY.format(amount)} RWF" }
     }
 
@@ -118,6 +113,7 @@ class CardToolsFragment : Fragment() {
     private fun reset() {
         if (_binding == null) return
         renderCard(null)
+        viewLifecycleOwner.lifecycleScope.launch { cardViewModel.clearCardDetails() }
         childFragmentManager.beginTransaction().replace(R.id.fl_card_tool, freshTool(current)).commit()
     }
 
@@ -133,15 +129,6 @@ class CardToolsFragment : Fragment() {
         current = tool
         childFragmentManager.beginTransaction().replace(R.id.fl_card_tool, freshTool(tool)).commit()
         style()
-    }
-
-    // The details are shown above, so the embedded screen keeps only its action part.
-    private fun hideChildChrome() {
-        // The screen may have closed before this posted step ran.
-        if (!isAdded || view == null) return
-        val child = childFragmentManager.findFragmentById(R.id.fl_card_tool)?.view ?: return
-        listOf(R.id.rl_header_title, R.id.tv_main_title, R.id.rl_student_details, R.id.rl_topup_student_details)
-            .forEach { id -> child.findViewById<View>(id)?.visibility = View.GONE }
     }
 
     private fun style() {

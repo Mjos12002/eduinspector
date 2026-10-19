@@ -1,263 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Top up form inside the Cards tab; the student is shown above it. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragment.topup.CardTopUpFragment"
-    android:background="@color/main_background_color">
+    android:layout_height="wrap_content"
+    android:background="@drawable/visitor_panel_background"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".ui.fragment.topup.CardTopUpFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <RelativeLayout
-        android:id="@+id/rl_header_title"
+    <TextView
+        style="@style/CardFormLabel"
+        android:layout_marginTop="0dp"
+        android:text="@string/topup_wallet" />
+
+    <LinearLayout
+        android:id="@+id/ll_wallets"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/main_green_color"
-        android:layout_alignParentTop="true"
-        android:padding="@dimen/ten">
+        android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:id="@+id/ll_from_transaction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_centerVertical="true"
-            android:gravity="center_vertical"
-            android:layout_alignParentStart="true">
+    <TextView
+        style="@style/CardFormLabel"
+        android:text="@string/topup_pay_with" />
 
-            <TextView
-                android:id="@+id/tv_search_student_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="@dimen/fifteen"
-                android:text="Welcome, man"
-                android:gravity="center_vertical"/>
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/img_logout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/outline_logout_24"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
-    </RelativeLayout>
-
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/ll_payment_types"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rl_header_title"
-        android:padding="10dp"
-        android:layout_marginTop="5dp">
+        android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/tv_main_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/topup"
-            android:fontFamily="sans-serif-black"
-            android:textSize="18sp"
-            android:textColor="#014C92"
-            android:layout_marginBottom="6sp"/>
+    <TextView
+        style="@style/CardFormLabel"
+        android:text="@string/topup_phone" />
 
-        <TextView
-            android:id="@+id/tv_processing_message"
-            android:layout_below="@+id/tv_main_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tapcard"
-            android:textSize="15sp"
-            android:fontFamily="sans-serif-black"
-            android:layout_centerHorizontal="true"
-            android:textColor="@color/black"/>
+    <EditText
+        android:id="@+id/et_phone_number"
+        style="@style/CardFormField"
+        android:hint="@string/topup_phone_hint"
+        android:importantForAutofill="no"
+        android:inputType="phone" />
 
-        <RelativeLayout
-            android:id="@+id/rl_topup_student_details"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10sp"
-            android:layout_below="@id/tv_processing_message"
-            android:padding="8sp"
-            android:background="@drawable/custom_card"
-            android:visibility="gone">
+    <TextView
+        style="@style/CardFormLabel"
+        android:text="@string/topup_amount" />
 
-            <TextView
-                android:id="@+id/tv_student_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:textSize="17sp"
-                android:text="Uwimanna aime"
-                android:textColor="@color/secondaryBlue"/>
+    <EditText
+        android:id="@+id/et_amount"
+        style="@style/CardFormField"
+        android:hint="@string/topup_amount_hint"
+        android:importantForAutofill="no"
+        android:inputType="number" />
 
-            <TextView
-                android:id="@+id/tv_card_number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_student_name"
-                android:textColor="#02A84B"
-                android:text="Card No: 128929"
-                android:layout_marginTop="5sp"
-                android:fontFamily="sans-serif-medium"/>
+    <TextView
+        android:id="@+id/tv_result"
+        style="@style/CardFormResult" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_card_number"
-                android:layout_marginTop="15sp"
-                android:background="@drawable/main_information_display"
-                android:padding="8sp">
-
-                <TextView
-                    android:id="@+id/tv_wallet_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:textColor="@color/mainGreen"
-                    android:fontFamily="sans-serif-medium"
-                    android:textSize="16sp"
-                    android:text="@string/wallet_details"
-                    android:layout_marginBottom="10sp"
-                    android:layout_marginTop="5sp"/>
-
-                <TextView
-                    android:layout_below="@id/tv_wallet_balance"
-                    android:id="@+id/tv_transport_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5sp"
-                    android:layout_marginBottom="5sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="14sp"
-                    android:text="Wallet: 0"/>
-
-                <TextView
-                    android:layout_below="@id/tv_transport_balance"
-                    android:id="@+id/tv_schoolfees_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="14sp"
-                    android:text="Transport: 0"/>
-
-                <TextView
-                    android:layout_below="@id/tv_wallet_balance"
-                    android:layout_alignParentEnd="true"
-                    android:id="@+id/tv_support_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5sp"
-                    android:layout_marginBottom="5sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="14sp"
-                    android:text="Support: 0"/>
-
-                <TextView
-                    android:layout_below="@id/tv_support_balance"
-                    android:layout_alignParentEnd="true"
-                    android:id="@+id/tv_insurance_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="sans-serif-light"
-                    android:textSize="14sp"
-                    android:text="Insurance: 0"/>
-            </RelativeLayout>
-
-        </RelativeLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/rl_topup_student_details">
-            <RelativeLayout
-                android:id="@+id/rl_topup_payment_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8sp"
-                android:background="@drawable/custom_card"
-                android:layout_marginTop="10sp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/tv_transaction_type_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/transaction_type"
-                    android:layout_alignParentTop="true"
-                    android:textColor="@color/black" />
-                <Spinner
-                    android:id="@+id/spn_transaction_type"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_transaction_type_title"
-                    android:layout_marginTop="5sp"/>
-
-                <TextView
-                    android:id="@+id/tv_payment_type_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/payment_type"
-                    android:layout_below="@id/spn_transaction_type"
-                    android:textColor="@color/black"
-                    android:layout_marginTop="10sp"
-                    />
-                <Spinner
-                    android:id="@+id/spn_payment_type"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_payment_type_title"
-                    android:layout_marginTop="5sp"/>
-
-                <EditText
-                    android:id="@+id/et_phone_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/phone_number"
-                    android:layout_below="@id/spn_payment_type"
-                    android:textColor="#717171"
-                    android:layout_marginTop="10sp"
-                    android:padding="5sp"
-                    android:inputType="phone"
-                    android:background="@drawable/search_edittext_style" />
-
-                <EditText
-                    android:id="@+id/et_amount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/amount"
-                    android:layout_below="@id/et_phone_number"
-                    android:textColor="#717171"
-                    android:layout_marginTop="10sp"
-                    android:inputType="numberDecimal"
-                    android:padding="5sp"
-                    android:background="@drawable/search_edittext_style"/>
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btn_topup"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/topup"
-                    android:layout_below="@id/et_amount"
-                    android:textColor="@color/white"
-                    android:layout_marginTop="10sp"
-                    android:minHeight="0sp"
-                    android:padding="8sp"
-                    android:background="@drawable/search_transaction_button_background"/>
-
-
-            </RelativeLayout>
-        </ScrollView>
-
-
-
-
-    </RelativeLayout>
-
-</RelativeLayout>
+    <Button
+        android:id="@+id/btn_topup"
+        style="@style/CardFormButton"
+        android:text="@string/topup" />
+</LinearLayout>

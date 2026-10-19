@@ -19,7 +19,7 @@ class PaymentViewModel: ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getPaymentType(token: String) {
         try {
-            val res = PaymentRepository().getPaymentType("Bearer $token")
+            val res = PaymentRepository().getPaymentType(token)
             _paymentMutableLiveData.postValue(res)
         }catch (e: Exception) { }
     }
