@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.databinding.FragmentCardToolsBinding
 import com.example.inspectorappupdate.model.card.CardModel
@@ -17,11 +18,15 @@ import com.example.inspectorappupdate.ui.fragment.issue.ReportCardFragment
 import com.example.inspectorappupdate.ui.fragment.pin.ChangePinFragment
 import com.example.inspectorappupdate.ui.fragment.topup.CardTopUpFragment
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
 // Card tab with top up, block card and change PIN. Each starts with tapping the student's card, then shows
 // the student's details and that tab's form (embedded without its own header and student panel).
+// Everything clears 2 s after the card is taken away from the phone.
 class CardToolsFragment : Fragment() {
 
     private var _binding: FragmentCardToolsBinding? = null
@@ -35,6 +40,8 @@ class CardToolsFragment : Fragment() {
 
     // Whether a student card was read since this screen opened; the forms show only after that.
     private var cardRead = false
+    private var resetJob: Job? = null
+    private var tapped = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCardToolsBinding.inflate(inflater, container, false)
@@ -60,6 +67,18 @@ class CardToolsFragment : Fragment() {
             if (card !== before && !cardViewModel.isNoCard(card)) renderCard(card)
             // The chosen screen also reacts to the card and may show its own student panel again.
             binding.root.post { hideChildChrome() }
+        }
+
+        cardViewModel.cardPresent.observe(viewLifecycleOwner) { present ->
+            resetJob?.cancel()
+            // Only a card tapped on this screen; an unknown card's message clears the same way.
+            if (present) tapped = true
+            if (present || !tapped) return@observe
+            tapped = false
+            resetJob = viewLifecycleOwner.lifecycleScope.launch {
+                delay(RESET_AFTER_MS)
+                reset()
+            }
         }
     }
 
@@ -95,16 +114,24 @@ class CardToolsFragment : Fragment() {
         ).joinToString("\n") { (label, amount) -> "$label: ${MONEY.format(amount)} RWF" }
     }
 
+    // Back to "Tap the student's card" with an empty form.
+    private fun reset() {
+        if (_binding == null) return
+        renderCard(null)
+        childFragmentManager.beginTransaction().replace(R.id.fl_card_tool, freshTool(current)).commit()
+    }
+
+    private fun freshTool(tool: Tool): Fragment = when (tool) {
+        Tool.TOPUP -> CardTopUpFragment()
+        Tool.BLOCK -> ReportCardFragment()
+        Tool.PIN -> ChangePinFragment()
+    }
+
     private fun show(tool: Tool) {
         binding.flCardTool.visibility = if (cardRead) View.VISIBLE else View.GONE
         if (tool == current && childFragmentManager.findFragmentById(R.id.fl_card_tool) != null) return
         current = tool
-        val fragment = when (tool) {
-            Tool.TOPUP -> CardTopUpFragment()
-            Tool.BLOCK -> ReportCardFragment()
-            Tool.PIN -> ChangePinFragment()
-        }
-        childFragmentManager.beginTransaction().replace(R.id.fl_card_tool, fragment).commit()
+        childFragmentManager.beginTransaction().replace(R.id.fl_card_tool, freshTool(tool)).commit()
         style()
     }
 
@@ -129,11 +156,13 @@ class CardToolsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        resetJob?.cancel()
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
         private val MONEY = NumberFormat.getIntegerInstance(Locale.US)
+        private const val RESET_AFTER_MS = 2000L
     }
 }
