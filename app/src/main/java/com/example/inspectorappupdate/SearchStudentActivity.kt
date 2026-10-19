@@ -237,8 +237,9 @@ class SearchStudentActivity : AppCompatActivity() {
                 return
             }
 
-            // Discipline keeps the student up while the card is held, and clears after it is taken away.
-            if (tag != null && navController.currentDestination?.id == R.id.SearchStudentFragment) {
+            // Discipline and Cards keep the student up while the card is held, and clear after it is taken away.
+            val holdsCard = navController.currentDestination?.id in listOf(R.id.SearchStudentFragment, R.id.CardToolsFragment)
+            if (tag != null && holdsCard) {
                 val uid = tag.id.toHexString()
                 cardViewModel.onCardPresent()
                 lifecycleScope.launch {
