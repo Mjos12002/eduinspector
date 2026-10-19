@@ -285,5 +285,6 @@
     <string name="discipline_looking_up">Looking up the student…</string>
     <string name="discipline_failed">Something went wrong. Check the connection and try again.</string>
     <string name="discipline_loading_faults">Loading faults…</string>
+    <string name="discipline_card_unknown">This card isn\'t linked to any student.</string>
     <string name="discipline_clear">Clear student</string>
 </resources>
