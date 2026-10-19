@@ -17,6 +17,14 @@ class CardViewModel: ViewModel() {
     private var _cardMutableLiveData = MutableLiveData<CardModel>()
     val cardLiveData : LiveData<CardModel> = _cardMutableLiveData
 
+    // True while the tapped card is still held against the phone.
+    private val _cardPresent = MutableLiveData(false)
+    val cardPresent: LiveData<Boolean> = _cardPresent
+
+    fun onCardPresent() { _cardPresent.value = true }
+
+    fun onCardRemoved() { _cardPresent.value = false }
+
     // The screen showing now; a card read belongs to the screen it was made on.
     private var screen: Int = 0
 
@@ -24,6 +32,7 @@ class CardViewModel: ViewModel() {
     fun onScreenChanged(destination: Int) {
         screen = destination
         _cardMutableLiveData.value = empty()
+        _cardPresent.value = false
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
