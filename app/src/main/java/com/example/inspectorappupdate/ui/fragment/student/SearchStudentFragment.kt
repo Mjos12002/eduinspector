@@ -115,8 +115,13 @@ class SearchStudentFragment : Fragment() {
 
         cardViewModel.cardLiveData.observe(viewLifecycleOwner) { card ->
             if (cardViewModel.isNoCard(card) || !fromCard || saving) return@observe
-            if (card.error || card.data == null) {
+            if (card.error) {
                 showWaiting(card.message.ifBlank { getString(R.string.discipline_failed) }, error = true)
+                return@observe
+            }
+            // An unknown chip comes back as a success without data.
+            if (card.data == null || card.data.reg_number.isNullOrBlank()) {
+                showWaiting(getString(R.string.discipline_card_unknown), error = true)
                 return@observe
             }
             binding.tvTapPrompt.text = "${card.data.first_name} ${card.data.last_name}"
