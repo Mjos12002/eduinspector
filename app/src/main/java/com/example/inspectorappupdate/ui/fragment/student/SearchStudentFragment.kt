@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.IndexActivity
@@ -56,7 +57,7 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private val binding get() = _binding!!
 
     // Initialize the view model for the student search
-    private val studentViewModel: StudentViewModel by activityViewModels()
+    private val studentViewModel: StudentViewModel by viewModels()
 
     // Initialize the view model for the card details
     private val cardViewModel: CardViewModel by activityViewModels()
@@ -150,6 +151,9 @@ class SearchStudentFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
                     binding.tvStudentName.text = studentName.toString()
                     binding.tvStudentRegNumber.text = regNumberStrBuilder.toString()
+                    binding.tvTapPrompt.visibility = View.GONE
+                    binding.tvStudentName.visibility = View.VISIBLE
+                    binding.tvStudentRegNumber.visibility = View.VISIBLE
 
                     // Set the student id value
                     studentID = it.data.id

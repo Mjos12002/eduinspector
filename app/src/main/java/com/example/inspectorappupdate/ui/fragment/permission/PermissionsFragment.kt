@@ -113,7 +113,7 @@ class PermissionsFragment : Fragment() {
 
         // A card tapped while this screen is open opens the form for that student. The value held from before is ignored.
         val before = cardViewModel.cardLiveData.value
-        cardViewModel.cardLiveData.observe(viewLifecycleOwner) { card -> if (card !== before) onCardRead(card) }
+        cardViewModel.cardLiveData.observe(viewLifecycleOwner) { card -> if (card !== before && !cardViewModel.isNoCard(card)) onCardRead(card) }
 
         withToken { viewModel.load(it) }
     }

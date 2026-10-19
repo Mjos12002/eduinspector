@@ -108,6 +108,7 @@ class ChangePinFragment : Fragment() {
 
         // Observe the change in card view model
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
+            if (cardViewModel.isNoCard(it)) return@Observer
             try {
                 val msgHolder = root.findViewById<TextView>(R.id.tv_processing_message)
 

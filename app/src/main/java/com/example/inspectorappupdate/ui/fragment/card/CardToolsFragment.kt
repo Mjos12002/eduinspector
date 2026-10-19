@@ -57,7 +57,7 @@ class CardToolsFragment : Fragment() {
         // Only a card tapped after this screen opened counts; the value held from before is ignored.
         val before = cardViewModel.cardLiveData.value
         cardViewModel.cardLiveData.observe(viewLifecycleOwner) { card ->
-            if (card !== before) renderCard(card)
+            if (card !== before && !cardViewModel.isNoCard(card)) renderCard(card)
             // The chosen screen also reacts to the card and may show its own student panel again.
             binding.root.post { hideChildChrome() }
         }
@@ -110,6 +110,8 @@ class CardToolsFragment : Fragment() {
 
     // The details are shown above, so the embedded screen keeps only its action part.
     private fun hideChildChrome() {
+        // The screen may have closed before this posted step ran.
+        if (!isAdded || view == null) return
         val child = childFragmentManager.findFragmentById(R.id.fl_card_tool)?.view ?: return
         listOf(R.id.rl_header_title, R.id.tv_main_title, R.id.rl_student_details, R.id.rl_topup_student_details)
             .forEach { id -> child.findViewById<View>(id)?.visibility = View.GONE }

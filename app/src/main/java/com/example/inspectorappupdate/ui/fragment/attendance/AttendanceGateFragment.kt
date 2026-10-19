@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.inspectorappupdate.R
@@ -82,7 +83,7 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
     // Variable to hold the card view model
     private val cardViewModel: CardViewModel by activityViewModels()
     // Variable to hold the student view model
-    private val studentViewModel: StudentViewModel by activityViewModels()
+    private val studentViewModel: StudentViewModel by viewModels()
     // Variable selected class name
     private var txtSelectedClassName = ""
     // Variable for the prompt category
@@ -465,6 +466,7 @@ class AttendanceFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
         // Observe to changes in the card information
         cardViewModel.cardLiveData.observe(viewLifecycleOwner, Observer {
+            if (cardViewModel.isNoCard(it)) return@Observer
             // Try Or fail
             lifecycleScope.launch {
                 userToken = appDatabase.loggedInUserDao().getLastLogin().token

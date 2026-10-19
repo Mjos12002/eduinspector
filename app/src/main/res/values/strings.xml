@@ -201,6 +201,14 @@
     <string name="visitor_attach_another">Attach another card</string>
     <string name="session_ended">Your session has ended. Sign in again.</string>
     <string name="card_blocked">Card blocked</string>
+    <string name="tab_discipline">Discipline</string>
+    <string name="tab_permissions">Permissions</string>
+    <string name="tab_visitors">Visitors</string>
+    <string name="tab_cards">Cards</string>
+    <string name="tab_in_out">In/Out</string>
+    <string name="tab_issue_cards">Issue cards</string>
+    <string name="tab_my_cards">My cards</string>
+    <string name="tab_more">More</string>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
     <string name="sign_in_wrong_password">The email, phone or password is wrong. Check them, or ask your school to reset your password.</string>
