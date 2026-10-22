@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import com.example.inspectorappupdate.apirequest.gate.IStudentGate
 import com.example.inspectorappupdate.model.gate.StudentGateRequest
 import com.example.inspectorappupdate.model.gate.StudentGateResult
+import com.example.inspectorappupdate.utils.CardChip
 import com.example.inspectorappupdate.utils.RetrofitInstance
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -25,9 +26,9 @@ class StudentGateRepository {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun tap(token: String, cardNumber: String, direction: String, deviceId: String?): GateTapResult {
+    suspend fun tap(token: String, cardNumber: String, direction: String, deviceId: String?, chip: CardChip.Reading? = null): GateTapResult {
         return try {
-            val response = api.tap("Bearer $token", StudentGateRequest(cardNumber, direction, deviceId))
+            val response = api.tap("Bearer $token", StudentGateRequest(cardNumber, direction, deviceId, chip?.signature, chip?.counter))
             val decided = response.body()?.data
             if (response.isSuccessful && decided != null) {
                 GateTapResult.Decided(decided)

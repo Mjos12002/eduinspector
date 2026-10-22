@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.inspectorappupdate.repository.gate.GateTapResult
 import com.example.inspectorappupdate.repository.gate.StudentGateRepository
+import com.example.inspectorappupdate.utils.CardChip
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,12 +39,12 @@ class StudentGateViewModel : ViewModel() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun onCardTapped(token: String, uid: String, deviceId: String?) {
+    fun onCardTapped(token: String, uid: String, deviceId: String?, chip: CardChip.Reading? = null) {
         if (_loading.value == true) return
         clearJob?.cancel()
         _loading.value = true
         viewModelScope.launch {
-            _result.value = repository.tap(token, uid, (_direction.value ?: Direction.IN).api, deviceId)
+            _result.value = repository.tap(token, uid, (_direction.value ?: Direction.IN).api, deviceId, chip)
             _loading.value = false
         }
     }

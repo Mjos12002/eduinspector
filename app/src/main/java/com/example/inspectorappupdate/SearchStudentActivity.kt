@@ -18,7 +18,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import com.example.inspectorappupdate.databinding.ActivitySearchStudentBinding
+import com.example.inspectorappupdate.repository.card.CardChipRepository
 import com.example.inspectorappupdate.utils.AppDatabase
+import com.example.inspectorappupdate.utils.CardChip
 import com.example.inspectorappupdate.utils.AppRole
 import com.example.inspectorappupdate.utils.DbUtility
 import com.example.inspectorappupdate.utils.RetrofitInstance
@@ -34,6 +36,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import android.view.Menu
 import android.view.MotionEvent
 import android.view.View
@@ -201,9 +205,11 @@ class SearchStudentActivity : AppCompatActivity() {
                         Toast.makeText(baseContext, "Sign in again", Toast.LENGTH_LONG).show()
                         return@launch
                     }
-                    studentGateViewModel.onCardTapped(token, uid, deviceId)
+                    val chip = readChip(tag)
+                    studentGateViewModel.onCardTapped(token, uid, deviceId, chip)
+                    watchCardPresence(tag) { studentGateViewModel.onCardRemoved() }
+                    if (chip.protection == CardChip.Protection.OPEN) setUpChip(tag, token, chip)
                 }
-                watchCardPresence(tag) { studentGateViewModel.onCardRemoved() }
                 return
             }
             // Issuing a card reads only the chip UID of the new card.
@@ -216,7 +222,12 @@ class SearchStudentActivity : AppCompatActivity() {
                         Toast.makeText(baseContext, "Sign in again", Toast.LENGTH_LONG).show()
                         return@launch
                     }
-                    cardIssueViewModel.onCardTapped(token, uid)
+                    val chip = readChip(tag)
+                    cardIssueViewModel.onCardTapped(token, uid, chip)
+                    // Agents set up every new chip at the tap; the outcome is reported once it is issued.
+                    if (chip.ev1) {
+                        setUpChip(tag, token, chip, report = false)?.let { cardIssueViewModel.onChipSetUp(token, uid, it) }
+                    }
                 }
                 return
             }
@@ -249,9 +260,12 @@ class SearchStudentActivity : AppCompatActivity() {
                         Toast.makeText(baseContext, "Sign in again", Toast.LENGTH_LONG).show()
                         return@launch
                     }
+                    val chip = readChip(tag)
                     cardViewModel.getCardDetails(token, uid)
+                    watchCardPresence(tag) { cardViewModel.onCardRemoved() }
+                    val state = chipRepository.tap(token, chip, if (navController.currentDestination?.id == R.id.CardToolsFragment) "cards" else "discipline")
+                    if (chip.protection == CardChip.Protection.OPEN || (state != null && !state.setup && chip.ev1)) setUpChip(tag, token, chip)
                 }
-                watchCardPresence(tag) { cardViewModel.onCardRemoved() }
                 return
             }
 
@@ -277,6 +291,27 @@ class SearchStudentActivity : AppCompatActivity() {
     }
 
     private var presenceJob: Job? = null
+    // One chip operation at a time: reading, setting up, or checking the card is still there.
+    private val chipLock = Mutex()
+    private val chipRepository = CardChipRepository()
+
+    /** Reads the chip (signature, raised counter, protection); a chip that can't be read gives an empty reading. */
+    private suspend fun readChip(tag: Tag): CardChip.Reading =
+        withContext(Dispatchers.IO) { chipLock.withLock { CardChip.read(tag) } }
+
+    /**
+     * Puts the card's password on its chip while it is still on the phone, and reports the outcome unless [report]
+     * is false. The server gives the password only for chips it knows (any new chip for agents).
+     */
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun setUpChip(tag: Tag, token: String, chip: CardChip.Reading, report: Boolean = true): CardChip.SetupResult? {
+        val password = chipRepository.password(token, chip.uid) ?: return null
+        val result = withContext(Dispatchers.IO) {
+            chipLock.withLock { CardChip.setUp(tag, CardChip.hex(password.pwd), CardChip.hex(password.pack)) }
+        }
+        if (report) chipRepository.reportSetup(token, chip.uid, result, chip.signature)
+        return result
+    }
 
     // Tells a gate screen when the tapped card is taken away, so its result stays up until then.
     // Reconnecting fails once the card is gone.
@@ -292,12 +327,18 @@ class SearchStudentActivity : AppCompatActivity() {
             try {
                 while (isActive) {
                     delay(PRESENCE_CHECK_MS)
-                    try {
-                        chip.close()
-                        chip.connect()
-                    } catch (e: Exception) {
-                        break
+                    // Connects and lets go each time, so setting up the chip can use it in between.
+                    val present = chipLock.withLock {
+                        try {
+                            chip.connect()
+                            true
+                        } catch (e: Exception) {
+                            false
+                        } finally {
+                            try { chip.close() } catch (_: Exception) { }
+                        }
                     }
+                    if (!present) break
                 }
                 if (isActive) withContext(Dispatchers.Main) { onRemoved() }
             } finally {

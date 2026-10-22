@@ -10,6 +10,8 @@ import com.example.inspectorappupdate.model.agent.AgentStudent
 import com.example.inspectorappupdate.model.agent.IssueResult
 import com.example.inspectorappupdate.repository.agent.AgentRepository
 import com.example.inspectorappupdate.repository.agent.AgentResult
+import com.example.inspectorappupdate.repository.card.CardChipRepository
+import com.example.inspectorappupdate.utils.CardChip
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,6 +60,10 @@ class CardIssueViewModel : ViewModel() {
     private var searchJob: Job? = null
     private val pin = StringBuilder()
     private var firstPin: String? = null
+    private var tappedChip: CardChip.Reading? = null
+    // Set-up outcomes by chip, waiting for the chip to be issued.
+    private val chipSetups = mutableMapOf<String, CardChip.SetupResult>()
+    private val chipRepository = CardChipRepository()
 
     fun search(token: String, term: String) {
         val trimmed = term.trim()
@@ -106,19 +112,21 @@ class CardIssueViewModel : ViewModel() {
             return
         }
         tappedUid = null
+        tappedChip = null
         _stepError.value = null
         _step.value = Step.TAP
     }
 
-    fun onCardTapped(token: String, uid: String) {
+    fun onCardTapped(token: String, uid: String, chip: CardChip.Reading? = null) {
         val current = _student.value ?: return
         if (_step.value != Step.TAP || _busy.value == true) return
         _busy.value = true
         _stepError.value = null
         viewModelScope.launch {
-            when (val result = repository.check(token, current.id, uid)) {
+            when (val result = repository.check(token, current.id, uid, chip?.signature)) {
                 is AgentResult.Success -> if (result.data.ok) {
                     tappedUid = uid
+                    tappedChip = chip?.takeIf { it.uid == uid }
                     clearPin()
                     _step.value = Step.PIN
                 } else {
@@ -166,10 +174,12 @@ class CardIssueViewModel : ViewModel() {
         _busy.value = true
         _stepError.value = null
         viewModelScope.launch {
-            when (val result = repository.issue(token, current.id, uid, chosen, pin.toString())) {
+            val chip = tappedChip
+            when (val result = repository.issue(token, current.id, uid, chosen, pin.toString(), chip?.signature, chip?.counter)) {
                 is AgentResult.Success -> {
                     clearPin()
                     _issued.value = result.data
+                    reportChipSetup(token, uid)
                     result.data.student?.let { _student.value = it }
                     _step.value = Step.DONE
                 }
@@ -233,6 +243,18 @@ class CardIssueViewModel : ViewModel() {
         }
     }
 
+    /** The outcome of setting our password on the tapped chip; reported once the chip is the student's card. */
+    fun onChipSetUp(token: String, uid: String, result: CardChip.SetupResult) {
+        chipSetups[uid] = result
+        if (_issued.value?.card?.cardNumber.equals(uid, ignoreCase = true)) reportChipSetup(token, uid)
+    }
+
+    private fun reportChipSetup(token: String, uid: String) {
+        val result = chipSetups.remove(uid) ?: return
+        val signature = tappedChip?.takeIf { it.uid == uid }?.signature
+        viewModelScope.launch { chipRepository.reportSetup(token, uid, result, signature) }
+    }
+
     private fun clearPin() {
         pin.clear()
         firstPin = null
@@ -243,6 +265,7 @@ class CardIssueViewModel : ViewModel() {
     private fun reset() {
         clearPin()
         tappedUid = null
+        tappedChip = null
         _student.value = null
         _issued.value = null
         _stepError.value = null
