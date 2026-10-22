@@ -44,11 +44,12 @@ class AgentRepository {
     suspend fun block(token: String, cardId: Int, reason: String): AgentResult<AgentStudent> =
         call({ api.block(bearer(token), cardId, BlockCardRequest(reason)) }) { it.data }
 
-    suspend fun check(token: String, studentId: Int, uid: String): AgentResult<ChipCheck> =
-        call({ api.check(bearer(token), ChipCheckRequest(studentId, uid)) }) { it.data }
+    suspend fun check(token: String, studentId: Int, uid: String, signature: String? = null): AgentResult<ChipCheck> =
+        call({ api.check(bearer(token), ChipCheckRequest(studentId, uid, signature)) }) { it.data }
 
-    suspend fun issue(token: String, studentId: Int, uid: String, pin: String, confirmation: String): AgentResult<IssueResult> =
-        call({ api.issue(bearer(token), IssueCardRequest(studentId, uid, pin, confirmation)) }) { it.data }
+    suspend fun issue(token: String, studentId: Int, uid: String, pin: String, confirmation: String,
+                      signature: String? = null, counter: Int? = null): AgentResult<IssueResult> =
+        call({ api.issue(bearer(token), IssueCardRequest(studentId, uid, pin, confirmation, signature, counter)) }) { it.data }
 
     suspend fun stats(token: String): AgentResult<AgentStatsData> = call({ api.stats(bearer(token)) }) { it.data }
 

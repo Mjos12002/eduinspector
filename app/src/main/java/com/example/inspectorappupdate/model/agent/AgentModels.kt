@@ -68,7 +68,8 @@ data class BlockCardRequest(@SerializedName("reason") val reason: String)
 
 data class ChipCheckRequest(
     @SerializedName("student_id") val studentId: Int,
-    @SerializedName("card_number") val cardNumber: String
+    @SerializedName("card_number") val cardNumber: String,
+    @SerializedName("chip_signature") val chipSignature: String? = null
 )
 
 /** Whether a tapped chip can become the student's card. */
@@ -82,7 +83,9 @@ data class IssueCardRequest(
     @SerializedName("student_id") val studentId: Int,
     @SerializedName("card_number") val cardNumber: String,
     @SerializedName("pin") val pin: String,
-    @SerializedName("pin_confirmation") val pinConfirmation: String
+    @SerializedName("pin_confirmation") val pinConfirmation: String,
+    @SerializedName("chip_signature") val chipSignature: String? = null,
+    @SerializedName("chip_counter") val chipCounter: Int? = null
 )
 
 data class IssueResult(

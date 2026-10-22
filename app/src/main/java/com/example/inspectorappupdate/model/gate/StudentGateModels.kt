@@ -6,7 +6,10 @@ import com.google.gson.annotations.SerializedName
 data class StudentGateRequest(
     @SerializedName("card_number") val cardNumber: String,
     @SerializedName("direction") val direction: String,
-    @SerializedName("device_id") val deviceId: String?
+    @SerializedName("device_id") val deviceId: String?,
+    // What the chip read on this tap (see CardChip); left out when it couldn't be read.
+    @SerializedName("chip_signature") val chipSignature: String? = null,
+    @SerializedName("chip_counter") val chipCounter: Int? = null
 )
 
 data class StudentGateResponse(
