@@ -1,8 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+}
+
+// Release signing key, kept outside the repo: -PeducardKeystore=<keystore.properties>, default ../dev/keystores.
+val releaseKeys = Properties().apply {
+    val file = rootProject.file((project.findProperty("educardKeystore") as String?) ?: "../dev/keystores/keystore.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
 android {
@@ -13,14 +21,25 @@ android {
         applicationId = "com.example.inspectorappupdate"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.7"
+        versionCode = 101
+        versionName = "0.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     // Backend origin. Override for a local backend with -PeducardApiUrl=http://<lan-ip>:8000/
     val apiUrlOverride = project.findProperty("educardApiUrl") as String?
+
+    signingConfigs {
+        if (releaseKeys.isNotEmpty()) {
+            create("release") {
+                storeFile = file(releaseKeys.getProperty("storeFile"))
+                storePassword = releaseKeys.getProperty("storePassword")
+                keyAlias = releaseKeys.getProperty("keyAlias")
+                keyPassword = releaseKeys.getProperty("keyPassword")
+            }
+        }
+    }
 
     buildTypes {
         debug {
@@ -31,6 +50,7 @@ android {
         }
         release {
             buildConfigField("String", "API_BASE_URL", "\"${apiUrlOverride ?: "https://api.educard.rw/"}\"")
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
