@@ -297,6 +297,8 @@
     <string name="topup_bad_phone">Enter a Rwandan phone number, e.g. 0788 123 456.</string>
     <string name="topup_bad_amount">Enter an amount in RWF.</string>
     <string name="topup_sent">Payment request sent to %1$s. It is credited once approved on that phone.</string>
+    <string name="topup_paid">Paid. The wallet is topped up.</string>
+    <string name="topup_not_paid">The payment was not approved. Ask the payer to try again.</string>
     <string name="pin_new_first">Student: enter the new PIN</string>
     <string name="pin_new_again">Enter the same PIN again</string>
     <string name="pin_new_hint">4 digits. The old PIN isn\'t needed.</string>

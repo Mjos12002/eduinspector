@@ -66,4 +66,11 @@ class PaymentRepository {
         }
     }
 
+
+    /** The top-up's payment status (PENDING, SUCCESSFUL, FAILED, TIMEOUT…), or null when it couldn't be read. */
+    suspend fun topupStatus(token: String, id: Int): String? = try {
+        paymentAPIInterface.showTopup("Bearer $token", id).body()?.data?.payment_status
+    } catch (e: Exception) {
+        null
+    }
 }

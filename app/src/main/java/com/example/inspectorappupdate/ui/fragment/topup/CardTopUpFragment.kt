@@ -23,6 +23,8 @@ import com.example.inspectorappupdate.utils.Keyboard
 import com.example.inspectorappupdate.viewmodel.card.CardViewModel
 import com.example.inspectorappupdate.viewmodel.payment.PaymentViewModel
 import com.example.inspectorappupdate.viewmodel.wallet.WalletViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** Top up form of the Cards tab: wallet, payment method, paying phone and amount for the tapped card. */
@@ -46,6 +48,8 @@ class CardTopUpFragment : Fragment() {
     private var parentID = 0
     private var sending = false
     private var sent = false
+    // Follows the sent top-up until it is paid or refused; cancelled when another card is tapped.
+    private var watch: Job? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -78,6 +82,7 @@ class CardTopUpFragment : Fragment() {
             studentID = 0
             parentID = 0
             sent = false
+            watch?.cancel()
             binding.etAmount.text?.clear()
             CardFormUi.result(binding.tvResult, null, ok = true)
             loadStudent(model.data.reg_number)
@@ -154,10 +159,35 @@ class CardTopUpFragment : Fragment() {
                 // One request per tap, so a second press can't send a second payment prompt.
                 sent = true
                 CardFormUi.result(binding.tvResult, getString(R.string.topup_sent, phone), ok = true)
+                if (res.data.id > 0) watchTopup(res.data.id)
             } else {
                 CardFormUi.result(binding.tvResult, res.message.ifBlank { getString(R.string.card_form_failed) }, ok = false)
             }
             updateButton()
+        }
+    }
+
+    // Every 2 s for up to 3 minutes; the API asks the gateway each time, so the result shows seconds after approval.
+    private fun watchTopup(id: Int) {
+        watch?.cancel()
+        watch = viewLifecycleOwner.lifecycleScope.launch {
+            val token = DbUtility().dbBuilder(requireContext()).loggedInUserDao().getLastLogin().token
+            repeat(90) {
+                delay(2000)
+                val status = PaymentRepository().topupStatus(token, id)?.uppercase() ?: return@repeat
+                if (_binding == null) return@launch
+                when (status) {
+                    "PENDING" -> Unit
+                    "SUCCESSFUL" -> {
+                        CardFormUi.result(binding.tvResult, getString(R.string.topup_paid), ok = true)
+                        return@launch
+                    }
+                    else -> {
+                        CardFormUi.result(binding.tvResult, getString(R.string.topup_not_paid), ok = false)
+                        return@launch
+                    }
+                }
+            }
         }
     }
 
