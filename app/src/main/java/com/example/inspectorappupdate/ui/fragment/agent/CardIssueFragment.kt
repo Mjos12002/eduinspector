@@ -30,6 +30,7 @@ import com.example.inspectorappupdate.R
 import com.example.inspectorappupdate.SearchStudentActivity.Companion.appDatabase
 import com.example.inspectorappupdate.databinding.FragmentCardIssueBinding
 import com.example.inspectorappupdate.model.agent.AgentStudent
+import com.example.inspectorappupdate.model.agent.CardFee
 import com.example.inspectorappupdate.repository.agent.AgentResult
 import com.example.inspectorappupdate.utils.signOut
 import com.example.inspectorappupdate.viewmodel.agent.CardIssueViewModel
@@ -360,8 +361,17 @@ class CardIssueFragment : Fragment() {
             student?.className?.let { "Class: $it" },
             "New card: ${tail(viewModel.tappedUid.orEmpty())}",
             "PIN: chosen by the student",
+            viewModel.fee?.let { feeLine(it) },
             "The card will be active straight away and listed as issued by you."
         ).joinToString("\n")
+    }
+
+    private fun feeLine(fee: CardFee): String {
+        val amount = "RWF " + java.text.NumberFormat.getIntegerInstance().format(fee.amount.toLong())
+        return when (fee.kind) {
+            "replacement" -> "Replacement fee: $amount is added to the school's card fees."
+            else -> "New card fee: $amount is added to the school's card fees (covers this year)."
+        }
     }
 
     private fun goBack() {

@@ -76,7 +76,14 @@ data class ChipCheckRequest(
 data class ChipCheck(
     @SerializedName("ok") val ok: Boolean,
     @SerializedName("code") val code: String?,
-    @SerializedName("message") val message: String?
+    @SerializedName("message") val message: String?,
+    @SerializedName("fee") val fee: CardFee? = null
+)
+
+/** What issuing the card adds to the school's card fees: issuance or replacement, in RWF. */
+data class CardFee(
+    @SerializedName("kind") val kind: String,
+    @SerializedName("amount") val amount: Double
 )
 
 data class IssueCardRequest(

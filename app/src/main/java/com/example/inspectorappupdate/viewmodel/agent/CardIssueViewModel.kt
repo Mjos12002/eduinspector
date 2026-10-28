@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.inspectorappupdate.model.agent.AgentStudent
+import com.example.inspectorappupdate.model.agent.CardFee
 import com.example.inspectorappupdate.model.agent.IssueResult
 import com.example.inspectorappupdate.repository.agent.AgentRepository
 import com.example.inspectorappupdate.repository.agent.AgentResult
@@ -50,6 +51,10 @@ class CardIssueViewModel : ViewModel() {
     val pinDigits: LiveData<Int> = _pinDigits
     private val _pinRepeat = MutableLiveData(false)
     val pinRepeat: LiveData<Boolean> = _pinRepeat
+
+    // The card fee this issue adds to the school's statement, from the card check.
+    var fee: CardFee? = null
+        private set
 
     private val _issued = MutableLiveData<IssueResult?>(null)
     val issued: LiveData<IssueResult?> = _issued
@@ -125,6 +130,7 @@ class CardIssueViewModel : ViewModel() {
         viewModelScope.launch {
             when (val result = repository.check(token, current.id, uid, chip?.signature)) {
                 is AgentResult.Success -> if (result.data.ok) {
+                    fee = result.data.fee
                     tappedUid = uid
                     tappedChip = chip?.takeIf { it.uid == uid }
                     clearPin()
