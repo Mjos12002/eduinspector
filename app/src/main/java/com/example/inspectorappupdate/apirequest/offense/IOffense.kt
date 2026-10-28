@@ -18,6 +18,6 @@ interface IOffense {
 
     @FormUrlEncoded
     @POST("api/student-offense")
-    suspend fun createStudentOffense(@Header("Authorization") bearer: String, @Field("student_id") student_id: Int, @Field("offense_type_id") offense_type_id: Int, @Field("academic_year_id") academic_year_id: Int, @Field("term_id") term_id: Int, @Field("offense_date") offense_date: String, @Field("institute_id") institute_id: Int): Response<StudentOffenseCreationModel>
+    suspend fun createStudentOffense(@Header("Authorization") bearer: String, @Field("student_id") student_id: Int, @Field("offense_type_id") offense_type_id: Int, @Field("academic_year_id") academic_year_id: Int?, @Field("term_id") term_id: Int?, @Field("offense_date") offense_date: String, @Field("institute_id") institute_id: Int, @Field("card_number") card_number: String?): Response<StudentOffenseCreationModel>
 
 }

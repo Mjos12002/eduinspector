@@ -14,5 +14,8 @@ data class CardModelData(
     val payment_status: String,
     val school_fees_balance: Double,
     val insurance_fees_balance: Double,
-    val student_id: Int
+    val student_id: Int,
+    // Signed link to the student's photo, relative to the API host; usable = active and in date.
+    val photo: String? = null,
+    val usable: Boolean? = null
 )

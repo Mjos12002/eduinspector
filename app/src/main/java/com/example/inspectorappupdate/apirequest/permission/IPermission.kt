@@ -20,6 +20,7 @@ interface IPermission {
     suspend fun list(
         @Header("Authorization") bearer: String,
         @Query("active_on") day: String,
+        @Query("mine") mine: Int? = null,
         @Query("per_page") perPage: Int = 100
     ): Response<PermissionListResponse>
 

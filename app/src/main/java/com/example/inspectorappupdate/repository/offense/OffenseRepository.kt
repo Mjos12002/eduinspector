@@ -47,10 +47,11 @@ class OffenseRepository() {
 
     // Create the student offense
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun createStudentOffense(bearer: String, studentID: Int, offenseTypeID: Int, academicYearID: Int, termID: Int, offenseDate: String, instituteID: Int): StudentOffenseCreationModel{
+    suspend fun createStudentOffense(bearer: String, studentID: Int, offenseTypeID: Int, academicYearID: Int, termID: Int, offenseDate: String, instituteID: Int, cardNumber: String? = null): StudentOffenseCreationModel{
         var resp: StudentOffenseCreationModel
         try {
-            val res = offenseAPIInterface.createStudentOffense("Bearer $bearer", studentID, offenseTypeID, academicYearID, termID, offenseDate, instituteID)
+            val res = // Without a known term the server uses the current one.
+            offenseAPIInterface.createStudentOffense("Bearer $bearer", studentID, offenseTypeID, academicYearID.takeIf { it > 0 }, termID.takeIf { it > 0 }, offenseDate, instituteID, cardNumber)
             Log.i("ITEM-SELECTED", "$res")
             resp = if (res.code() == 200 || res.code() == 201) {
                 res.body()!!

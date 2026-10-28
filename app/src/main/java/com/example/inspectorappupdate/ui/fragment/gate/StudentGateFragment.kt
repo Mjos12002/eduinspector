@@ -80,6 +80,13 @@ class StudentGateFragment : Fragment() {
         "DAY_CHECK_OUT" -> "CHECKED OUT"
         "CHECK_IN" -> "CHECKED IN"
         "CHECK_IN_LATE" -> "CHECKED IN · LATE"
+        "CHECK_IN_AGAIN" -> "BACK IN"
+        "ALREADY_CHECKED_IN" -> "ALREADY INSIDE"
+        "ALREADY_OUT" -> "ALREADY OUT"
+        "NO_PERMISSION" -> "NO PERMISSION"
+        "PERMISSION_NOT_STARTED" -> "PERMISSION NOT STARTED"
+        "PERMISSION_EXPIRED" -> "PERMISSION EXPIRED"
+        "PERMISSION_CANCELLED" -> "PERMISSION CANCELLED"
         else -> if (decision.allowed) "RECORDED" else "NOT ALLOWED"
     }
 

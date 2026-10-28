@@ -22,8 +22,8 @@ class PermissionRepository {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun list(token: String, day: String): VisitorResult<List<Permission>> =
-        call { api.list("Bearer $token", day) }.map { it.data?.permissions.orEmpty() }
+    suspend fun list(token: String, day: String, mine: Boolean = false): VisitorResult<List<Permission>> =
+        call { api.list("Bearer $token", day, if (mine) 1 else null) }.map { it.data?.permissions.orEmpty() }
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun create(token: String, request: CreatePermissionRequest): VisitorResult<String?> =

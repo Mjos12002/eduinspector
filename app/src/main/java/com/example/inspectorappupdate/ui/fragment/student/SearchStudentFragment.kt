@@ -1,5 +1,7 @@
 package com.example.inspectorappupdate.ui.fragment.student
 
+import com.example.inspectorappupdate.enums.HttpRequestEnums
+import com.squareup.picasso.Picasso
 import com.example.inspectorappupdate.utils.signOut
 import android.graphics.Color
 import android.os.Build
@@ -60,6 +62,8 @@ class SearchStudentFragment : Fragment() {
     private var cardHeld = false
     private var fault: OffenseTypeData? = null
     private var saving = false
+    private var tappedCard: String? = null
+    private var tappedPhoto: String? = null
     private var resetJob: Job? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -124,6 +128,13 @@ class SearchStudentFragment : Fragment() {
                 showWaiting(getString(R.string.discipline_card_unknown), error = true)
                 return@observe
             }
+            // A blocked or expired card records nothing; the server refuses it too.
+            if (card.data.usable == false || !card.data.card_status.equals("active", ignoreCase = true)) {
+                showWaiting(getString(R.string.discipline_card_unusable, card.data.card_status.lowercase()), error = true)
+                return@observe
+            }
+            tappedCard = card.data.card_number
+            tappedPhoto = card.data.photo
             binding.tvTapPrompt.text = "${card.data.first_name} ${card.data.last_name}"
             lifecycleScope.launch { studentViewModel.searchStudentByRegNumber(userToken, card.data.reg_number) }
         }
@@ -154,6 +165,8 @@ class SearchStudentFragment : Fragment() {
         Keyboard.hide(requireActivity())
         resetJob?.cancel()
         fromCard = false
+        tappedCard = null
+        tappedPhoto = null
         showWaiting(getString(R.string.discipline_looking_up))
         lifecycleScope.launch { studentViewModel.searchStudentByRegNumber(userToken, regNumber) }
     }
@@ -183,6 +196,7 @@ class SearchStudentFragment : Fragment() {
         binding.llStudent.visibility = View.VISIBLE
         binding.tvStudentName.text = "${found.first_name} ${found.last_name}"
         binding.tvStudentRegNumber.text = getString(R.string.discipline_reg, found.reg_number)
+        showPhoto(found.photo ?: tappedPhoto)
         binding.tvTotalDeductionValue.text = "…"
         binding.tvLastOffense.text = ""
         loadTermFaults(found.student!!.id)
@@ -255,7 +269,8 @@ class SearchStudentFragment : Fragment() {
         binding.btnBack.visibility = View.GONE
         lifecycleScope.launch {
             val date = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-            val resp = OffenseRepository().createStudentOffense(userToken, record.id, chosen.id, academicYearID, academicTermID, date, school)
+            val resp = OffenseRepository().createStudentOffense(userToken, record.id, chosen.id, academicYearID, academicTermID, date, school,
+                tappedCard.takeIf { fromCard })
             saving = false
             if (_binding == null) return@launch
             if (resp.error) {
@@ -265,13 +280,23 @@ class SearchStudentFragment : Fragment() {
                 showResult(resp.message.ifBlank { getString(R.string.discipline_failed) }, ok = false)
             } else {
                 binding.btnConfirm.visibility = View.GONE
-                showResult(getString(R.string.discipline_recorded), ok = true)
+                val left = resp.data?.current_marks
+                showResult(if (left != null) getString(R.string.discipline_recorded_marks, left, resp.data.initial_marks ?: 40)
+                    else getString(R.string.discipline_recorded), ok = true)
                 loadTermFaults(record.id)
                 // A typed search has no card to take away, so it clears on its own.
                 if (!fromCard || !cardHeld) resetSoon()
             }
             if (fromCard && !cardHeld && resp.error) resetSoon()
         }
+    }
+
+    // The photo link is relative to the API host and signed, so it opens without the sign-in token.
+    private fun showPhoto(photo: String?) {
+        binding.ivStudentPhoto.setImageDrawable(null)
+        val path = photo?.takeIf { it.isNotBlank() } ?: return
+        val url = if (path.startsWith("http")) path else HttpRequestEnums.BASEURL.value.trimEnd('/') + "/" + path.trimStart('/')
+        Picasso.get().load(url).fit().centerCrop().into(binding.ivStudentPhoto)
     }
 
     private fun showResult(message: String, ok: Boolean) {

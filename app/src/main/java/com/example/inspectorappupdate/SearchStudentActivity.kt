@@ -248,8 +248,8 @@ class SearchStudentActivity : AppCompatActivity() {
                 return
             }
 
-            // Discipline and Cards keep the student up while the card is held, and clear after it is taken away.
-            val holdsCard = navController.currentDestination?.id in listOf(R.id.SearchStudentFragment, R.id.CardToolsFragment)
+            // Discipline, Cards and Permissions read the chip and know when the card is taken away.
+            val holdsCard = navController.currentDestination?.id in listOf(R.id.SearchStudentFragment, R.id.CardToolsFragment, R.id.PermissionsFragment)
             if (tag != null && holdsCard) {
                 val uid = tag.id.toHexString()
                 cardViewModel.onCardPresent()
@@ -263,7 +263,12 @@ class SearchStudentActivity : AppCompatActivity() {
                     val chip = readChip(tag)
                     cardViewModel.getCardDetails(token, uid)
                     watchCardPresence(tag) { cardViewModel.onCardRemoved() }
-                    val state = chipRepository.tap(token, chip, if (navController.currentDestination?.id == R.id.CardToolsFragment) "cards" else "discipline")
+                    val context = when (navController.currentDestination?.id) {
+                        R.id.CardToolsFragment -> "cards"
+                        R.id.PermissionsFragment -> "permissions"
+                        else -> "discipline"
+                    }
+                    val state = chipRepository.tap(token, chip, context)
                     if (chip.protection == CardChip.Protection.OPEN || (state != null && !state.setup && chip.ev1)) setUpChip(tag, token, chip)
                 }
                 return

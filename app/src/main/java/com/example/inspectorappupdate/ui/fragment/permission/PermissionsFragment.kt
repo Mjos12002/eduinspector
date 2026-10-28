@@ -1,5 +1,6 @@
 package com.example.inspectorappupdate.ui.fragment.permission
 
+import com.example.inspectorappupdate.utils.AppRole
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -376,7 +377,7 @@ class PermissionsFragment : Fragment() {
     private fun withToken(block: (String) -> Unit) {
         viewLifecycleOwner.lifecycleScope.launch {
             val current = token ?: try {
-                appDatabase.loggedInUserDao().getLastLogin().token.also { token = it }
+                appDatabase.loggedInUserDao().getLastLogin().also { viewModel.mineOnly = it.role == AppRole.INSPECTOR }.token.also { token = it }
             } catch (e: Exception) {
                 return@launch
             }

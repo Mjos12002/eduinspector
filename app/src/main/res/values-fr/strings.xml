@@ -172,4 +172,7 @@
     <string name="external">Visiteur</string>
     <string name="class_room_attendance_title">Presence en classe</string>
 
+    <string name="discipline_student_photo">Photo de l\'élève</string>
+    <string name="discipline_card_unusable">Cette carte est %1$s. Utilisez la carte active de l\'élève.</string>
+    <string name="discipline_recorded_marks">Faute enregistrée. Points de conduite restants : %1$d sur %2$d</string>
 </resources>

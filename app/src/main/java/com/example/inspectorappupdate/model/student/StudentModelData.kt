@@ -6,6 +6,7 @@ data class StudentModelData(
     val first_name: String,
     val last_name: String,
     val reg_number: String,
+    val photo: String? = null,
     val student: StudentRecordRef? = null
 )
 

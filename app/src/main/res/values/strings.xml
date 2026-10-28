@@ -314,4 +314,7 @@
     <string name="block_done">Card blocked</string>
     <string name="block_not_active">This card is %1$s, so it can\'t be blocked.</string>
     <string name="card_form_failed">Something went wrong. Check the connection and try again.</string>
+    <string name="discipline_student_photo">Student photo</string>
+    <string name="discipline_card_unusable">This card is %1$s. Use the student\'s active card.</string>
+    <string name="discipline_recorded_marks">Fault recorded. Conduct marks left: %1$d of %2$d</string>
 </resources>

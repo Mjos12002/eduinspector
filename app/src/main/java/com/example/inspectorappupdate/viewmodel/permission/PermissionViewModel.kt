@@ -46,11 +46,14 @@ class PermissionViewModel : ViewModel() {
         load(token)
     }
 
+    // Inspectors list the permissions they issued; admins the whole school's.
+    var mineOnly = false
+
     fun load(token: String) {
         val day = DAY.format(_day.value!!.time)
         _loading.value = true
         viewModelScope.launch {
-            _permissions.value = repository.list(token, day)
+            _permissions.value = repository.list(token, day, mineOnly)
             _loading.value = false
         }
     }
