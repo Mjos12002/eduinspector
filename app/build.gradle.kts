@@ -21,8 +21,8 @@ android {
         applicationId = "com.example.inspectorappupdate"
         minSdk = 24
         targetSdk = 36
-        versionCode = 102
-        versionName = "0.1.2"
+        versionCode = 103
+        versionName = "0.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
